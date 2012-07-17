@@ -68,16 +68,24 @@ function _metasystem_unset()
 	empty_function
 }
 
+function do_smartcd_install_templates()
+{
+	local src_dir=$1
+	local dst_dir=~/.smartcd/templates
+	if [[ -e $src_dir ]]; then
+		[[ ! -d $dst_dir ]] && mkdir -p $dst_dir
+		for name in `'ls' $src_dir`; do
+			echo "Installing smartcd template '$name' ..."
+			rm -f $dst_dir/$name
+			cp $src_dir/$name $dst_dir
+		done
+	fi
+}
+
 function smartcd_install_templates()
 {
-	local src_dir=$METASYSTEM_ROOT/templates/smartcd
-	local dst_dir=~/.smartcd/templates
-	[[ ! -d $dst_dir ]] && mkdir -p $dst_dir
-	for name in `'ls' $src_dir`; do
-		echo "Installing smartcd template '$name' ..."
-		rm -f $dst_dir/$name
-		cp $src_dir/$name $dst_dir
-	done
+	do_smartcd_install_templates $METASYSTEM_ROOT/templates/smartcd
+	do_smartcd_install_templates $METASYSTEM_LOCAL_ROOT/templates/smartcd
 }
 
 alias scd-ee='smartcd edit enter'
