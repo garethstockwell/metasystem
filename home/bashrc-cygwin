@@ -1,0 +1,38 @@
+# bashrc-cygwin
+
+#------------------------------------------------------------------------------
+# Path handling
+#------------------------------------------------------------------------------
+
+function drivepath()
+{
+	local letter=$(driveletter $1)
+	[[ -n $letter ]] && echo /cygdrive/$letter
+}
+
+function driveletter()
+{
+	echo $1 | sed -e 's/\/cygdrive\/\([a-z]\).*/\1/'
+}
+
+function nativepath()
+{
+	[[ -n $1 ]] && cygpath -w $1
+}
+
+function unixpath()
+{
+	[[ -n $1 ]] && cygpath $1
+}
+
+
+#------------------------------------------------------------------------------
+# Custom mounts
+#------------------------------------------------------------------------------
+
+if [[ -z `mount | grep desktop` ]]; then
+	desktop=`cygpath -D -w`
+	echo "Desktop = $desktop"
+	mount "$desktop" /desktop
+fi
+

@@ -1,0 +1,67 @@
+# opt/config
+
+#------------------------------------------------------------------------------
+# Define which packages are enabled
+#------------------------------------------------------------------------------
+
+METASYSTEM_OPT_ANDROID=yes
+METASYSTEM_OPT_SYMBIAN=
+METASYSTEM_OPT_QT=yes
+
+METASYSTEM_OPT_CD=dirinfo
+[[ "$METASYSTEM_OS" != "windows" ]] && METASYSTEM_OPT_CD=smartcd
+
+
+#------------------------------------------------------------------------------
+# Stub functions
+#------------------------------------------------------------------------------
+
+function metasystem_parse_dirinfo()
+{
+	empty_function
+}
+
+function _metasystem_cd()
+{
+	[[ $1 != -metasystem-init ]] && builtin cd $*
+}
+
+function _metasystem_export()
+{
+	export "$@"
+}
+
+function _metasystem_unset()
+{
+	unset "$@"
+}
+
+function autostash()
+{
+	export "$@"
+}
+
+
+#------------------------------------------------------------------------------
+# Exported functions
+#------------------------------------------------------------------------------
+
+# Called by smartcd/templates/metasystem
+export -f metasystem_parse_dirinfo
+
+# Called from scripts written by metasystem-*.py
+export -f _metasystem_export
+export -f _metasystem_unset
+
+
+#------------------------------------------------------------------------------
+# Source
+#------------------------------------------------------------------------------
+
+[[ -n $METASYSTEM_OPT_ANDROID ]] && source $METASYSTEM_HOME/opt/android
+[[ -n $METASYSTEM_OPT_SYMBIAN ]] && source $METASYSTEM_HOME/opt/symbian
+[[ -n $METASYSTEM_OPT_QT ]] && source $METASYSTEM_HOME/opt/qt
+
+[[ $METASYSTEM_OPT_CD == dirinfo ]] && source $METASYSTEM_HOME/opt/cd-dirinfo
+[[ $METASYSTEM_OPT_CD == smartcd ]] && source $METASYSTEM_HOME/opt/cd-smartcd
+

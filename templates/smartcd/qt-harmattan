@@ -1,0 +1,47 @@
+########################################################################
+# This is a smartcd template.  Edit this file to create a named
+# configuration you can copy to any number of directories.  This is
+# useful if you often use the same settings in different directories
+# but with minor differences.
+#
+# The string __PATH__ will be replaced with the directory being
+# configured when this template is installed, so you can set variables:
+#
+#    autostash PATH=__PATH__/bin:$PATH
+#
+# This template is named 'qt-harmattan'
+########################################################################
+
+# Enter any bash_enter commands below here: (leave this line!)
+#------------------------------------------------------------------------------
+# qt-harmattan
+#------------------------------------------------------------------------------
+
+# MADDE
+echo -e "\n${NAKED_LIGHT_GREEN}Sourcing setup-madde-toolchain.sh ...${NAKED_NO_COLOR}"
+autostash PATH # comment out if using qt5 template (already autostashes PATH)
+autostash PKG_CONFIG_LIBDIR
+autostash PKG_CONFIG_SYSROOT_DIR
+autostash SYSROOT_DIR
+autostash custom_postfix
+autostash custom_target_name
+autostash mad_admin
+autostash mad_install_dir
+autostash mad_target_admin
+autostash possible_madde_paths
+autostash possible_path
+autostash repo_base
+autostash sysroot_dir
+source ~/git/github/resworb-scripts/setup-madde-toolchain.sh
+
+# Uncomment according to Qt version
+#autostash QT_HARMATTAN_PREFIX=/home/user/qt4
+#autostash QT_HARMATTAN_PREFIX=/home/user/qt5
+
+
+# Enter any bash_leave commands below here: (leave this line!)
+#------------------------------------------------------------------------------
+# qt-harmattan
+#------------------------------------------------------------------------------
+
+

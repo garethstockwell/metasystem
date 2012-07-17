@@ -1,0 +1,13 @@
+# android-app-enter
+
+echo -e "\n${NAKED_LIGHT_GREEN}Adding Android tools to PATH${NAKED_NO_COLOR}"
+autostash ANDROID_SDK_DIR=~/work/local/sdks/android/aosp
+autostash PATH=$ANDROID_SDK_DIR/platform-tools:$PATH
+autostash PATH=$ANDROID_SDK_DIR/tools:$PATH
+
+# Used by metasystem_android_emulator()
+autostash ANDROID_SDCARD_IMG=__PATH__/data/sdcard.img
+
+# Alias to function exported from bashrc
+alias emulator=metasystem_android_emulator
+

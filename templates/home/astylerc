@@ -1,0 +1,34 @@
+#
+# Config file for ASTYLE (http://sourceforge.net/projects/astyle/)
+# for formatting C++ code according to Symbian coding conventions
+#
+
+# Use C/C++ parser
+mode=c
+
+# Place opening bracket on a new line (ANSI C/C++ style)
+brackets=break
+
+# Add extra indentation to brackets so they align with following code block
+indent-brackets
+
+# Put empty lines around if/while blocks
+break-blocks
+
+# Don't break one-line blocks (e.g. inline function bodies in header files)
+one-line=keep-blocks
+
+# Place whitespace padding around operators
+# This is not strictly speaking a Symbian convention; just a personal preference
+pad=oper
+
+# Indent with tabs; treat each tab as 4 spaces
+indent=tab=4
+
+# Indent switch blocks
+indent-switches
+
+# Produces clearer relationship betwen multi-line conditionals and the following
+# code
+min-conditional-indent=0
+

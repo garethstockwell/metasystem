@@ -1,0 +1,84 @@
+# bashrc-cbr
+
+#------------------------------------------------------------------------------
+# CBR
+#------------------------------------------------------------------------------
+
+CBR_TOOLS="envinfo getenv cleanenv getrel preprel diffrel diffenv \
+	removerel makeenv importrel exportrel listcomponents latestver \
+	viewnotes blddocs getsource bininfo sourceinfo importenv \
+	exportenv pullenv pullrel pushrel importenv exportenv"
+
+for tool in $CBR_TOOLS
+do
+	alias $tool="winwrapper $tool"
+done
+unset tool
+
+# Slightly modified from Mike's version to due differnces in environment setup
+function get_current_drive()
+{
+	current_drive=`cygpath -w $PWD | sed -e 's/:.*//'`
+}
+
+# Slow, exhaustive version
+function get_cbr_list_archive()
+{
+	reltools archives archive_path list
+
+	# Get the location of reltools.ini
+	get_current_drive
+	reltools=/cygdrive/${current_drive}/epoc32/relinfo/reltools.ini
+
+	# only set cbr_list once
+	test "x$cbr_list" == "x" || return 1
+
+	echo -e "\nGetting full CBR list ..."
+
+	# archive_path directories should not have spaces or tabs in them
+	archives=`GREP_OPTIONS= grep ^archive_path "$reltools" | sed -e 's/^archive_path[ \t]*[^ \t]*[ \t]*//' | sed -e 's/[ \t].*$//'`
+	for a in $archives
+	do
+		echo $a
+		archive_path="`cygpath -ua $a`"
+		list="$list `ls $archive_path`"
+	done
+
+	# drop out duplicates
+	cbr_list=`echo $list | sort | uniq`
+}
+
+# Fast version
+function get_cbr_list_env()
+{
+	cbr_list=`envinfo | awk '{ print $1 }' | tail -n+6`
+}
+
+function complete_cbr()
+{
+	cur=${COMP_WORDS[COMP_CWORD]}
+	n=$COMP_CWORD
+
+	get_cbr_list_env
+
+	# ignore command line options
+	case ${COMP_WORDS[1]} in
+	-*)
+		let n--
+		;;
+	*)
+		;;
+	esac
+
+	case $n in
+	1)
+		COMPREPLY=( $( compgen -W "$cbr_list" -- "$cur" ) )
+		;;
+	*)
+		;;
+	esac
+	return 0
+}
+
+complete -F complete_cbr cbr
+

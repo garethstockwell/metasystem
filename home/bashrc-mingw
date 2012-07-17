@@ -1,0 +1,59 @@
+# bashrc-mingw
+
+#------------------------------------------------------------------------------
+# Path handling
+#------------------------------------------------------------------------------
+
+function drivepath()
+{
+	local letter=$(driveletter $1)
+	[[ -n $letter ]] && echo /$letter
+}
+
+function driveletter()
+{
+	echo $1 | sed -e 's/\/\([a-zA-Z]\).*/\1/'
+}
+
+function nativepath()
+{
+	echo $1 | sed -e 's/^\/\([a-zA-Z]\)\//\1:\//'
+}
+
+function unixpath()
+{
+	echo $1 | sed -e 's/^\([a-zA-Z]\):/\/\1/' -e 's/\\/\//g'
+}
+
+function nativepathlist()
+{
+	echo ":$*" | sed \
+		-e 's/\\/\//g' \
+		-e 's/:/;/g' \
+		-e 's/;\([a-zA-Z]\);\//;\1:\//g' \
+		-e 's/;\/\([a-zA-Z]\)\//;\1:\//g' \
+		-e 's/^;//' \
+		-e 's/\//\\/g'
+}
+
+function unixpathlist()
+{
+	echo ";$*" | sed \
+		-e 's/;\([a-zA-Z]\):[\\\/]/:\/\1\//g' \
+		-e 's/^://'
+}
+
+function path_remove_mingw()
+{
+	local path=$PATH
+	path=$(path_remove /usr/local/bin $path)
+	path=$(path_remove /mingw/bin $path)
+	path=$(path_remove /bin $path)
+	path=$(path_remove $MINGW_HOME/bin $path)
+	path=$(path_remove $(npath $MINGW_HOME/bin) $path)
+	echo $path
+}
+
+export -f nativepathlist
+export -f path_remove_mingw
+

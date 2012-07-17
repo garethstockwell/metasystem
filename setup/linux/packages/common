@@ -1,0 +1,12 @@
+#----------------------------------------------------------------------
+# Common packages
+#----------------------------------------------------------------------
+
+include android-dev
+include graphics-dev
+include linux-dev
+include misc
+include qt4-dev
+include qt5-dev
+include unix-dev
+

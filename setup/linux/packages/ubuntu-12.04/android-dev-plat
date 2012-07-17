@@ -1,0 +1,28 @@
+#----------------------------------------------------------------------
+# Android development
+#----------------------------------------------------------------------
+
+# http://source.android.com/source/initializing.html
+bison
+build-essential
+curl
+flex
+git-core
+g++-multilib
+gnupg
+gperf
+libc6-dev
+libgl1-mesa-dev:i386
+libncurses5-dev:i386
+libreadline6-dev:i386
+libx11-dev:i386
+libxml2-utils
+mingw32
+openjdk-6-jdk
+python-markdown
+tofrodos
+x11proto-core-dev
+xsltproc
+zip
+zlib1g-dev:i386
+

@@ -1,0 +1,75 @@
+#----------------------------------------------------------------------
+# Qt4 development (individual package list)
+#----------------------------------------------------------------------
+
+# Bearer Management
+network-manager-dev
+
+# Bluetooth
+libbluetooth-dev
+
+# CUPS
+libcups2-dev
+
+# DBus
+dbus
+
+# GLib
+libglib2.0-dev
+
+# GTK+
+libgtk2.0-dev
+
+# Multimedia
+gstreamer0.10-ffmpeg
+gstreamer0.10-plugins-base
+gstreamer0.10-plugins-good
+gstreamer-tools
+libasound2-dev
+libgstreamer0.10-dev
+libgstreamer-plugins-base0.10-dev
+phonon-backend-gstreamer
+
+# OpenGL
+libgl1-mesa-dev
+libglu1-mesa-dev
+
+# Service Framework
+libsqlite3-dev
+
+# SSL
+libssl-dev
+
+# System Information
+hal
+libhal-dev
+network-manager-dev
+
+# X11
+libx11-dev
+libxau-dev
+libxaw7-dev
+libxcb1-dev
+libxcomposite-dev
+libxcursor-dev
+libxdamage-dev
+libxdmcp-dev
+libxext-dev
+libxfixes-dev
+libxfont-dev
+libxft-dev
+libxi-dev
+libxinerama-dev
+libxkbfile-dev
+libxmu-dev
+libxmuu-dev
+libxpm-dev
+libxrandr-dev
+libxrender-dev
+libxres-dev
+libxss-dev
+libxt-dev
+libxtst-dev
+libxv-dev
+libxvmc-dev
+

@@ -1,0 +1,31 @@
+########################################################################
+# This is a smartcd template.  Edit this file to create a named
+# configuration you can copy to any number of directories.  This is
+# useful if you often use the same settings in different directories
+# but with minor differences.
+#
+# The string __PATH__ will be replaced with the directory being
+# configured when this template is installed, so you can set variables:
+#
+#    autostash PATH=__PATH__/bin:$PATH
+#
+# This template is named 'wayland'
+########################################################################
+
+# Enter any bash_enter commands below here: (leave this line!)
+#------------------------------------------------------------------------------
+# wayland
+#------------------------------------------------------------------------------
+
+autostash WAYLAND_PREFIX=__PATH__/install
+autostash LD_LIBRARY_PATH=$WAYLAND_PREFIX/lib
+autostash PKG_CONFIG_PATH=$WAYLAND_PREFIX/lib/pkgconfig:$WAYLAND_PREFIX/share/pkgconfig
+autostash ACLOCAL="aclocal -I $WAYLAND_PREFIX/share/aclocal"
+
+
+# Enter any bash_leave commands below here: (leave this line!)
+#------------------------------------------------------------------------------
+# wayland
+#------------------------------------------------------------------------------
+
+

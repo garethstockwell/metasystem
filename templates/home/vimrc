@@ -1,0 +1,529 @@
+" ============================================================================
+" vimrc
+" http://www.ashberg.de/vim/vimrc.html
+" http://amix.dk/vim/vimrc.html
+" ============================================================================
+
+" ----------------------------------------------------------------------------
+" General setup
+" ----------------------------------------------------------------------------
+
+" enable backspace to delete anyting (includes \n) in insert mode
+set backspace=2
+
+" use vim, not vi
+set nocompatible
+
+" map leader to ,
+let mapleader=","
+
+" allow current buffer to go to the background without first writing to disk
+set hidden
+
+" maintain at least 3 lines' context around the cursor
+set scrolloff=3
+
+" ----------------------------------------------------------------------------
+" Text-Formatting, Identing, Tabbing
+" ----------------------------------------------------------------------------
+
+" autoindenting (local to buffer)
+set ai
+
+" smartindenting (clever autoindenting)
+set si
+
+" number of spaces the tab stands for
+set tabstop=4
+
+" number of spaces used for (auto)indenting
+set shiftwidth=4
+
+" a <tab> in an indent insets 'shiftwidth' spaces (not tabstop)
+set smarttab
+
+" if non-zero, number of spaces to insert for a <tab>
+set softtabstop=4
+
+" enable specific indenting for c-code and others
+set cindent
+
+" and here some nice options for cindenting
+set cinoptions={.5s,+.5s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
+
+" now real wrap during insert (enable/override this when using as mail-editor)
+set tw=0
+
+" use full featured format-options. see "help fo-table for help
+if v:version >= 600
+    set formatoptions=tcrqn2
+else
+    " vim 5 doesn't know r/n
+    set formatoptions=tcq2
+endif
+
+" define what are comments
+set com& " reset to default
+set com^=sr:*\ -,mb:*\ \ ,el:*/ com^=sr://\ -,mb://\ \ ,el:///
+
+" auto tw=78 when textmode
+if has("autocmd")
+    autocmd FileType text setlocal textwidth=78
+    autocmd FileType text set nocindent
+endif
+
+set textwidth=80
+
+" ----------------------------------------------------------------------------
+" Searching, substituting
+" ----------------------------------------------------------------------------
+
+" change the way backslashes are used in search patterns
+set magic
+
+" begin search at top when EOF reached
+set wrapscan
+
+" jump to matches during entering the pattern
+set sm
+
+" highlight all matches...
+set hlsearch
+
+" ...and also during entering the pattern
+set incsearch
+
+" don't remember absence of g and s suffixes on :%s commands
+set noedcompatible
+
+" ----------------------------------------------------------------------------
+" Highlighting, Colors, Fonts
+" ----------------------------------------------------------------------------
+
+" when we have a colored terminal or gui...
+if &t_Co > 2 || has("gui_running")
+    " ...then use highlighting
+    syntax on
+endif
+
+if has("gui_running")
+    "columns
+    set co=98
+    "lines
+    set lines=41
+    if has("win32")
+        set guifont=Fixedsys:h9:cANSI
+        "set guifont=Courier:h10:cANSI
+    else
+        "set gfn=-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-15
+        "set gfn=Courier\ New\ 12
+        "set gfn=Nimbus\ Mono\ L\ 12
+    endif
+    "colorscheme morning
+endif
+
+" how many lines to sync backwards
+syn sync minlines=10000 maxlines=10000
+
+" how many lines to search backward after a jump to check syntax
+let c_minlines = 200
+
+" also highlight some things in comments
+let c_comment_strings = 1
+
+" use white background in GUI-Mode, black on console
+if has("gui_running")
+"|| &term=="xterm"
+    set bg=light
+else
+    set bg=dark
+endif
+
+" use css when converting syntax to html (2html.vim)
+let html_use_css = 1
+
+" ----------------------------------------------------------------------------
+" Menu
+" ----------------------------------------------------------------------------
+
+" use tab for auto-expansion in menus
+set wc=<TAB>
+
+" make menus tab-completable
+set wildmenu
+
+" how command line completion works
+set wildmode=list:longest,list:full
+
+" ignore some files for filename completion
+set wildignore=*.o,*.r,*.so,*.sl,*.tar,*.tgz
+
+" some filetypes got lower priority
+set su=.h,.bak,~,.o,.info,.swp,.obj
+
+" remember last 2000 typed commands
+set hi=2000
+
+" show cursor position below each window
+set ruler
+set ru
+
+" ----------------------------------------------------------------------------
+" Statusline
+" ----------------------------------------------------------------------------
+
+" shows the current status (insert, visual, ...) in statusline
+"set showmode
+
+" use shortest messages
+"set shm=a
+
+set statusline=%f "tail of the filename
+
+"display a warning if fileformat isnt unix
+set statusline+=%#warningmsg#
+set statusline+=%{&ff!='unix'?'['.&ff.']':''}
+set statusline+=%*
+
+"display a warning if file encoding isnt utf-8
+set statusline+=%#warningmsg#
+set statusline+=%{(&fenc!='utf-8'&&&fenc!='')?'['.&fenc.']':''}
+set statusline+=%*
+
+set statusline+=%h "help file flag
+set statusline+=%y "filetype
+set statusline+=%r "read only flag
+set statusline+=%m "modified flag
+
+"display a warning if &et is wrong, or we have mixed-indenting
+set statusline+=%#error#
+set statusline+=%{StatuslineTabWarning()}
+set statusline+=%*
+
+set statusline+=%= "left/right separator
+"set statusline+=%{StatuslineCurrentHighlight()}\ \ "current highlight
+set statusline+=%c, "cursor column
+set statusline+=%l/%L "cursor line/total lines
+set statusline+=\ %P "percent through file
+
+"recalculate the indenting warning when idle, and after saving
+autocmd cursorhold,bufwritepost * unlet! b:statusline_indenting_warning
+
+"return '[&et]' if &et is set wrong
+"return '[mixed-indenting]' if spaces and tabs are used to indent
+"return an empty string if everything is fine
+function! StatuslineTabWarning()
+    if !exists("b:statusline_indenting_warning")
+        let tabs = search('^\t', 'nw') != 0
+        let spaces = search('^ ', 'nw') != 0
+        if tabs && spaces
+            let b:statusline_indenting_warning = '[mixed-indenting]'
+        elseif (spaces && !&et) || (tabs && &et)
+            let b:statusline_indenting_warning = '[&et]'
+        else
+            let b:statusline_indenting_warning = ''
+        endif
+    endif
+    return b:statusline_indenting_warning
+endfunction
+
+" show always statusline of last window
+set laststatus=2
+
+" ----------------------------------------------------------------------------
+" Whitespace
+" ----------------------------------------------------------------------------
+
+" Highlight whitespace problems.
+" flags is '' to clear highlighting, or is a string to
+" specify what to highlight (one or more characters):
+"   e  whitespace at end of line
+"   i  spaces used for indenting
+"   s  spaces before a tab
+"   t  tabs not at start of line
+function! ShowWhitespace(flags)
+  let bad = ''
+  let pat = []
+  for c in split(a:flags, '\zs')
+    if c == 'e'
+      call add(pat, '\s\+$')
+    elseif c == 'i'
+      call add(pat, '^\t*\zs \+')
+    elseif c == 's'
+      call add(pat, ' \+\ze\t')
+    elseif c == 't'
+      call add(pat, '[^\t]\zs\t\+')
+    else
+      let bad .= c
+    endif
+  endfor
+  if len(pat) > 0
+    let s = join(pat, '\|')
+    exec 'syntax match ExtraWhitespace "'.s.'" containedin=ALL'
+  else
+    syntax clear ExtraWhitespace
+  endif
+  if len(bad) > 0
+    echo 'ShowWhitespace ignored: '.bad
+  endif
+endfunction
+
+function! ToggleShowWhitespace()
+  if !exists('b:ws_show')
+    let b:ws_show = 0
+  endif
+  if !exists('b:ws_flags')
+    let b:ws_flags = 'es'  " default (which whitespace to show)
+  endif
+  let b:ws_show = !b:ws_show
+  if b:ws_show
+    call ShowWhitespace(b:ws_flags)
+  else
+    call ShowWhitespace('')
+  endif
+endfunction
+
+nnoremap <Leader>ws :call ToggleShowWhitespace()<CR>
+highlight ExtraWhitespace ctermbg=red guibg=red
+
+:autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/ containedin=ALL
+
+function! FixWhitespace()
+  normal mZ
+  %s/\s\+$//e
+  if line("'Z") != line(".")
+    echo "Stripped trailing whitespace\n"
+  endif
+  normal `Z
+endfunction
+
+nnoremap <Leader>fws :call FixWhitespace()<CR>
+
+" automatically remove trailing whitespace before saving
+"autocmd BufWritePre *.c,*.cpp,*.h,*.hpp,*.inl,*.py,*.sh :call FixWhitespace()
+
+" ----------------------------------------------------------------------------
+" Insert-Mode Completion
+" ----------------------------------------------------------------------------
+
+" order and what to complete. see ":help complete" for info
+set complete=.,w,b,u,t,i
+
+" enable dictionary (add k to complete to scan dict when completing)
+" set dict=<FILENAME>
+" adjust case of a keyword completion match
+set infercase
+
+" showfulltag   when completing tags in Insert mode show only the name
+" not any arguments (when a c-funtion is inserted)
+set nosft
+
+" ----------------------------------------------------------------------------
+" Bracket expansion
+" ----------------------------------------------------------------------------
+
+vnoremap $1 <esc>`>a)<esc>`<i(<esc>
+vnoremap $2 <esc>`>a]<esc>`<i[<esc>
+vnoremap $3 <esc>`>a}<esc>`<i{<esc>
+vnoremap $$ <esc>`>a"<esc>`<i"<esc>
+vnoremap $q <esc>`>a'<esc>`<i'<esc>
+vnoremap $e <esc>`>a"<esc>`<i"<esc>
+
+" Show matching brackets
+set showmatch
+
+" ----------------------------------------------------------------------------
+" Python
+" ----------------------------------------------------------------------------
+
+let python_highlight_all = 1
+au FileType python syn keyword pythonDecorator True None False self
+
+au FileType python inoremap <buffer> $r return
+au FileType python inoremap <buffer> $i import
+au FileType python inoremap <buffer> $p print
+au FileType python inoremap <buffer> $f #--- PH ----------------------------------------------<esc>FP2xi
+
+au FileType python set expandtab
+
+" ----------------------------------------------------------------------------
+" File, backup, path
+" ----------------------------------------------------------------------------
+
+" number of characters typed to cause a swap file update
+set uc=50
+
+" make no backups
+set nobackup
+set nowb
+set noswapfile
+
+" ----------------------------------------------------------------------------
+" Windows specific
+" ----------------------------------------------------------------------------
+
+" first of all: we don't use "behave windows"
+" to try to get a better clipboard-handling
+" (we do it ourself)
+
+if has("win32")
+    if has("gui_running")
+        " alt jumps to menu
+        set winaltkeys=menu
+
+        " CTRL-Z is Undo; not in cmdline though
+        noremap <C-Z> u
+        inoremap <C-Z> <C-O>u
+
+        " CTRL-Y is Redo (although not repeat); not in cmdline though
+        noremap <C-Y> <C-R>
+        inoremap <C-Y> <C-O><C-R>
+
+        " CTRL-A is Select all
+        noremap <C-A> gggH<C-O>G
+        inoremap <C-A> <C-O>gg<C-O>gH<C-O>G
+        cnoremap <C-A> <C-C>gggH<C-O>G
+
+        " CTRL-Tab is Next window
+        noremap <C-Tab> <C-W>w
+        inoremap <C-Tab> <C-O><C-W>w
+        cnoremap <C-Tab> <C-C><C-W>w
+
+        " CTRL-v is paste
+        inoremap <C-v> <esc>"*p<return>i
+        noremap <C-v> "*p<return>
+
+        " CTRL-x is cut (in visual mode only)
+        vnoremap <C-x> "*d
+
+        " CTRL-c is copy (in visual mode only)
+        vnoremap <C-c> "*y
+
+        " make real <C-V> (visual block) as <C-Q> available
+        noremap <c-q> <c-v>
+        inoremap <C-Y> <C-Y>
+    endif
+endif
+
+" ----------------------------------------------------------------------------
+" UNIX specific
+" ----------------------------------------------------------------------------
+
+if has("unix")
+    set clipboard=autoselect
+    set shell=/bin/bash
+endif
+
+" ----------------------------------------------------------------------------
+" Special Features
+" ----------------------------------------------------------------------------
+
+if v:version >= 600
+    filetype on
+    filetype indent on
+else
+    filetype on
+endif
+
+if has("autocmd")
+    " try to auto-examine filetype
+    if v:version >= 600
+        filetype plugin indent on
+    endif
+
+    " try to restore last known cursor position
+    autocmd BufReadPost * if line("'\"") | exe "normal '\"" | endif
+
+    " autoread gzip-files
+    augroup gzip
+
+    " Remove all gzip autocommands
+    au!
+
+    " Enable editing of gzipped files
+    " set binary mode before reading the file
+    autocmd BufReadPre,FileReadPre      *.gz,*.bz2 set bin
+    autocmd BufReadPost,FileReadPost    *.gz call GZIP_read("gunzip")
+    autocmd BufReadPost,FileReadPost    *.bz2 call GZIP_read("bunzip2")
+    autocmd BufWritePost,FileWritePost  *.gz call GZIP_write("gzip")
+    autocmd BufWritePost,FileWritePost  *.bz2 call GZIP_write("bzip2")
+    autocmd FileAppendPre               *.gz call GZIP_appre("gunzip")
+    autocmd FileAppendPre               *.bz2 call GZIP_appre("bunzip2")
+    autocmd FileAppendPost              *.gz call GZIP_write("gzip")
+    autocmd FileAppendPost              *.bz2 call GZIP_write("bzip2")
+
+    " After reading compressed file: Uncompress text in buffer with "cmd"
+    fun! GZIP_read(cmd)
+        let ch_save = &ch
+        set ch=2
+        execute "'[,']!" . a:cmd
+        set nobin
+        let &ch = ch_save
+        execute ":doautocmd BufReadPost " . expand("%:r")
+    endfun
+
+    " After writing compressed file: Compress written file with "cmd"
+    fun! GZIP_write(cmd)
+        !mv <afile> <afile>:r
+        execute "!" . a:cmd . " <afile>:r"
+    endfun
+
+    " Before appending to compressed file: Uncompress file with "cmd"
+    fun! GZIP_appre(cmd)
+        execute "!" . a:cmd . " <afile>"
+        !mv <afile>:r <afile>
+    endfun
+    augroup END " gzip
+endif
+
+" ----------------------------------------------------------------------------
+" Mappings
+" ----------------------------------------------------------------------------
+
+" Appends / insert current date
+nmap _d "=strftime("%d.%m.%Y")<CR>p
+nmap _D "=strftime("%d.%m.%Y")<CR>P
+
+" Changes directory to the one of the current file
+nmap _h :cd%:h<CR>
+
+" Suppresses all spaces at end/beginning of lines
+nmap _s :%s/\s\+$//<CR>
+nmap _S :%s/^\s\+//<CR>
+
+" Converts file format to/from unix
+command Unixformat :set ff=unix
+command Dosformat :set ff=dos
+
+" Folkes magic # adder/remover
+vnoremap # :s/^\([ \t]*\)\(.*\)$/#\1\2<cr>:nohl<cr>:silent! set hl<CR>
+vnoremap 3 :s/^\([ \t]*\)#\(.*\)$/\1\2<cr>:nohl<cr>:silent! set hl<CR>
+
+" Allow shift-<arrow key> to select text
+set keymodel=startsel,stopsel
+
+" ----------------------------------------------------------------------------
+" Misc
+" ----------------------------------------------------------------------------
+
+" Remove the Windows ^M - when the encodings gets messed up
+noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
+
+"set foldclose=all
+set foldmethod=marker
+
+" enable modeline (e.g. # vim:ft=squid)
+set modeline
+
+" Enable mouse support in console
+set mouse=a
+
+" Line Numbers
+"set number
+
+" don't redraw when don't have to
+set lazyredraw
+
+
+
+

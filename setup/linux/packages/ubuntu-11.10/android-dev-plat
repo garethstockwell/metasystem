@@ -1,0 +1,39 @@
+#----------------------------------------------------------------------
+# Android development
+#----------------------------------------------------------------------
+
+# http://source.android.com/source/initializing.html
+bison
+build-essential
+curl
+flex
+g++-multilib
+git-core
+gnupg
+gperf
+ia32-libs
+lib32ncurses5-dev
+lib32readline5-dev
+lib32z-dev
+libc6-dev
+libgl1-mesa-dev
+libxml2-utils
+libx11-dev
+libx11-dev:i386
+mingw32
+python-markdown
+tofrodos
+x11proto-core-dev
+xsltproc
+zip
+zlib1g-dev
+
+# 4.0.3_r1 does not build using default gcc 4.6
+# http://www.android-dev.ro/2011/12/13/building-android-4-0-on-ubuntu-11-10/
+# Remember to set CC=gcc-4.4 CXX=g++-4.4, either in environment or on make
+# command
+gcc-4.4
+g++-4.4
+g++-4.4-multilib
+gcc-4.4-multilib
+

@@ -1,0 +1,11 @@
+
+[Desktop Entry]
+Type=Application
+Exec=gnome-terminal --geometry=100x50+100+50
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=gnome-terminal
+Name=gnome-terminal
+Comment[en_US]=
+Comment=

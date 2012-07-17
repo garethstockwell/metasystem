@@ -1,0 +1,16 @@
+compression yes
+SendEnv GIT_PUSH
+
+Host codereview.qt-project.org
+Port 29418
+User gastockw
+
+Host n9
+HostName 192.168.2.15
+User developer
+
+Host android-adb
+HostName 127.0.0.1
+Port 9999
+User root
+

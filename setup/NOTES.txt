@@ -1,0 +1,11 @@
+===============================================================================
+metasystem setup notes
+===============================================================================
+
+* MSYS /etc/fstab needs to be updated (see files/msys/etc/fstab)
+
+* Console2 setup
+	Shell commands:
+    * C:\MinGW\msys\1.0\bin\bash.exe --login -i
+	* C:\cygwin\Cygwin.bat
+
