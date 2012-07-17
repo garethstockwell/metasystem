@@ -1,7 +1,14 @@
 # android-plat-enter
 
 autostash PATH
-autostash ANDROID_SRC=__PATH__/android
+
+if [[ -d __PATH__/android ]]; then
+	autostash ANDROID_SRC=__PATH__/android
+else
+	autostash ANDROID_SRC=__PATH__
+fi
+
+autostash TOP=$ANDROID_SRC
 
 if [[ -e $ANDROID_SRC/build/envsetup.sh ]]; then
 	echo -e "\n${NAKED_LIGHT_GREEN}Sourcing build/envsetup.sh${NAKED_NO_COLOR}"
@@ -113,21 +120,29 @@ if [[ -e $ANDROID_SRC/build/envsetup.sh ]]; then
 	}
 
 	# Read in .lunch file if it exists
-	if [[ -e $LUNCH_CONFIG ]]; then
-		echo -en "\n${NAKED_LIGHT_GREEN}Applying lunch selection $(cat $LUNCH_CONFIG) ...${NAKED_NO_COLOR}"
-		lunch $(cat $LUNCH_CONFIG)
+	if [[ -n $ANDROID_AUTO_LUNCH ]]; then
+		if [[ -e $LUNCH_CONFIG ]]; then
+				echo -en "\n${NAKED_LIGHT_GREEN}Applying lunch selection $(cat $LUNCH_CONFIG) ...${NAKED_NO_COLOR}"
+				lunch $(cat $LUNCH_CONFIG)
+		else
+			echo -e "\n.lunch not found\n"
+		fi
+	else
+		echo
 	fi
 
 	# Kernel compilation variables
-	echo -e "${NAKED_LIGHT_GREEN}Setting kernel compilation environment variables${NAKED_NO_COLOR}"
-	autostash ARCH=arm
-	autostash SUBARCH=arm
-	autostash CROSS_COMPILE=arm-eabi-
-	echo "ARCH ....................... $ARCH"
-	echo "SUBARCH .................... $SUBARCH"
-	echo "CROSS_COMPILE .............. $CROSS_COMPILE"
-	autostash ANDROID_CROSS_COMPILER_VERSION=$(arm-eabi-gcc --version 2>/dev/null | head -n1 | awk '{print $3}')
-	echo "Cross compiler version ..... $ANDROID_CROSS_COMPILER_VERSION"
+	if [[ -n $ANDROID_SET_KERNEL_COMPILATION_VARS ]]; then
+		echo -e "${NAKED_LIGHT_GREEN}Setting kernel compilation environment variables${NAKED_NO_COLOR}"
+		autostash ARCH=arm
+		autostash SUBARCH=arm
+		autostash CROSS_COMPILE=arm-eabi-
+		echo "ARCH ....................... $ARCH"
+		echo "SUBARCH .................... $SUBARCH"
+		echo "CROSS_COMPILE .............. $CROSS_COMPILE"
+		autostash ANDROID_CROSS_COMPILER_VERSION=$(arm-eabi-gcc --version 2>/dev/null | head -n1 | awk '{print $3}')
+		echo "Cross compiler version ..... $ANDROID_CROSS_COMPILER_VERSION"
+	fi
 
 	echo
 

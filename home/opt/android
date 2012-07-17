@@ -246,6 +246,9 @@ export ANDROID_EMULATOR_SDCARD_SIZE=512M
 export ANDROID_SDK_DIR=~/work/local/sdks/android/aosp/sdk
 export ANDROID_NDK_DIR=~/work/local/sdks/android/aosp/ndk
 
+export ANDROID_AUTO_LUNCH=1
+export ANDROID_SET_KERNEL_COMPILATION_VARS=1
+
 
 #------------------------------------------------------------------------------
 # Exported functions

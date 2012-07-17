@@ -33,7 +33,7 @@ function make()
 	local sched=$METASYSTEM_MAKE_SCHED
 	local log=$METASYSTEM_MAKE_LOG
 	local measure_time=$METASYSTEM_MEASURE_TIME
-	local vanilla=
+	local vanilla=$METASYSTEM_MAKE_VANILLA
 	for x in "$@"; do
 		case $x in
 			-log | --log | -log=yes | --log=yes)
