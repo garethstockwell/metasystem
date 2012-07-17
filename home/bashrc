@@ -11,13 +11,20 @@
 # Ensure that we start in the home directory
 cd $HOME
 
-export METASYSTEM_ROOT=~/work/sync/git/metasystem
+# Find location of this script
+export METASYSTEM_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
+
 export METASYSTEM_BIN=$METASYSTEM_ROOT/bin
 export METASYSTEM_HOME=$METASYSTEM_ROOT/home
 export METASYSTEM_LIB=$METASYSTEM_ROOT/lib
 export METASYSTEM_TEMPLATES=$METASYSTEM_ROOT/templates
 
-metasystem_local_root=$METASYSTEM_ROOT/../metasystem-local
+if [[ -n $METASYSTEM_LOCAL_ROOT ]]; then
+	metasystem_local_root=$METASYSTEM_LOCAL_ROOT
+else
+	metasystem_local_root=$METASYSTEM_ROOT/../metasystem-local
+fi
+
 if [[ -d $metasystem_local_root ]]; then
 	export METASYSTEM_LOCAL_ROOT=$(cd $metasystem_local_root && pwd)
 	export METASYSTEM_LOCAL_BIN=$METASYSTEM_LOCAL_ROOT/bin
