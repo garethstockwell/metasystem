@@ -351,9 +351,12 @@ function setup_generate_dot_files()
 {
 	print_banner Generating .metasystem-xxx files
 	METASYSTEM_HOSTNAME=$HOSTNAME \
+	METASYSTEM_CONFIG=$METASYSTEM_TEMPLATES/local/config \
 		execute $METASYSTEM_BIN/metasystem-profile.py set --reset --auto all
-	execute $METASYSTEM_BIN/metasystem-id.py generate
-	execute $METASYSTEM_BIN/metasystem-tools.py generate
+	METASYSTEM_CONFIG=$METASYSTEM_TEMPLATES/local/config \
+		execute $METASYSTEM_BIN/metasystem-id.py generate
+	METASYSTEM_CONFIG=$METASYSTEM_TEMPLATES/local/config \
+		execute $METASYSTEM_BIN/metasystem-tools.py generate
 }
 
 function do_it()
