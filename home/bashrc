@@ -650,7 +650,7 @@ _metasystem_projectdirs_updated=
 function metasystem_project_env_prefix()
 {
 	local project=$1
-	echo METASYSTEM_PROJECT_$(uppercase ${project/-/_})
+	echo METASYSTEM_PROJECT_$(uppercase ${project//-/_})
 }
 
 function _metasystem_do_set_projectdirs()
