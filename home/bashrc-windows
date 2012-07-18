@@ -38,7 +38,7 @@ export PYTHON26DIR=$_METASYSTEM_APPS/python/2.6.6
 export PYTHON27DIR=$_METASYSTEM_APPS/python/2.7
 [[ ! -d $PYTHON27DIR ]] && PYTHON27DIR=$_METASYSTEM_APPS/python/2.7.2
 [[ ! -d $PYTHON27DIR ]] && PYTHON27DIR=$_METASYSTEM_APPS/python/2.7.1
-PATH=$(path_prepend_if_exists $PYTHON27DIR $PATH)
+PATH=$(path_append_if_exists $PYTHON27DIR $PATH)
 
 
 #------------------------------------------------------------------------------
