@@ -14,5 +14,5 @@ if [[ -n `grep 'Ubuntu 11' /etc/issue 2>/dev/null` ]]; then
 	alias gvim='gvim -f'
 fi
 
-export JAVA_HOME=/opt/java/x86_64
+[[ -d /opt/java/x86_64 ]] && export JAVA_HOME=/opt/java/x86_64
 

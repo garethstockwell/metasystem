@@ -29,17 +29,19 @@ if [[ -e $ANDROID_SRC/build/envsetup.sh ]]; then
 	# Used by android_emulator()
 	autostash ANDROID_SDCARD_IMG=$ANDROID_DATA/sdcard.img
 
-	# make setup
-	autostash METASYSTEM_MAKE_PARALLEL=1
-	autostash METASYSTEM_MAKE_SCHED=
-	autostash METASYSTEM_MAKE_LOG=1
-	autostash METASYSTEM_MAKE_TIME=1
-	autostash MAKE_LOG_DIR=$ANDROID_DATA/logs/make
-	mkdir -p $MAKE_LOG_DIR
-	echo -e "\n${NAKED_LIGHT_GREEN}make setup${NAKED_NO_COLOR}"
-	echo "Parallel ................... $METASYSTEM_MAKE_PARALLEL"
-	[[ $METASYSTEM_OS == linux ]] &&\
-		echo "Schedule boost ............. $METASYSTEM_MAKE_SCHED"
+	# make
+	if [[ -z $METASYSTEM_MAKE_VANILLA ]]; then
+		autostash METASYSTEM_MAKE_PARALLEL=1
+		autostash METASYSTEM_MAKE_SCHED=
+		autostash METASYSTEM_MAKE_LOG=1
+		autostash METASYSTEM_MAKE_TIME=1
+		autostash MAKE_LOG_DIR=$ANDROID_DATA/logs/make
+		mkdir -p $MAKE_LOG_DIR
+		echo -e "\n${NAKED_LIGHT_GREEN}make setup${NAKED_NO_COLOR}"
+		echo "Parallel ................... $METASYSTEM_MAKE_PARALLEL"
+		[[ $METASYSTEM_OS == linux ]] &&\
+			echo "Schedule boost ............. $METASYSTEM_MAKE_SCHED"
+	fi
 
 	# Variables modified by envsetup.sh
 	autostash LUNCH_MENU_CHOICES
@@ -51,43 +53,58 @@ if [[ -e $ANDROID_SRC/build/envsetup.sh ]]; then
 	autostash TARGET_BUILD_TYPE
 	autostash TARGET_BUILD_APPS
 
-	# Use GCC 4.4
-	echo -e "\n${NAKED_LIGHT_GREEN}Setting CC,CXX to point to GCC 4.4${NAKED_NO_COLOR}"
-	autostash CC=gcc-4.4
-	autostash CXX=g++-4.4
+	# Host GCC
+	if [[ -n $ANDROID_HOST_GCC_VERSION ]]; then
+		echo -e "\n${NAKED_LIGHT_GREEN}Setting CC,CXX to point to GCC ${ANDROID_HOST_GCC_VERSION}${NAKED_NO_COLOR}"
+		autostash CC=gcc-${ANDROID_HOST_GCC_VERSION}
+		autostash CXX=g++-${ANDROID_HOST_GCC_VERSION}
+	fi
 
+	# Detect arch
 	prebuilt_arch_32=
 	prebuilt_arch_64=
+	prebuilt_arch=
 	case $METASYSTEM_OS in
 		linux)
 			prebuilt_arch_32=linux-x86
 			prebuilt_arch_64=linux-x86_64
+			# Detect 32/64 bit
+			prebuilt_arch=linux-$(uname -m)
 			;;
 		mac)
 			prebuilt_arch_32=darwin-x86
 			prebuilt_arch_64=darwin-x86_64
+			# Assume all Macs are 64-bit
+			prebuilt_arch=$prebuilt_arch_64
 			;;
 		windows)
 			prebuilt_arch_32=windows
 			prebuilt_arch_64=windows-x86_64
+			# Assume all Windows is 64-bit
+			prebuilt_arch=$prebuilt_arch_64
 			;;
 	esac
 
-	# Use ccache
-	autostash USE_CCACHE=1
-	autostash CCACHE_DIR=$HOME/work/local/build/ccache
-	echo -e "\n${NAKED_LIGHT_GREEN}Enabling ccache${NAKED_NO_COLOR}"
-	echo "CCACHE_DIR = $CCACHE_DIR"
-	if [[ -n $prebuilt_arch_32 ]]; then
-		export PATH=$(path_prepend $ANDROID_SRC/prebuilt/$prebuilt_arch_32/ccache $PATH)
-		ccache -M 50G
+	# ccache
+	if [[ $USE_CCACHE == 1 ]]; then
+		autostash CCACHE_DIR=$HOME/work/local/build/ccache
+		echo -e "\n${NAKED_LIGHT_GREEN}Enabling ccache${NAKED_NO_COLOR}"
+		echo "CCACHE_DIR = $CCACHE_DIR"
+		# ccache is only built for 32-bit
+		if [[ -n $prebuilt_arch_32 ]]; then
+			export PATH=$(path_prepend $ANDROID_SRC/prebuilt/$prebuilt_arch_32/ccache $PATH)
+			ccache -M 50G
+		fi
 	fi
 
-	[[ -n $prebuilt_arch_64 ]] &&\
-		autostash ANDROID_SWT=$ANDROID_SRC/prebuilt/$prebuilt_arch_64/swt
+	# SWT
+	[[ -n $prebuilt_arch ]] &&\
+		autostash ANDROID_SWT=$ANDROID_SRC/prebuilt/$prebuilt_arch/swt
 
+	# Clean up
 	unset prebuilt_arch_32
 	unset prebuilt_arch_64
+	unset prebuilt_arch
 
 	# Add buildscripts to PATH
 	if [[ -d $ANDROID_SRC/buildscripts ]]; then
