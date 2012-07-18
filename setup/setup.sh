@@ -368,7 +368,7 @@ function do_it()
 	test $METASYSTEM_PLATFORM == "cygwin" && setup_cygwin
 	test $METASYSTEM_PLATFORM == "mingw" && setup_mingw
 	setup_generate_dot_files
-	setup_todo
+	#setup_todo
 }
 
 #------------------------------------------------------------------------------
