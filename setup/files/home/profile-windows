@@ -1,0 +1,6 @@
+_profile=${HOME}/work/sync/git/github/metasystem/home/profile
+[[ -z $MSYSTEM ]] && _profile=/cygdrive/${_profile}
+. ${_profile}
+unset _profile
+. ~/.bashrc
+

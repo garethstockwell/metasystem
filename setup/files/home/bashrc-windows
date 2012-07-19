@@ -1,0 +1,9 @@
+if [[ -n $PS1 ]]; then
+	_gitdir=${HOME}/work/sync/git
+	[[ -z $MSYSTEM ]] && _gitdir=/cygdrive/${_gitdir}
+	#export METASYSTEM_LOCAL_ROOT=...
+	. ${_gitdir}/github/metasystem/home/bashrc
+	metasystem_cd ~
+	unset _gitdir
+fi
+
