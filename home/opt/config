@@ -8,8 +8,8 @@ METASYSTEM_OPT_ANDROID=yes
 METASYSTEM_OPT_SYMBIAN=
 METASYSTEM_OPT_QT=yes
 
-METASYSTEM_OPT_CD=dirinfo
-[[ "$METASYSTEM_OS" != "windows" ]] && METASYSTEM_OPT_CD=smartcd
+#METASYSTEM_OPT_CD=dirinfo
+METASYSTEM_OPT_CD=smartcd
 
 
 #------------------------------------------------------------------------------
