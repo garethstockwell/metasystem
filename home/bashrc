@@ -382,21 +382,23 @@ complete -F _metasystem_todo_complete todo
 # Banner
 #------------------------------------------------------------------------------
 
-_rule='-------------------------------------------------------------------------------'
+export _METASYSTEM_RULE='-------------------------------------------------------------------------------'
 
-function _banner()
+function _metasystem_print_banner()
 {
-	echo -e "\n$_rule"
+	echo -e "\n$_METASYSTEM_RULE"
 	echo $1
-	echo -e "$_rule\n"
+	echo -e "$_METASYSTEM_RULE\n"
 }
+
+export -f _metasystem_print_banner
 
 
 #------------------------------------------------------------------------------
 # System information
 #------------------------------------------------------------------------------
 
-echo -e "$_rule\n"
+echo -e "$_METASYSTEM_RULE\n"
 echo "Hostname:   $METASYSTEM_HOSTNAME"
 [[ -n $have_python ]] && echo "Domain:     $($METASYSTEM_BIN/network-info.py domain)"
 if [[ $METASYSTEM_OS == linux ]]; then
@@ -443,7 +445,7 @@ alias dirinfo-init='_metasystem_dirinfo_init'
 # Opt
 #==============================================================================
 
-_banner "Optional packages"
+_metasystem_print_banner "Optional packages"
 
 source $METASYSTEM_HOME/opt/config
 
@@ -485,7 +487,7 @@ function metasystem_create_local()
 # Profile
 #------------------------------------------------------------------------------
 
-_banner "Profile"
+_metasystem_print_banner "Profile"
 
 function profile_update()
 {
@@ -1145,9 +1147,9 @@ EOF
 alias help='_metasystem_help'
 alias h=help
 
-echo -e "\n$_rule"
+echo -e "\n$_METASYSTEM_RULE"
 echo -e "Type 'help' for a list of metasystem functions and aliases"
-echo -e "$_rule"
+echo -e "$_METASYSTEM_RULE"
 
 
 #==============================================================================
@@ -1181,12 +1183,6 @@ _metasystem_update_prompt_tools
 
 # Export final PATH
 export PATH
-
-# Undefine variables
-unset _rule
-
-# Undefine functions
-unset _banner
 
 # Don't know where these get set...
 unset f
