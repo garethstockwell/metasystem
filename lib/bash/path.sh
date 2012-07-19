@@ -22,7 +22,7 @@ function path_remove()
 	local element=$1
 	shift
 	local src="$*"
-	path_split '\n' "$src" | grep -v "$element" | tr '\n' ':' | sed 's/:$//'
+	path_split '\n' "$src" | grep -v "^$element\$" | tr '\n' ':' | sed 's/:$//'
 }
 
 function path_append()
