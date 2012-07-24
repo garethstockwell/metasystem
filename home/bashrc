@@ -5,6 +5,61 @@
 #==============================================================================
 
 #------------------------------------------------------------------------------
+# OS / platform
+#------------------------------------------------------------------------------
+
+# TODO: set METASYSTEM_OS_VERSION on Windows
+# http://www.windows-commandline.com/2009/01/find-windows-os-version-from-command.html
+
+METASYSTEM_OS=unknown
+METASYSTEM_OS_VENDOR=unknown
+METASYSTEM_OS_VERSION=unknown
+METASYSTEM_PLATFORM=unknown
+
+if [[ -n `uname | grep -i ^cygwin` ]]; then
+	METASYSTEM_OS=windows
+	METASYSTEM_OS_VENDOR=microsoft
+	METASYSTEM_PLATFORM=cygwin
+	export CYGWIN_HOME=/cygdrive/c/cygwin
+fi
+
+if [[ -n `uname | grep -i ^mingw` ]]; then
+	METASYSTEM_OS=windows
+	METASYSTEM_OS_VENDOR=microsoft
+	METASYSTEM_PLATFORM=mingw
+	export MSYS_HOME=/c/MinGW/msys/1.0
+	export TERM=msys
+fi
+
+if [[ -n `uname | grep -i ^darwin` ]]; then
+	METASYSTEM_OS=mac
+	METASYSTEM_OS_VENDOR=apple
+	METASYSTEM_OS_VERSION=`sw_vers -productVersion`
+	METASYSTEM_PLATFORM=unix
+fi
+
+if [[ -n `uname | grep -i ^sunos` ]]; then
+	METASYSTEM_OS=sunos
+	METASYSTEM_OS_VENDOR=sun
+	METASYSTEM_OS_VERSION=
+	METASYSTEM_PLATFORM=unix
+fi
+
+if [[ -z $METASYSTEM_OS && -e /etc/issue ]]; then
+	METASYSTEM_OS=linux
+	METASYSTEM_OS_VENDOR=`cat /etc/issue | awk '{ print $1 }' | tr 'A-Z' 'a-z'`
+	METASYSTEM_OS_VERSION=`cat /etc/issue | awk '{ print $2 }' | tr 'A-Z' 'a-z'`
+	METASYSTEM_PLATFORM=unix
+fi
+
+export METASYSTEM_OS
+export METASYSTEM_OS_VENDOR
+export METASYSTEM_OS_VERSION
+export METASYSTEM_PLATFORM
+export METASYSTEM_HOSTNAME=$HOSTNAME
+
+
+#------------------------------------------------------------------------------
 # Home
 #------------------------------------------------------------------------------
 
@@ -60,54 +115,6 @@ fi
 
 export METASYSTEM_BASH_ASSOC_ARRAY
 export METASYSTEM_BASH_PARAM_SUBST_CASE_MODIFIERS
-
-
-#------------------------------------------------------------------------------
-# OS / platform
-#------------------------------------------------------------------------------
-
-# TODO: set METASYSTEM_OS_VERSION on Windows
-# http://www.windows-commandline.com/2009/01/find-windows-os-version-from-command.html
-
-METASYSTEM_OS=unknown
-METASYSTEM_OS_VENDOR=unknown
-METASYSTEM_OS_VERSION=unknown
-METASYSTEM_PLATFORM=unknown
-
-if [[ -n `uname | grep -i ^cygwin` ]]; then
-	METASYSTEM_OS=windows
-	METASYSTEM_OS_VENDOR=microsoft
-	METASYSTEM_PLATFORM=cygwin
-	export CYGWIN_HOME=/cygdrive/c/cygwin
-fi
-
-if [[ -n `uname | grep -i ^mingw` ]]; then
-	METASYSTEM_OS=windows
-	METASYSTEM_OS_VENDOR=microsoft
-	METASYSTEM_PLATFORM=mingw
-	export MSYS_HOME=/c/MinGW/msys/1.0
-	export TERM=msys
-fi
-
-if [[ -n `uname | grep -i ^darwin` ]]; then
-	METASYSTEM_OS=mac
-	METASYSTEM_OS_VENDOR=apple
-	METASYSTEM_OS_VERSION=`sw_vers -productVersion`
-	METASYSTEM_PLATFORM=unix
-fi
-
-if [[ -e /etc/issue ]]; then
-	METASYSTEM_OS=linux
-	METASYSTEM_OS_VENDOR=`cat /etc/issue | awk '{ print $1 }' | tr 'A-Z' 'a-z'`
-	METASYSTEM_OS_VERSION=`cat /etc/issue | awk '{ print $2 }' | tr 'A-Z' 'a-z'`
-	METASYSTEM_PLATFORM=unix
-fi
-
-export METASYSTEM_OS
-export METASYSTEM_OS_VENDOR
-export METASYSTEM_OS_VERSION
-export METASYSTEM_PLATFORM
-export METASYSTEM_HOSTNAME=$HOSTNAME
 
 
 #------------------------------------------------------------------------------
@@ -446,7 +453,6 @@ alias dirinfo-init='_metasystem_dirinfo_init'
 #==============================================================================
 
 _metasystem_print_banner "Optional packages"
-
 source $METASYSTEM_HOME/opt/config
 
 
