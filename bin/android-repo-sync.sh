@@ -325,7 +325,11 @@ fi
 
 if [[ -n $opt_local_manifest ]]; then
 	[[ ! -e $opt_local_manifest ]] && error "Manifest '$opt_local_manifest' not found"
-	execute cp $opt_local_manifest $local_manifest
+	if [[ $METASYSTEM_OS == windows ]]; then
+		execute cp $opt_local_manifest $local_manifest
+	else
+		execute ln -s $opt_local_manifest $local_manifest
+	fi
 fi
 
 execute repo sync -j $opt_numjobs
