@@ -45,7 +45,7 @@ if [[ -n `uname | grep -i ^sunos` ]]; then
 	METASYSTEM_PLATFORM=unix
 fi
 
-if [[ -z $METASYSTEM_OS && -e /etc/issue ]]; then
+if [[ $METASYSTEM_OS == unknown && -e /etc/issue ]]; then
 	METASYSTEM_OS=linux
 	METASYSTEM_OS_VENDOR=`cat /etc/issue | awk '{ print $1 }' | tr 'A-Z' 'a-z'`
 	METASYSTEM_OS_VERSION=`cat /etc/issue | awk '{ print $2 }' | tr 'A-Z' 'a-z'`
@@ -290,12 +290,14 @@ alias del='cmd /c del'
 
 alias less='less -x4 -R'	# R is for cgrep
 
-# ls alias family - assumes we are using GNU ls
+alias ls='ls -hF'
 if [[ $METASYSTEM_PLATFORM == mac ]]; then
 	alias ls='ls -hFG'		# add colors for filetype recognition
 else
-	alias ls='ls -hF --color'	# add colors for filetype recognition
+	[[ $METASYSTEM_OS != sunos ]] &&\
+		alias ls='ls -hF --color'	# add colors for filetype recognition
 fi
+
 alias ll='ls -l'			# long listing
 alias lx='ls -lXB'			# sort by extension
 alias lk='ls -lSr'			# sort by size

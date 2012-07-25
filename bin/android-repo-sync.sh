@@ -26,9 +26,11 @@ opt_verbosity=normal
 opt_dryrun=no
 
 opt_clean=no
+opt_reference=
 opt_manifest_url=
 opt_manifest_branch=
 opt_local_manifest=
+opt_repo_url=
 opt_numjobs=
 
 for arg in $ARGUMENTS; do
@@ -106,8 +108,12 @@ Options:
     -v, --verbose           Verbose output
     -V, --version           Display version information and exit
 
+    --reference PATH        Reference
+
     -u, --url URL           Manifest URL
     -b, --branch REVISION   Manifest branch or revision
+
+    --repo-url URL          Repo URL
 
     -l, --local MANIFEST    Local manifest
 
@@ -161,6 +167,13 @@ function parse_command_line()
 				opt_clean=yes
 				;;
 
+			-reference | --reference)
+				prev=opt_reference
+				;;
+			-reference=* | --reference=*)
+				opt_reference=$optarg
+				;;
+
 			-u | -url | --url)
 				prev=opt_manifest_url
 				;;
@@ -173,6 +186,13 @@ function parse_command_line()
 				;;
 			-b=* | -branch=* | --branch=*)
 				opt_manifest_branch=$optarg
+				;;
+
+			-repo-url | --repo-url)
+				prev=opt_repo_url
+				;;
+			-repo-url=* | --repo-url=*)
+				opt_repo_url=$optarg
 				;;
 
 			-l | -local | --local)
@@ -244,8 +264,10 @@ Force ................................... $opt_force
 Verbosity ............................... $opt_verbosity
 
 Clean ................................... $opt_clean
+Reference ............................... $opt_reference
 Manifest URL ............................ $opt_manifest_url
 Manifest branch ......................... $opt_manifest_branch
+Repo URL ................................ $opt_repo_url
 Local manifest .......................... $opt_local_manifest
 Number of jobs .......................... $opt_numjobs
 
@@ -287,7 +309,11 @@ execute cd $ANDROID_SRC
 
 if [[ -n $opt_manifest_url ]]; then
 	[[ -z $opt_manifest_branch ]] && error No manifest branch specified
-	execute repo init -u $opt_manifest_url -b $opt_manifest_branch
+	cmd="repo init"
+	[[ -n $opt_reference ]] && cmd="$cmd --reference $opt_reference"
+	cmd="$cmd -u $opt_manifest_url -b $opt_manifest_branch"
+	[[ -n $opt_repo_url ]] && cmd="$cmd --repo-url $opt_repo_url"
+	execute $cmd
 fi
 
 if [[ -n $opt_local_manifest ]]; then
