@@ -316,13 +316,15 @@ if [[ -n $opt_manifest_url ]]; then
 	execute $cmd
 fi
 
+local_manifest=$ANDROID_SRC/.repo/local_manifest.xml
+
+if [[ -e $local_manifest ]]; then
+	[[ $opt_force != yes ]] && error "Destination file '$local_manifest' exists.  Use --force to remove"
+	execute rm -f $local_manifest
+fi
+
 if [[ -n $opt_local_manifest ]]; then
-	local_manifest=$ANDROID_SRC/.repo/local_manifest.xml
 	[[ ! -e $opt_local_manifest ]] && error "Manifest '$opt_local_manifest' not found"
-	if [[ -e $local_manifest ]]; then
-		[[ $opt_force != yes ]] && error "Destination file '$local_manifest' exists.  Use --force to remove"
-		execute rm -f $local_manifest
-	fi
 	execute cp $opt_local_manifest $local_manifest
 fi
 
