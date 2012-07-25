@@ -260,7 +260,7 @@ function set_script()
 
 function push_script()
 {
-	execute adb push $local_script $remote_script
+	execute adb push $(nativepath $local_script) $remote_script
 	execute adb shell "chmod 755 $remote_script"
 }
 
@@ -356,7 +356,7 @@ push_script
 
 # Push keys
 print_banner Pushing public key
-execute adb push ~/.ssh/id_rsa.pub /data/id_rsa.pub
+execute adb push $(nativepath ~/.ssh/id_rsa.pub) /data/id_rsa.pub
 execute adb shell "cat /data/id_rsa.pub >> $REMOTE_SSH_DIR/authorized_keys"
 
 # Start sshd
