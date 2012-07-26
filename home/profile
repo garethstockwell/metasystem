@@ -38,3 +38,5 @@ export        WHITE="\[${NAKED_WHITE}\]"
 export    NO_COLOUR="\[${NAKED_NO_COLOUR}\]"
 export     NO_COLOR=$NO_COLOUR
 
+export EDITOR=vim
+
