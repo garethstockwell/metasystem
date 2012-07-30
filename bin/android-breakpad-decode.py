@@ -45,10 +45,17 @@ class ArgumentParser(argparse.ArgumentParser):
                           help='Dump file')
 
         # Options
+        self.add_argument('-o', '--out',
+                          dest='out_dir', default=None,
+                          help='output directory')
         self.add_argument('--debug',
                           dest='debug', default=False,
                           action='store_true',
                           help='show debugging output')
+        self.add_argument('-f', '--force',
+                          dest='force', default=False,
+                          action='store_true',
+                          help='overwrite existing output files')
         self.add_argument('-n', '--dry-run',
                           dest='dry_run', default=False,
                           action='store_true',
@@ -141,27 +148,31 @@ class ProgressBar:
             sys.stdout.write('\n')
 
 
-class MinidumpStackwalkParser(object):
-    '''
-    Parses output of minidump_stackwalk
-    '''
-    def __init__(self):
-        pass
+class MinidumpStackwalk(object):
+    class Result(object):
+        def __init__(self):
+            self.out = ''
+            self.err = ''
 
-    def _parse(self, dump):
-        result = []
-        try:
-            # Note: following line only works on Unix
-            fnull = open('/dev/null', 'w')
-            output = subprocess.check_output(['minidump_stackwalk', dump], stderr=fnull)
-            result = output.split('\n')
-        except:
-            pass
+    def __init__(self, dump, config):
+        self._dump = dump
+        self._config = config
+
+    def run(self):
+        result = MinidumpStackwalk.Result()
+        # Note: following line only works on Unix
+        fnull = open('/dev/null', 'w')
+        args = ['minidump_stackwalk', self._dump]
+        sym_dir = self._config['sym_dir']
+        if os.path.exists(sym_dir):
+            args.append(sym_dir)
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result.out, result.err = p.communicate()
         return result
 
-    def get_libs(self, dump):
+    def get_libs(self):
         result = []
-        output = self._parse(dump)
+        output = self.run().out.split('\n')
         in_section = False
         for line in output:
             if in_section:
@@ -252,8 +263,8 @@ def build_lib_dict(lib_dir, args):
     return result
 
 
-def resolve_libs(libs, args):
-    lib_dir = os.path.join(os.environ['ANDROID_PRODUCT_OUT'], 'symbols')
+def resolve_libs(libs, args, config):
+    lib_dir = config['lib_dir']
     lib_dict = build_lib_dict(lib_dir, args)
     for lib in libs:
         if lib.name in lib_dict.keys():
@@ -262,8 +273,8 @@ def resolve_libs(libs, args):
             print >> sys.stderr,'Warning: failed to resolve ' + lib.name
 
 
-def generate_symbols(lib, args):
-    sym_dir = os.path.join(os.environ['ANDROID_PRODUCT_OUT'], 'symbols', 'minidump')
+def generate_symbols(lib, args, config):
+    sym_dir = config['sym_dir']
     logging.debug("generate_symbols so_path " + lib.path)
     # Note: following line only works on Unix
     fnull = open('/dev/null', 'w')
@@ -275,7 +286,11 @@ def generate_symbols(lib, args):
         logging.debug("generate_symbols sym_name " + sym_name)
         if sym_name == lib.name:
             lib.sym_name = sym_name
-            lib.sym_hash = tokens[3]
+
+            # minidump fails to determine library versions
+            #lib.sym_hash = tokens[3]
+            lib.sym_hash = '000000000000000000000000000000000'
+
             logging.debug("generate_symbols sym_hash " + lib.sym_hash)
             lib.sym_path = os.path.join(sym_dir, lib.sym_name, lib.sym_hash, lib.sym_name + '.sym')
             logging.debug("generate_symbols sym_path " + lib.sym_path)
@@ -287,14 +302,14 @@ def generate_symbols(lib, args):
             print >> sys.stderr,'Warning: symbol name mismatch ({0:s}, {1:s}'.format(lib.name, sym_name)
 
 
-def generate_all_symbols(libs, args):
+def generate_all_symbols(libs, args, config):
     print "\nGenerating symbols ..."
     p = ProgressBar(maxValue = len(libs))
     n = 0
     for lib in libs:
         p.update(note = lib.name)
         if lib.path:
-            generate_symbols(lib, args)
+            generate_symbols(lib, args, config)
         n += 1
         p.update(note = lib.name, amount = n)
     print
@@ -311,6 +326,21 @@ def print_libs(libs):
     print '----------------------------------------------------------------'
 
 
+def check_output(filename, args):
+    if os.path.exists(filename):
+        if args.force:
+            os.remove(filename)
+        else:
+            raise IOError, "Output file '" + filename + "' already exists"
+
+
+def write_output(stackwalk, args):
+    out = open(os.path.join(args.out_dir, 'breakpad.out'), 'w')
+    err = open(os.path.join(args.out_dir, 'breakpad.err'), 'w')
+    result = stackwalk.run()
+    out.write(result.out)
+    err.write(result.err)
+
 
 #------------------------------------------------------------------------------
 # Main
@@ -326,14 +356,26 @@ if args.debug:
 if os.environ['ANDROID_PRODUCT_OUT'] == '':
     raise IOError, "ANDROID_PRODUCT_OUT is not set - have you lunched?"
 
-parser = MinidumpStackwalkParser()
-libs = parser.get_libs(args.dump)
+config = {
+    'lib_dir': os.path.join(os.environ['ANDROID_PRODUCT_OUT'], 'symbols'),
+    'sym_dir': os.path.join(os.environ['ANDROID_PRODUCT_OUT'], 'symbols', 'minidump')
+}
 
-resolve_libs(libs, args)
-generate_all_symbols(libs, args)
+if not args.out_dir:
+    dmp_dir, dmp_name = os.path.split(args.dump)
+    dmp_desc, dmp_ext = os.path.splitext(dmp_name)
+    args.out_dir = os.path.join(dmp_dir, dmp_desc + '_decoded')
+
+if not os.path.exists(args.out_dir):
+    os.makedirs(args.out_dir)
+check_output(os.path.join(args.out_dir, 'breakpad.out'), args)
+check_output(os.path.join(args.out_dir, 'breakpad.err'), args)
+
+stackwalk = MinidumpStackwalk(args.dump, config)
+libs = stackwalk.get_libs()
+resolve_libs(libs, args, config)
+generate_all_symbols(libs, args, config)
 print_libs(libs)
 
-# TODO: re-process dump file
-
-#logging.debug('Testing testing 123')
+write_output(stackwalk, args)
 
