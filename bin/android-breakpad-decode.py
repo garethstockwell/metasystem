@@ -11,6 +11,8 @@ import logging
 import os
 import subprocess
 import sys
+import tempfile
+from time import time
 
 
 #------------------------------------------------------------------------------
@@ -62,6 +64,83 @@ class ArgumentParser(argparse.ArgumentParser):
                           help="show program's version number and exit")
 
 
+# Progress bar
+# Based on code from http://stackoverflow.com/questions/274493/how-to-copy-a-file-in-python-with-a-progress-bar
+
+class ProgressBar:
+    def __init__(self, minValue = 0, maxValue = 10, totalWidth = 40):
+        self.min = minValue
+        self.max = maxValue
+        self.span = maxValue - minValue
+        self.width = totalWidth
+        self.amount = 0
+        self.percentDone = 0
+        self.elapsedSecs = 0
+        self.startTime = time()
+        self.note = ''
+        self.maxWidth = 0
+        self.update(0) # Build progress bar string
+
+    def update(self, note = None, amount = -1):
+        self.note = note if note else ''
+
+        if amount != -1:
+            if amount < self.min: amount = self.min
+            if amount > self.max: amount = self.max
+            self.amount = amount
+
+        # Figure out the new percent done, round to an integer
+        diffFromMin = float(self.amount - self.min)
+        percentDone = (diffFromMin / float(self.span)) * 100.0
+        percentDone = round(percentDone)
+        percentDone = int(percentDone)
+
+        # Calculate elapsed time
+        secs = int(time() - self.startTime)
+
+        # Decide whether to update the display
+        if 100 == self.percentDone:
+            return
+        if (0 == self.amount) or (percentDone - self.percentDone >= 1) \
+            or (secs - self.elapsedSecs >= 1) or (100 == percentDone):
+            self.percentDone = percentDone
+            self.elapsedSecs = secs
+        else:
+            return
+
+        # Figure out how many hash bars the percentage should be
+        allFull = self.width - 2
+        numHashes = (percentDone / 100.0) * allFull
+        numHashes = int(round(numHashes))
+
+        # Build progress bar
+        output = "[" + '#'*numHashes + ' '*(allFull-numHashes) + "]"
+
+        # Append percentage
+        output += ' %3d%%' % percentDone
+
+        # Calculate elapsed time
+        mins = 0
+        hours = 0
+        if secs >= 60 * 60:
+            hours = int(secs / (60 * 60))
+            secs -= hours * (60 * 60)
+        if secs >= 60:
+            mins = int(secs / 60)
+            secs -= mins * 60
+        #output += ' %02d:%02d:%02d' % (hours,mins,secs) #hours, mins, secs)
+
+        output += ' ' + self.note
+        self.maxWidth = max(len(output), self.maxWidth)
+        output += ' ' * (self.maxWidth - len(output))
+
+        # Write to display
+        sys.stdout.write('\r%s\r' % output)
+
+        if 100 == percentDone:
+            sys.stdout.write('\n')
+
+
 class MinidumpStackwalkParser(object):
     '''
     Parses output of minidump_stackwalk
@@ -105,6 +184,8 @@ class Library(object):
     def __init__(self, name):
         self.name = name
         self.path = None
+        self.sym_name = None
+        self.sym_hash = None
         self.sym_path = None
 
     def __repr__(self):
@@ -160,17 +241,63 @@ def file_exists(filename):
     return result
 
 
-def resolve_libs(libs):
-    lib_dir = os.path.join(os.environ['ANDROID_PRODUCT_OUT'], 'symbols', 'system', 'lib')
+def build_lib_dict(lib_dir, args):
+    result = {}
+    for root, dirs, files in os.walk(lib_dir):
+        for name in files:
+            if name.endswith('.so'):
+                path = os.path.join(root, name)
+                logging.debug('build_lib_dict ' + name + ' ' + path)
+                result[name] = path
+    return result
+
+
+def resolve_libs(libs, args):
+    lib_dir = os.path.join(os.environ['ANDROID_PRODUCT_OUT'], 'symbols')
+    lib_dict = build_lib_dict(lib_dir, args)
     for lib in libs:
-        lib_path = os.path.join(lib_dir, lib.name)
-        if file_exists(lib_path):
-            lib.path = lib_path
+        if lib.name in lib_dict.keys():
+            lib.path = lib_dict[lib.name]
+        else:
+            print >> sys.stderr,'Warning: failed to resolve ' + lib.name
 
 
-def generate_symbols(libs):
-    # TODO
-    pass
+def generate_symbols(lib, args):
+    sym_dir = os.path.join(os.environ['ANDROID_PRODUCT_OUT'], 'symbols', 'minidump')
+    logging.debug("generate_symbols so_path " + lib.path)
+    # Note: following line only works on Unix
+    fnull = open('/dev/null', 'w')
+    output = subprocess.check_output(['dump_syms', lib.path], stderr=fnull)
+    if output.startswith('MODULE'):
+        lines = output.split('\n')
+        tokens = lines[0].split()
+        sym_name = tokens[4]
+        logging.debug("generate_symbols sym_name " + sym_name)
+        if sym_name == lib.name:
+            lib.sym_name = sym_name
+            lib.sym_hash = tokens[3]
+            logging.debug("generate_symbols sym_hash " + lib.sym_hash)
+            lib.sym_path = os.path.join(sym_dir, lib.sym_name, lib.sym_hash, lib.sym_name + '.sym')
+            logging.debug("generate_symbols sym_path " + lib.sym_path)
+            if not os.path.exists(lib.sym_path):
+                os.makedirs(os.path.dirname(lib.sym_path))
+                sym_file = open(lib.sym_path, 'w')
+                sym_file.write(output)
+        else:
+            print >> sys.stderr,'Warning: symbol name mismatch ({0:s}, {1:s}'.format(lib.name, sym_name)
+
+
+def generate_all_symbols(libs, args):
+    print "\nGenerating symbols ..."
+    p = ProgressBar(maxValue = len(libs))
+    n = 0
+    for lib in libs:
+        p.update(note = lib.name)
+        if lib.path:
+            generate_symbols(lib, args)
+        n += 1
+        p.update(note = lib.name, amount = n)
+    print
 
 
 def print_libs(libs):
@@ -179,8 +306,8 @@ def print_libs(libs):
     print '----------------------------------------------------------------'
     for lib in libs:
         has_path = 'y' if lib.path else 'n'
-        has_sym = 'y' if lib.sym_path else 'n'
-        print '{0:40s} {1:s}        {2:s}'.format(lib.name, has_path, has_sym)
+        sym_hash = lib.sym_hash[0:6] if lib.sym_hash else '-'
+        print '{0:40s} {1:s}   {2:s}'.format(lib.name, has_path, sym_hash)
     print '----------------------------------------------------------------'
 
 
@@ -202,8 +329,8 @@ if os.environ['ANDROID_PRODUCT_OUT'] == '':
 parser = MinidumpStackwalkParser()
 libs = parser.get_libs(args.dump)
 
-resolve_libs(libs)
-generate_symbols(libs)
+resolve_libs(libs, args)
+generate_all_symbols(libs, args)
 print_libs(libs)
 
 # TODO: re-process dump file
