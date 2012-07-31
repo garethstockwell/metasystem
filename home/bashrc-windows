@@ -68,6 +68,17 @@ function _metasystem_wrap_native()
 # Remove suffixes from scripts
 alias subst-drives='subst-drives.sh'
 
-alias explorer='explorer.exe . &'
+function metasystem_windows_explorer()
+{
+	local path=.
+	if [[ -n $1 ]]; then
+		path=$(metasystem_nativepath $1)
+		path=${path//\//\\}
+	fi
+	explorer.exe $path &
+}
 
+export -f metasystem_windows_explorer
+
+alias explorer=metasystem_windows_explorer
 
