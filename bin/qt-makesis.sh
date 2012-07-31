@@ -260,7 +260,7 @@ EOF
 #------------------------------------------------------------------------------
 
 # In its present version, this script can only be run on Windows
-# This is due in part to its usage of the drivepath function
+# This is due in part to its usage of the metasystem_drivepath function
 metasystem_assert_os windows $0
 
 parse_command_line $*

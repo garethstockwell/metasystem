@@ -11,12 +11,12 @@ alias eclipse="run_bg eclipse"
 # Cygwin compatibility
 #------------------------------------------------------------------------------
 
-function nativepath()
+function metasystem_nativepath()
 {
 	echo $1
 }
 
-function unixpath()
+function metasystem_unixpath()
 {
 	echo $1
 }

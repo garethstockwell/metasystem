@@ -216,7 +216,7 @@ function install_sis
 {
 	sis=$1
 	echo -e "Installing $sis ..."
-	execute runonphone.exe -s $(nativepath $sis)
+	execute runonphone.exe -s $(metasystem_nativepath $sis)
 	echo
 }
 

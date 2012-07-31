@@ -154,12 +154,12 @@ function empty_function()
 	echo > /dev/null
 }
 
-function run_bg()
+function metasystem_run_bg()
 {
 	nohup "$@" 1>/dev/null 2>/dev/null &
 }
 
-export -f run_bg
+export -f metasystem_run_bg
 
 
 #------------------------------------------------------------------------------
@@ -208,14 +208,14 @@ function metasystem_assert_platform()
 	fi
 }
 
-export -f nativepath
-export -f unixpath
+export -f metasystem_nativepath
+export -f metasystem_unixpath
 export -f metasystem_assert_os
 export -f metasystem_assert_platform
 
 if [[ $METASYSTEM_OS == windows ]]; then
-	export -f driveletter
-	export -f drivepath
+	export -f metasystem_driveletter
+	export -f metasystem_drivepath
 fi
 
 
@@ -249,10 +249,10 @@ PATH=$(path_append_if_exists ~/work/sync/git/templater/bin $PATH)
 
 PATH=$(path_remove '^\.$' $PATH)
 
-[[ -d $VIM_HOME ]] && export METASYSTEM_EDITOR=$(nativepath $VIM_HOME/vim.exe)
+[[ -d $VIM_HOME ]] && export METASYSTEM_EDITOR=$(metasystem_nativepath $VIM_HOME/vim.exe)
 
 # Raptor
-[[ -n $SBS_HOME ]] && PATH=$PATH:$(unixpath $SBS_HOME)/bin
+[[ -n $SBS_HOME ]] && PATH=$PATH:$(metasystem_unixpath $SBS_HOME)/bin
 
 
 #------------------------------------------------------------------------------
@@ -313,8 +313,10 @@ alias sync='sync.py'
 alias p4='p4.pl'
 alias todo='todo.sh'
 
-alias npath=nativepath
-alias upath=unixpath
+alias nativepath=metasystem_nativepath
+alias npath=metasystem_nativepath
+alias unixpath=metasystem_unixpath
+alias upath=metasystem_unixpath
 
 alias beep="echo $'\a'"
 
@@ -329,7 +331,7 @@ alias path='path_split \\n $PATH'
 [[ $METASYSTEM_PLATFORM == mingw ]] && alias ftp='/bin/ftp.exe'
 
 [[ $METASYSTEM_OS == linux ]] &&\
-	alias rdp='run_bg xfreerdp -d dir -u $USER -g 1920x1080 -a 32 -x l -o'
+	alias rdp='metasystem_run_bg xfreerdp -d dir -u $USER -g 1920x1080 -a 32 -x l -o'
 
 
 #------------------------------------------------------------------------------
@@ -892,7 +894,7 @@ function metasystem_install_git_hooks()
 
 export -f metasystem_install_git_hooks
 
-export HGEXT_DIR=$(nativepath ~/work/sync/hg/hgext)
+export HGEXT_DIR=$(metasystem_nativepath ~/work/sync/hg/hgext)
 
 
 #------------------------------------------------------------------------------

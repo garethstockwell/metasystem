@@ -252,8 +252,8 @@ function sign_sis {
 
     execute rm -f $sis_output
     execute winwrapper signsis $sis_input $sis_output \
-		$(nativepath $CERT_DIR/$arg_cert/$cert) \
-		$(nativepath $CERT_DIR/$arg_cert/$key)
+		$(metasystem_nativepath $CERT_DIR/$arg_cert/$cert) \
+		$(metasystem_nativepath $CERT_DIR/$arg_cert/$key)
 	echo
 }
 

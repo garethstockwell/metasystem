@@ -12,7 +12,7 @@ function _metasystem_check_epocroot()
 		EPOCROOT=$METASYSTEM_DIRINFO_ROOT/
 		PATH=$(path_prepend_epoc)
 		[[ $METASYSTEM_OS == windows &&\
-		   $METASYSTEM_DIRINFO_ROOT == $(drivepath $METASYSTEM_DIRINFO_ROOT) ]] &&\
+		   $METASYSTEM_DIRINFO_ROOT == $(metasystem_drivepath $METASYSTEM_DIRINFO_ROOT) ]] &&\
 			EPOCROOT=\\
 		echo -e "${NAKED_LIGHT_RED}epoc: $EPOCROOT${NAKED_NO_COLOUR}"
 	else
@@ -71,7 +71,7 @@ if [[ $METASYSTEM_PLATFORM == windows ]]; then
 	{
 		# imaker requires Python 2.6
 		local epocroot=$EPOCROOT
-		[[ $epocroot == \\ ]] && epocroot=$(driveletter $PWD):
+		[[ $epocroot == \\ ]] && epocroot=$(metasystem_driveletter $PWD):
 		PATH=$PYTHON26DIR:$PATH PYTHONPATH=$PYTHON26DIR/Lib \
 			 winwrapper $epocroot/epoc32/tools/imaker $*
 	}
@@ -90,9 +90,9 @@ if [[ $METASYSTEM_PLATFORM == windows ]]; then
 		/usr/bin/tail -f $HOME/Local\ Settings/Temp/epocwind.out
 	}
 
-	alias carbide-2.7='run_bg $_METASYSTEM_APPS/carbide/2.7/Carbide.c++.2.7.exe'
-	alias carbide-3.0='run_bg $_METASYSTEM_APPS/carbide/3.0/Carbide.c++.3.0.exe'
-	alias carbide-3.4='run_bg $_METASYSTEM_APPS/carbide/Carbide.c++.3.4.exe'
+	alias carbide-2.7='metasystem_run_bg $_METASYSTEM_APPS/carbide/2.7/Carbide.c++.2.7.exe'
+	alias carbide-3.0='metasystem_run_bg $_METASYSTEM_APPS/carbide/3.0/Carbide.c++.3.0.exe'
+	alias carbide-3.4='metasystem_run_bg $_METASYSTEM_APPS/carbide/Carbide.c++.3.4.exe'
 
 	alias carbide=carbide-3.4
 fi
