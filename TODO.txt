@@ -10,14 +10,6 @@ Definitely
 Maybe
 ---------------------------------------------------------------------------
 
-* Reformat README in MarkDown syntax
-
-* Add ssh key management to metasystem-id.py
-	- This may need tweaks in sync.py ...
-
-* Platform-specific subdirs in bin/
-	- e.g. bin/win32/win32-compiler.sh
-
 * Tidy up python scripts
 	- Comply with PEP008 naming conventions (member_functions,
 	  __private_members etc)
