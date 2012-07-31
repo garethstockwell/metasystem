@@ -234,6 +234,47 @@ function metasystem_android_pull_kconfig()
 	rm -f config.gz
 }
 
+function metasystem_android_find_binary_local()
+{
+	[[ -z $ANDROID_PRODUCT_OUT ]] &&\
+		echo "Error: ANDROID_PRODUCT_OUT not set" >&2 &&\
+		return 1
+	result=$(find $ANDROID_PRODUCT_OUT/system -iname "$@")
+	[[ -z $result ]] &&\
+		echo "Error: '$@' not found in \$ANDROID_PRODUCT_OUT/system" >&2 &&\
+		return 1
+	[[ $(echo $result | wc -w) != 1 ]] &&\
+		echo "Error: '$@' matches multiple files in \$ANDROID_PRODUCT_OUT/system:" >&2 &&\
+		for a in $result; do echo $a >&2; done &&\
+		return 1
+	echo $result
+}
+
+function metasystem_android_find_binary_remote()
+{
+	result=$(adb shell find /system -iname "$@")
+	[[ -z $result ]] &&\
+		echo "Error: '$@' not found in /system" >&2 &&\
+		return 1
+	[[ $(echo $result | wc -w) != 1 ]] &&\
+		echo "Error: '$@' matches multiple files in /system:" >&2 &&\
+		for a in $result; do echo $a >&2; done &&\
+		return 1
+	echo $result
+}
+
+# Push binary to device
+function metasystem_android_push_binary()
+{
+	for file in "$@"; do
+		local src=$(metasystem_android_find_binary_local $file)
+		local dst=$(metasystem_android_find_binary_remote $file)
+		local cmd="adb push $src $dst"
+		echo $cmd
+		$cmd
+	done
+}
+
 
 #------------------------------------------------------------------------------
 # Exported variables
@@ -278,6 +319,7 @@ alias android-ssh-adb=metasystem_android_ssh_adb
 alias adb=android-adb.sh
 alias android-sync=metasystem_android_sync
 alias android-pull-kconfig=metasystem_android_pull_kconfig
+alias android-push-binary=metasystem_android_push_binary
 
 
 #------------------------------------------------------------------------------
