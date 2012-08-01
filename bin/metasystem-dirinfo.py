@@ -199,7 +199,7 @@ def handle_project(command, context):
         sourcedir = abspath_mingw(sourcedir)
         builddir = abspath_mingw(builddir)
     context['output'].write("\n# [{0:d}] {1:s}\n".format(command.line_number, command.line))
-    context['output'].write("_metasystem_set_projectdirs {0:s} $(unixpath \"{1:s}\") $(unixpath \"{2:s}\")\n".format(name, builddir, sourcedir))
+    context['output'].write("_metasystem_set_projectdirs {0:s} $(metasystem_unixpath \"{1:s}\") $(metasystem_unixpath \"{2:s}\")\n".format(name, builddir, sourcedir))
     context['projects'].append(name)
 
 def handle_shell(command, context):

@@ -4,23 +4,23 @@
 # Path handling
 #------------------------------------------------------------------------------
 
-function drivepath()
+function metasystem_drivepath()
 {
-	local letter=$(driveletter $1)
+	local letter=$(metasystem_driveletter $1)
 	[[ -n $letter ]] && echo /cygdrive/$letter
 }
 
-function driveletter()
+function metasystem_driveletter()
 {
 	echo $1 | sed -e 's/\/cygdrive\/\([a-z]\).*/\1/'
 }
 
-function nativepath()
+function metasystem_nativepath()
 {
 	[[ -n $1 ]] && cygpath -w $1
 }
 
-function unixpath()
+function metasystem_unixpath()
 {
 	[[ -n $1 ]] && cygpath $1
 }

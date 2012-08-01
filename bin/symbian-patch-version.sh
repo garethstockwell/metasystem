@@ -258,7 +258,7 @@ function find_dlls()
 		test "$option_verbosity" != silent && echo -e "\nDLLs:"
 		for dll in $dll_list
 		do
-			native_dll=$(nativepath $dll)
+			native_dll=$(metasystem_nativepath $dll)
 			dlls="$dlls $native_dll"
 			test "$option_verbosity" != silent && echo "    $native_dll"
 		done

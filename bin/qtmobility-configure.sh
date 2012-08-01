@@ -379,7 +379,7 @@ then
 	if [ -d "$option_prefix" ]
 	then
 		cd $option_prefix
-		option_prefix=$(nativepath `pwd`)
+		option_prefix=$(metasystem_nativepath `pwd`)
 		cd $build_dir
 	fi
 	command="$command -prefix $option_prefix"

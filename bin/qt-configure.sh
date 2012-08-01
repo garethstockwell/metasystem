@@ -678,7 +678,7 @@ then
 			option_prefix="$QT_BUILD_DIR/../install"
 			;;
 		windows)
-			option_prefix="$(nativepath $QT_BUILD_DIR/../install)"
+			option_prefix="$(metasystem_nativepath $QT_BUILD_DIR/../install)"
 			;;
 	esac
 fi
@@ -802,7 +802,7 @@ then
 	if [ "$METASYSTEM_PLATFORM" == "mingw" ]
 	then
 		# Ensure PATH used by configure.exe is in Windows format
-		PATH=$(nativepathlist $PATH) $command
+		PATH=$(metasystem_nativepathlist $PATH) $command
 	else
 		$command
 	fi

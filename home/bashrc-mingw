@@ -4,28 +4,28 @@
 # Path handling
 #------------------------------------------------------------------------------
 
-function drivepath()
+function metasystem_drivepath()
 {
-	local letter=$(driveletter $1)
+	local letter=$(metasystem_driveletter $1)
 	[[ -n $letter ]] && echo /$letter
 }
 
-function driveletter()
+function metasystem_driveletter()
 {
 	echo $1 | sed -e 's/\/\([a-zA-Z]\).*/\1/'
 }
 
-function nativepath()
+function metasystem_nativepath()
 {
 	echo $1 | sed -e 's/^\/\([a-zA-Z]\)\//\1:\//'
 }
 
-function unixpath()
+function metasystem_unixpath()
 {
 	echo $1 | sed -e 's/^\([a-zA-Z]\):/\/\1/' -e 's/\\/\//g'
 }
 
-function nativepathlist()
+function metasystem_nativepathlist()
 {
 	echo ":$*" | sed \
 		-e 's/\\/\//g' \
@@ -36,14 +36,14 @@ function nativepathlist()
 		-e 's/\//\\/g'
 }
 
-function unixpathlist()
+function metasystem_unixpathlist()
 {
 	echo ";$*" | sed \
 		-e 's/;\([a-zA-Z]\):[\\\/]/:\/\1\//g' \
 		-e 's/^://'
 }
 
-function path_remove_mingw()
+function metasystem_path_remove_mingw()
 {
 	local path=$PATH
 	path=$(path_remove /usr/local/bin $path)
@@ -54,6 +54,8 @@ function path_remove_mingw()
 	echo $path
 }
 
-export -f nativepathlist
-export -f path_remove_mingw
+export -f metasystem_nativepathlist
+
+# Obsolete
+#export -f metasystem_path_remove_mingw
 

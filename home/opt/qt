@@ -54,7 +54,7 @@ alias qcd='qcdb'
 # Unix
 #------------------------------------------------------------------------------
 
-[[ $METASYSTEM_PLATFORM == unix ]] && alias qtcreator="run_bg $(which qtcreator)"
+[[ $METASYSTEM_PLATFORM == unix ]] && alias qtcreator="metasystem_run_bg $(which qtcreator)"
 
 
 #------------------------------------------------------------------------------

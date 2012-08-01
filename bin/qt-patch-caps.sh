@@ -242,6 +242,6 @@ fi
 for pkg in `'ls' *_template.pkg`
 do
 	echo "pkg file: $pkg"
-	execute perl $(nativepath $script) $pkg $target
+	execute perl $(metasystem_nativepath $script) $pkg $target
 done
 

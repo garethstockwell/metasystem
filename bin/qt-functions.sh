@@ -37,7 +37,7 @@ function check_qt_source_dir()
 function check_pwd_in_qt_build_dir()
 {
 	check_qt_build_dir
-	if [ -z `pwd | grep $(unixpath $QT_BUILD_DIR)` ]
+	if [ -z `pwd | grep $(metasystem_unixpath $QT_BUILD_DIR)` ]
     then
 		echo "Error: current path '$PWD' is not under \$QT_BUILD_DIR '$QT_BUILD_DIR'"
 		exit 1
@@ -47,7 +47,7 @@ function check_pwd_in_qt_build_dir()
 function check_pwd_in_qt_source_dir()
 {
 	check_qt_source_dir
-	if [ -z `pwd | grep $(unixpath $QT_SOURCE_DIR)` ]
+	if [ -z `pwd | grep $(metasystem_unixpath $QT_SOURCE_DIR)` ]
     then
 		echo "Error: current path '$PWD' is not under \$QT_SOURCE_DIR '$QT_SOURCE_DIR'"
 		exit 1
@@ -87,7 +87,7 @@ function check_qtmobility_source_dir()
 function check_pwd_in_qtmobility_build_dir()
 {
 	check_qtmobility_build_dir
-	if [ -z `pwd | grep $(unixpath $METASYSTEM_PROJECT_QTMOBILITY_BUILD_DIR)` ]
+	if [ -z `pwd | grep $(metasystem_unixpath $METASYSTEM_PROJECT_QTMOBILITY_BUILD_DIR)` ]
     then
 		echo "Error: current path '$PWD' is not under \$METASYSTEM_PROJECT_QTMOBILITY_BUILD_DIR '$METASYSTEM_PROJECT_QTMOBILITY_BUILD_DIR'"
 		exit 1
