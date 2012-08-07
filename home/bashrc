@@ -156,7 +156,28 @@ function empty_function()
 
 function metasystem_run_bg()
 {
-	nohup "$@" 1>/dev/null 2>/dev/null &
+	local args=
+	local background=1
+	for token in "$@"; do
+		case $token in
+			-fg | --fg | -foreground | --foreground)
+				background=
+				;;
+			-bg | --bg | -background | --background)
+				background=1
+				;;
+			*)
+				[[ -n $args ]] && args="$args "
+				args="$args$token"
+				;;
+		esac
+	done
+	if [[ -n $background ]]; then
+		echo "Launching '$args' in background ..."
+		nohup $args 1>/dev/null 2>/dev/null &
+	else
+		$args
+	fi
 }
 
 export -f metasystem_run_bg
@@ -943,6 +964,13 @@ function metasystem_install_git_hooks()
 export -f metasystem_install_git_hooks
 
 export HGEXT_DIR=$(metasystem_nativepath ~/work/sync/hg/hgext)
+
+
+#------------------------------------------------------------------------------
+# IDEs
+#------------------------------------------------------------------------------
+
+alias eclipse="metasystem_run_bg eclipse"
 
 
 #------------------------------------------------------------------------------
