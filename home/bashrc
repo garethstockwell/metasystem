@@ -487,9 +487,11 @@ function ssh_agent_stop()
 	rm -f ${SSH_AGENT_ENV}
 }
 
-echo
-[[ -f ${SSH_AGENT_ENV} ]] && source ${SSH_AGENT_ENV} > /dev/null
-ssh_agent_start
+if [[ -z $METASYSTEM_DISABLE_SSH_AGENT ]]; then
+	_metasystem_print_banner "ssh-agent"
+	[[ -f ${SSH_AGENT_ENV} ]] && source ${SSH_AGENT_ENV} > /dev/null
+	ssh_agent_start
+fi
 
 
 #------------------------------------------------------------------------------
@@ -566,8 +568,6 @@ function metasystem_create_local()
 # Profile
 #------------------------------------------------------------------------------
 
-_metasystem_print_banner "Profile"
-
 function profile_update()
 {
 	local args="--reset --auto all"
@@ -597,11 +597,14 @@ alias profile-print='metasystem-profile.py print'
 alias profile='profile-print'
 alias profile-update=profile_update
 
-if [[ -e ~/.metasystem-profile ]]; then
-	echo "Sourcing existing .metasystem-profile"
-	profile-get
-else
-	profile-update
+if [[ -z $METASYSTEM_DISABLE_PROFILE ]]; then
+	_metasystem_print_banner "Profile"
+	if [[ -e ~/.metasystem-profile ]]; then
+		echo "Sourcing existing .metasystem-profile"
+		profile-get
+	else
+		profile-update
+	fi
 fi
 
 
