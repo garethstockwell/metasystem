@@ -5,7 +5,11 @@
 case $1 in
 	logcat)
 		shift
-		android-adb-logcat.py "$@"
+		if [[ $METASYSTEM_OS == windows ]]; then
+			adb logcat "$@"
+		else
+			android-adb-logcat.py "$@"
+		fi
 		;;
 	shell)
 		if [[ $METASYSTEM_OS == windows ]]; then
