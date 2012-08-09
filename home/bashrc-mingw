@@ -25,6 +25,28 @@ function metasystem_unixpath()
 	echo $1 | sed -e 's/^\([a-zA-Z]\):/\/\1/' -e 's/\\/\//g'
 }
 
+# Compatibility function
+function cygpath()
+{
+	local args=
+	local native=
+	for token in "$@"; do
+		case $token in
+			-w)
+				native=1
+				;;
+			*)
+				args="$args $token"
+				;;
+		esac
+	done
+	if [[ -n $native ]]; then
+		metasystem_nativepath $args
+	else
+		metasystem_unixpath $args
+	fi
+}
+
 function metasystem_nativepathlist()
 {
 	echo ":$*" | sed \
