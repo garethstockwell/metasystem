@@ -1,0 +1,30 @@
+#!/bin/sh
+
+function _nativepath()
+{
+	echo $1 | sed -e 's/^\/\([a-zA-Z]\)\//\1:\//'
+}
+
+function _unixpath()
+{
+	echo $1 | sed -e 's/^\([a-zA-Z]\):/\/\1/' -e 's/\\/\//g'
+}
+
+args=
+native=
+for token in "$@"; do
+	case $token in
+		-w)
+			native=1
+			;;
+		*)
+			args="$args $token"
+			;;
+	esac
+done
+if [[ -n $native ]]; then
+	_nativepath $args
+else
+	_unixpath $args
+fi
+
