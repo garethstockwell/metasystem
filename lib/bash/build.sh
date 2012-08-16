@@ -34,6 +34,7 @@ function make()
 	local log=$METASYSTEM_MAKE_LOG
 	local measure_time=$METASYSTEM_MEASURE_TIME
 	local vanilla=$METASYSTEM_MAKE_VANILLA
+
 	for x in "$@"; do
 		case $x in
 			-log | --log | -log=yes | --log=yes)
@@ -77,6 +78,7 @@ function make()
 	if [[ $vanilla == 1 ]]; then
 		$cmd
 	else
+		local rc=0
 		if [[ $parallel == 1 ]]; then
 			local ncpus=$(number_of_processors)
 			if [[ -n $ncpus ]]; then
@@ -115,6 +117,9 @@ function make()
 			echo -e $output | tee -a $log_file
 			echo | tee -a $log_file
 			(time $cmd) 2>&1 | tee -a $log_file
+			# Use PIPESTATUS rather than $? to capture exit code from make
+			# rather than tee
+			rc=${PIPESTATUS[0]}
 			echo | tee -a $log_file
 			echo "End time .................... $(date)" | tee -a $log_file
 			echo "Log file .................... $log_file" >&2
@@ -122,10 +127,14 @@ function make()
 			[[ -z $METASYSTEM_MAKE_SILENT ]] && echo -e "$output\n" >&2
 			if [[ $measure_time == 1 ]]; then
 				time $cmd
+				rc=$?
 			else
 				$cmd
+				rc=$?
 			fi
 		fi
+		[[ $rc != 0 ]] && echo "Failed with exit code $rc" >&2
+		return $rc
 	fi
 }
 
