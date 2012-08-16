@@ -241,10 +241,10 @@ function metasystem_android_find_binary_local()
 		return 1
 	result=$(find $ANDROID_PRODUCT_OUT/system -iname "$@")
 	[[ -z $result ]] &&\
-		echo "Error: '$@' not found in \$ANDROID_PRODUCT_OUT/system" >&2 &&\
+		echo "Error: '$@' not found in local \$ANDROID_PRODUCT_OUT/system" >&2 &&\
 		return 1
 	[[ $(echo $result | wc -w) != 1 ]] &&\
-		echo "Error: '$@' matches multiple files in \$ANDROID_PRODUCT_OUT/system:" >&2 &&\
+		echo "Error: '$@' matches multiple local files in \$ANDROID_PRODUCT_OUT/system:" >&2 &&\
 		for a in $result; do echo $a >&2; done &&\
 		return 1
 	echo $result
@@ -252,12 +252,12 @@ function metasystem_android_find_binary_local()
 
 function metasystem_android_find_binary_remote()
 {
-	result=$(adb shell find /system -iname "$@")
+	result=$(adb shell "find /system -iname \"$@\" 2>&1")
 	[[ -z $result ]] &&\
-		echo "Error: '$@' not found in /system" >&2 &&\
+		echo "Error: '$@' not found in remote /system" >&2 &&\
 		return 1
 	[[ $(echo $result | wc -w) != 1 ]] &&\
-		echo "Error: '$@' matches multiple files in /system:" >&2 &&\
+		echo "Error: '$@' matches multiple files in remote /system:" >&2 &&\
 		for a in $result; do echo $a >&2; done &&\
 		return 1
 	echo $result | tr -d '\015'
