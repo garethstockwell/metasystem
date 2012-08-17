@@ -61,14 +61,5 @@ export -f metasystem_nativepathlist
 
 PATH=$PATH:$METASYSTEM_BIN/mingw
 
-function eclipse()
-{
-	echo "Launching Eclipse from MinGW is broken - start Cygwin" >&2
-	return 1
-	#local agent_env=${HOME}/.ssh/agent-env-${HOSTNAME}-windows-cygwin
-	#local ssh_auth_sock=
-	#[[ -e $agent_env ]] && source $agent_env
-	#[[ -n $SSH_AUTH_SOCK ]] && ssh_auth_sock=/c/cygwin/$SSH_AUTH_SOCK
-	#SSH_AUTH_SOCK=$ssh_auth_sock PATH=/c/cygwin/bin:$PATH /c/cygwin/bin/bash.exe -c eclipsec
-}
+alias eclipse="PATH=/c/cygwin/bin:\$PATH metasystem_run_bg eclipsec"
 
