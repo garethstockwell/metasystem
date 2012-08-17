@@ -61,5 +61,3 @@ export -f metasystem_nativepathlist
 
 PATH=$PATH:$METASYSTEM_BIN/mingw
 
-alias eclipse="PATH=/c/cygwin/bin:\$PATH metasystem_run_bg eclipsec"
-
