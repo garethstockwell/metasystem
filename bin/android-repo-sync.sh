@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# android-repo-init
+# android-repo-sync
 
 #------------------------------------------------------------------------------
 # Constants
@@ -25,12 +25,6 @@ opt_version=
 opt_verbosity=normal
 opt_dryrun=no
 
-opt_clean=no
-opt_reference=
-opt_manifest_url=
-opt_manifest_branch=
-opt_local_manifest=
-opt_repo_url=
 opt_numjobs=
 
 for arg in $ARGUMENTS; do
@@ -94,7 +88,7 @@ function print_banner()
 function print_usage()
 {
 	cat << EOF
-android-repo-init script
+android-repo-sync script
 
 Usage: $0 [options] $ARGUMENTS
 
@@ -108,15 +102,6 @@ Options:
     -v, --verbose           Verbose output
     -V, --version           Display version information and exit
 
-    --reference PATH        Reference
-
-    -u, --url URL           Manifest URL
-    -b, --branch REVISION   Manifest branch or revision
-
-    --repo-url URL          Repo URL
-
-    -l, --local MANIFEST    Local manifest
-
     -j, --jobs N            Number of jobs (default $DEFAULT_NUMJOBS)
 
 EOF
@@ -125,7 +110,7 @@ EOF
 function print_version()
 {
 	cat << EOF
-android-repo-init script version $SCRIPT_VERSION
+android-repo-sync script version $SCRIPT_VERSION
 EOF
 }
 
@@ -161,45 +146,6 @@ function parse_command_line()
 				;;
 			-V | -version | --version)
 				opt_version=yes
-				;;
-
-			-c | -clean | --clean)
-				opt_clean=yes
-				;;
-
-			-reference | --reference)
-				prev=opt_reference
-				;;
-			-reference=* | --reference=*)
-				opt_reference=$optarg
-				;;
-
-			-u | -url | --url)
-				prev=opt_manifest_url
-				;;
-			-u=* | -url=* | --url=*)
-				opt_manifest_url=$optarg
-				;;
-
-			-b | -branch | --branch)
-				prev=opt_manifest_branch
-				;;
-			-b=* | -branch=* | --branch=*)
-				opt_manifest_branch=$optarg
-				;;
-
-			-repo-url | --repo-url)
-				prev=opt_repo_url
-				;;
-			-repo-url=* | --repo-url=*)
-				opt_repo_url=$optarg
-				;;
-
-			-l | -local | --local)
-				prev=opt_local_manifest
-				;;
-			-l=* | -local=* | --local=*)
-				opt_local_manifest=$optarg
 				;;
 
 			-j | -jobs | --jobs)
@@ -263,12 +209,6 @@ Dry run ................................. $opt_dryrun
 Force ................................... $opt_force
 Verbosity ............................... $opt_verbosity
 
-Clean ................................... $opt_clean
-Reference ............................... $opt_reference
-Manifest URL ............................ $opt_manifest_url
-Manifest branch ......................... $opt_manifest_branch
-Repo URL ................................ $opt_repo_url
-Local manifest .......................... $opt_local_manifest
 Number of jobs .......................... $opt_numjobs
 
 EOF
@@ -303,32 +243,16 @@ echo
 
 [[ -z $ANDROID_SRC ]] && error ANDROID_SRC is not set
 
-[[ $opt_clean == yes && -d $ANDROID_SRC ]] && execute rm -f $ANDROID_SRC
-[[ ! -d $ANDROID_SRC ]] && execute mkdir -p $ANDROID_SRC
 execute cd $ANDROID_SRC
 
-if [[ -n $opt_manifest_url ]]; then
-	[[ -z $opt_manifest_branch ]] && error No manifest branch specified
-	cmd="repo init"
-	[[ -n $opt_reference ]] && cmd="$cmd --reference $opt_reference"
-	cmd="$cmd -u $opt_manifest_url -b $opt_manifest_branch"
-	[[ -n $opt_repo_url ]] && cmd="$cmd --repo-url $opt_repo_url"
-	execute $cmd
-fi
+execute repo sync -j $opt_numjobs
 
-local_manifest=$ANDROID_SRC/.repo/local_manifest.xml
+timestamp=$(date '+%y%m%d-%H%M%S')
+manifest_file=$ANDROID_SRC/.repo/manifest_${timestamp}.xml
 
-if [[ -e $local_manifest ]]; then
-	[[ $opt_force != yes ]] && error "Destination file '$local_manifest' exists.  Use --force to remove"
-	execute rm -f $local_manifest
-fi
+echo -e "\nSaving manifest to $manifest_file ..."
 
-if [[ -n $opt_local_manifest ]]; then
-	[[ ! -e $opt_local_manifest ]] && error "Manifest '$opt_local_manifest' not found"
-	execute cp $opt_local_manifest $local_manifest
-fi
-
-execute android-repo-sync.sh -j $opt_numjobs -q
+execute repo manifest -r -o $manifest_file
 
 print_banner Done
 
