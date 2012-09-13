@@ -32,6 +32,7 @@ opt_manifest_branch=
 opt_local_manifest=
 opt_repo_url=
 opt_numjobs=
+opt_sync=no
 
 for arg in $ARGUMENTS; do
 	eval "arg_$arg="
@@ -118,6 +119,9 @@ Options:
     -l, --local MANIFEST    Local manifest
 
     -j, --jobs N            Number of jobs (default $DEFAULT_NUMJOBS)
+
+    --sync                  Sync
+    --no-sync               Do not sync
 
 EOF
 }
@@ -209,6 +213,13 @@ function parse_command_line()
 				opt_numjobs=$optarg
 				;;
 
+			-sync | --sync)
+				opt_sync=yes
+				;;
+			-no-sync | --no-sync)
+				opt_sync=no
+				;;
+
 			# Environment variables
 			*=*)
 				envvar=`expr "x$token" : 'x\([^=]*\)='`
@@ -270,6 +281,7 @@ Manifest branch ......................... $opt_manifest_branch
 Repo URL ................................ $opt_repo_url
 Local manifest .......................... $opt_local_manifest
 Number of jobs .......................... $opt_numjobs
+Sync .................................... $opt_repo_sync
 
 EOF
 	for arg in $ARGUMENTS; do
@@ -328,7 +340,8 @@ if [[ -n $opt_local_manifest ]]; then
 	execute cp $opt_local_manifest $local_manifest
 fi
 
-execute android-repo-sync.sh -j $opt_numjobs -q
+[[ $opt_sync == yes ]] &&\
+	execute android-repo-sync.sh -j $opt_numjobs -q
 
 print_banner Done
 
