@@ -281,7 +281,7 @@ Manifest branch ......................... $opt_manifest_branch
 Repo URL ................................ $opt_repo_url
 Local manifest .......................... $opt_local_manifest
 Number of jobs .......................... $opt_numjobs
-Sync .................................... $opt_repo_sync
+Sync .................................... $opt_sync
 
 EOF
 	for arg in $ARGUMENTS; do
