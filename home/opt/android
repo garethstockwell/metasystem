@@ -16,6 +16,7 @@ function metasystem_android_emulator()
 
 	# Parse command line
 	local args=
+	local avd=
 	local opt_help=
 	local opt_sdcard=
 	local opt_observe=1
@@ -53,6 +54,9 @@ function metasystem_android_emulator()
 			-n | -dryrun | -dry-run | --dryrun | --dry-run)
 				opt_dryrun=1
 				;;
+			-avd | @*)
+				avd=1
+				;;
 			*)
 				append=1
 				;;
@@ -63,6 +67,7 @@ function metasystem_android_emulator()
 	# Compose command
 	local cmd="$exe $args"
 	[[ -n $opt_verbose ]] && cmd="$cmd -verbose -show-kernel"
+	[[ -z $avd && -n $ANDROID_DEFAULT_AVD ]] && cmd="$cmd @$ANDROID_DEFAULT_AVD"
 
 	# Create SD card image
 	if [[ -n $opt_sdcard ]]; then
@@ -299,6 +304,8 @@ function metasystem_android_push_binary()
 
 export ANDROID_HOST_SSH_PORT=9999
 export ANDROID_TARGET_SSH_PORT=2222
+
+export ANDROID_DEFAULT_AVD=15
 
 export ANDROID_EMULATOR_SDCARD_SIZE=512M
 export ANDROID_SDK_DIR=~/work/local/sdks/android/aosp/sdk
