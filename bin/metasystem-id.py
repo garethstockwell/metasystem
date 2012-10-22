@@ -208,7 +208,10 @@ def cmd_list(args, config):
         print "ids:", str.join(' ', config['ids'].keys())
 
 def write_config_file(args, type, id):
-    sourceFileName = os.path.join(os.environ.get('METASYSTEM_TEMPLATES'), 'home', type.config_file)
+    if 'METASYSTEM_LOCAL_TEMPLATES' in os.environ.keys():
+        sourceFileName = os.path.join(os.environ.get('METASYSTEM_LOCAL_TEMPLATES'), 'home', type.config_file)
+    if not os.path.isfile(sourceFileName):
+        sourceFileName = os.path.join(os.environ.get('METASYSTEM_TEMPLATES'), 'home', type.config_file)
     destFileName = os.path.join(HOME_PATH, '.' + type.config_file)
     if not args.quiet:
         print "Generating file ~/." + type.config_file
