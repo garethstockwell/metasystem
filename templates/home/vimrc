@@ -72,7 +72,7 @@ if has("autocmd")
     autocmd FileType text set nocindent
 endif
 
-set textwidth=80
+"set textwidth=80
 
 " ----------------------------------------------------------------------------
 " Searching, substituting
