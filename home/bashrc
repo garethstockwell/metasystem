@@ -874,7 +874,12 @@ function metasystem_project_cd_build()
 	local project_env_prefix=$(metasystem_project_env_prefix $project)
 	eval local build_dir=\$${project_env_prefix}_BUILD_DIR
 	[[ $path == $project ]] && path=
-	[[ -n $build_dir ]] && metasystem_cd $build_dir/$path
+	if [[ -n $build_dir ]]; then
+		metasystem_cd $build_dir/$path
+	else
+		echo "pcd: '$arg' not recognized"
+		return 1
+	fi
 }
 
 function metasystem_project_cd_source()
@@ -885,7 +890,12 @@ function metasystem_project_cd_source()
 	local project_env_prefix=$(metasystem_project_env_prefix $project)
 	eval local source_dir=\$${project_env_prefix}_SOURCE_DIR
 	[[ $path == $project ]] && path=
-	[[ -n $source_dir ]] && metasystem_cd $source_dir/$path
+	if [[ -n $source_dir ]]; then
+		metasystem_cd $source_dir/$path
+	else
+		echo "pcd: '$arg' not recognized"
+		return 1
+	fi
 }
 
 export -f metasystem_project_env_prefix
