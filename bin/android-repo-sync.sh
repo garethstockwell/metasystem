@@ -24,6 +24,7 @@ opt_force=no
 opt_version=
 opt_verbosity=normal
 opt_dryrun=no
+opt_kill=no
 
 opt_numjobs=
 
@@ -155,6 +156,10 @@ function parse_command_line()
 				opt_numjobs=$optarg
 				;;
 
+            -k | -kill | --kill)
+				opt_kill=yes
+				;;
+
 			# Environment variables
 			*=*)
 				envvar=`expr "x$token" : 'x\([^=]*\)='`
@@ -222,6 +227,39 @@ EOF
 	done
 }
 
+function do_sync()
+{
+	echo
+
+	[[ -z $ANDROID_SRC ]] && error ANDROID_SRC is not set
+
+	execute cd $ANDROID_SRC
+
+	execute repo sync -j $opt_numjobs
+
+	echo -e "\nWaiting for repo jobs to finish ..."
+	sleep 5
+
+	timestamp=$(date '+%y%m%d-%H%M%S')
+	manifest_file=$ANDROID_SRC/.repo/manifest_${timestamp}.xml
+
+	echo -e "\nSaving manifest to $manifest_file ..."
+
+	execute repo manifest -r -o $manifest_file
+}
+
+function do_kill()
+{
+	local pid_list=$(ps ax -u $(whoami) | grep '[r]epo' | grep -v $0 | awk '{ print $1 }')
+	for pid in $pid_list; do
+		local info=$(ps -o pid= -o cmd= $pid)
+		if [[ -n $info ]]; then
+			echo -e "\n$info"
+			execute kill -9 $pid
+		fi
+	done
+}
+
 
 #------------------------------------------------------------------------------
 # Main
@@ -239,20 +277,10 @@ parse_command_line $args
 [[ $opt_verbosity != silent ]] && print_summary
 
 print_banner Starting execution
-echo
 
-[[ -z $ANDROID_SRC ]] && error ANDROID_SRC is not set
+[[ $opt_kill == yes ]] && do_kill
 
-execute cd $ANDROID_SRC
-
-execute repo sync -j $opt_numjobs
-
-timestamp=$(date '+%y%m%d-%H%M%S')
-manifest_file=$ANDROID_SRC/.repo/manifest_${timestamp}.xml
-
-echo -e "\nSaving manifest to $manifest_file ..."
-
-execute repo manifest -r -o $manifest_file
+do_sync
 
 print_banner Done
 
