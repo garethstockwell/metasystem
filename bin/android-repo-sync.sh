@@ -237,8 +237,10 @@ function do_sync()
 
 	execute repo sync -j $opt_numjobs
 
-	echo -e "\nWaiting for repo jobs to finish ..."
-	sleep 5
+	if [[ $opt_dryrun != yes ]]; then
+		echo -e "\nWaiting for repo jobs to finish ..."
+		sleep 5
+	fi
 
 	timestamp=$(date '+%y%m%d-%H%M%S')
 	manifest_file=$ANDROID_SRC/.repo/manifest_${timestamp}.xml
