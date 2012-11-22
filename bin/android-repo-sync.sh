@@ -3,6 +3,13 @@
 # android-repo-sync
 
 #------------------------------------------------------------------------------
+# Imports
+#------------------------------------------------------------------------------
+
+source $METASYSTEM_LIB/bash/path.sh
+
+
+#------------------------------------------------------------------------------
 # Constants
 #------------------------------------------------------------------------------
 
@@ -230,9 +237,43 @@ EOF
 	done
 }
 
+function print_python_version()
+{
+	local python_bin=$(which python)
+	local python_version=$(python --version 2>&1 | sed -e 's/.* //g')
+	echo "$python_bin ($python_version)"
+}
+
+function check_python_version()
+{
+	# "repo sync -j<LOTS>" hangs under Python 2.7.2 - see if we have another version to use
+	print_banner "Checking Python version"
+	echo -n "Python: "
+	print_python_version
+	local orig_path=$PATH
+	local restore=1
+	if [[ $(python --version 2>&1 | sed -e 's/.* //g') == 2.7.2 ]]; then
+		PATH=$(path_remove $(dirname $(which python)) $PATH)
+		if [[ -n $(which python 2>/dev/null) ]]; then
+			if [[ $(python --version 2>&1 | sed -e 's/.* //g') != 2.7.2 ]]; then
+				restore=0
+			fi
+		fi
+	fi
+	if [[ $restore == 1 ]]; then
+		PATH=$orig_path
+	else
+		echo -n "Replaced python with: "
+		print_python_version
+	fi
+	export PATH
+}
+
 function do_sync()
 {
-	echo
+	check_python_version
+
+	print_banner "Syncing ..."
 
 	[[ -z $ANDROID_SRC ]] && error ANDROID_SRC is not set
 
@@ -255,6 +296,7 @@ function do_sync()
 
 function do_kill()
 {
+	print_banner "Killing repo ..."
 	local pid_list=$(ps ax -u $(whoami) | grep '[r]epo' | grep -v $0 | awk '{ print $1 }')
 	for pid in $pid_list; do
 		local info=$(ps -o pid= -o cmd= $pid)
@@ -280,8 +322,6 @@ parse_command_line $args
 [[ $opt_help == yes ]] && print_usage && exit 0
 [[ $opt_version == yes ]] && print_version && exit 0
 [[ $opt_verbosity != silent ]] && print_summary
-
-print_banner Starting execution
 
 [[ $opt_kill == yes ]] && do_kill
 
