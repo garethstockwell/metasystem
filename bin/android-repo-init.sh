@@ -212,6 +212,9 @@ function parse_command_line()
 			-j=* | -jobs=* | --jobs=*)
 				opt_numjobs=$optarg
 				;;
+			-j*)
+				opt_numjobs=$(echo $token | sed -e 's/^-j//')
+				;;
 
 			-sync | --sync)
 				opt_sync=yes

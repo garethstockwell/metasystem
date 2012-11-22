@@ -159,11 +159,11 @@ function parse_command_line()
 			-j | -jobs | --jobs)
 				prev=opt_numjobs
 				;;
-			-j*)
-				opt_numjobs=$(echo $token | sed -e 's/^-j//')
-				;;
 			-j=* | -jobs=* | --jobs=*)
 				opt_numjobs=$optarg
+				;;
+			-j*)
+				opt_numjobs=$(echo $token | sed -e 's/^-j//')
 				;;
 
             -k | -kill | --kill)
