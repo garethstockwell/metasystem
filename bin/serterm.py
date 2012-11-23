@@ -5,6 +5,15 @@
 # Simple serial terminal
 # Based on miniterm example, part of PySerial distribution
 
+# TODO
+# * Implement VT100 display attributes (http://www.termsys.demon.co.uk/vtansi.htm)
+# * Refactor / clean up ColorPrinter library
+#   - Move Console code from this file into library
+#   - Tidy up color / display attribute handling
+# * Add events API
+#   - Listen on local socket
+#   - Install / remove event handler which will respond to rx data
+
 
 #------------------------------------------------------------------------------
 # Imports
