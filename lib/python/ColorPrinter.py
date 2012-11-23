@@ -181,21 +181,35 @@ class AnsiTermColor:
 
 
 class ColorPrinter:
-    def __init__(self, stream = StdStream.STDOUT):
+    def __init__(self, stream = StdStream.STDOUT, color = None):
         self.stream = stream
+        self.color = color
         if platform.system() == 'Windows':
-            self.color = Win32TermColor()
+            self.color_ctrl = Win32TermColor()
         else:
-            self.color = AnsiTermColor()
+            self.color_ctrl = AnsiTermColor()
 
-    def printToConsole(self, text, color):
-        self.color.setColor(color, self.stream)
+    def set_color(self, color):
+        self.color = color
+
+    def write(self, text, color=None):
+        if color:
+            self.color = color
+        if self.color:
+            self.color_ctrl.setColor(self.color, self.stream)
         output = StreamDict[self.stream]
         output.write(text)
 
+    def flush(self):
+        output = StreamDict[self.stream]
+        output.flush()
+
+    def printToConsole(self, text, color=None):
+        self.write(text, color=color)
+
     def __del__(self):
-        self.color.setColor(TermColor.BACKGROUND_BLACK)
-        self.color.setColor(TermColor.FOREGROUND_WHITE)
+        self.color_ctrl.setColor(TermColor.BACKGROUND_BLACK)
+        self.color_ctrl.setColor(TermColor.FOREGROUND_WHITE)
 
 
 
