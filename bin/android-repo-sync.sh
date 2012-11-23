@@ -15,9 +15,6 @@ source $METASYSTEM_LIB/bash/path.sh
 
 SCRIPT_VERSION=0.1
 
-# Arguments
-ARGUMENTS=''
-
 DEFAULT_NUMJOBS=8
 
 
@@ -35,10 +32,7 @@ opt_kill=no
 
 opt_numjobs=
 
-for arg in $ARGUMENTS; do
-	eval "arg_$arg="
-done
-
+arg_paths=
 
 #------------------------------------------------------------------------------
 # Functions
@@ -185,30 +179,11 @@ function parse_command_line()
 
 			# Normal arguments
 			*)
-				local arg_used=
-				for arg in $ARGUMENTS; do
-					if [[ -z `eval "echo \\$arg_$arg"` ]]; then
-						eval "arg_$arg=$token"
-						arg_used=1
-						break
-					fi
-				done
-				[[ -z "$arg_used" ]] && warn "Additional argument '$token' ignored"
+				[[ -n $arg_paths ]] && arg_paths="${arg_paths} "
+				arg_paths="${arg_paths}${token}"
 				;;
 		esac
 	done
-
-	# Check that required arguments have been provided
-	# TODO: we only really need to check the last argument: is there a neater way,
-	# other than using a loop?
-	local args_supplied=1
-	for arg in $ARGUMENTS; do
-		if [[ -z `eval "echo \\$arg_$arg"` ]]; then
-			args_supplied=
-			break
-		fi
-	done
-	[[ -z "$args_supplied" ]] && usage_error 'Insufficient arguments provided'
 
 	# Apply defaults
 	[[ -z $opt_numjobs ]] && opt_numjobs=$DEFAULT_NUMJOBS
@@ -220,6 +195,8 @@ function print_summary()
 	local total_num_dots=40
 	cat << EOF
 
+Paths ................................... $arg_paths
+
 Dry run ................................. $opt_dryrun
 Force ................................... $opt_force
 Verbosity ............................... $opt_verbosity
@@ -227,14 +204,6 @@ Verbosity ............................... $opt_verbosity
 Number of jobs .......................... $opt_numjobs
 
 EOF
-	for arg in $ARGUMENTS; do
-		local arg_len=${#arg}
-		let num_dots=total_num_dots-arg_len
-		local value=`eval "echo \\$arg_$arg"`
-		echo -n "$arg "
-		awk "BEGIN{for(c=0;c<$num_dots;c++) printf \".\"}"
-		echo " $value"
-	done
 }
 
 function print_python_version()
@@ -279,7 +248,7 @@ function do_sync()
 
 	execute cd $ANDROID_SRC
 
-	execute repo sync -j $opt_numjobs
+	execute repo sync -j $opt_numjobs $arg_paths
 
 	if [[ $opt_dryrun != yes ]]; then
 		echo -e "\nWaiting for repo jobs to finish ..."
