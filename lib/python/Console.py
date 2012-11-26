@@ -3,153 +3,143 @@
 #------------------------------------------------------------------------------
 
 import os
+import sys
+
+__all__ = ['stdout', 'stderr', 'stdin']
 
 
 #------------------------------------------------------------------------------
 # Colors
 #------------------------------------------------------------------------------
 
-class TermColor:
-    FOREGROUND_BLACK     = 0
-    FOREGROUND_BLUE      = 1
-    FOREGROUND_GREEN     = 2
-    FOREGROUND_CYAN      = 3
-    FOREGROUND_RED       = 4
-    FOREGROUND_MAGENTA   = 5
-    FOREGROUND_YELLOW    = 6
-    FOREGROUND_GREY      = 7
-    FOREGROUND_WHITE     = 8
+BLACK     = 0
+BLUE      = 1
+GREEN     = 2
+CYAN      = 3
+RED       = 4
+MAGENTA   = 5
+YELLOW    = 6
+GREY      = 7
+WHITE     = 8
 
-    BACKGROUND_BLACK     = 100
-    BACKGROUND_BLUE      = 101
-    BACKGROUND_GREEN     = 102
-    BACKGROUND_CYAN      = 103
-    BACKGROUND_RED       = 104
-    BACKGROUND_MAGENTA   = 105
-    BACKGROUND_YELLOW    = 106
-    BACKGROUND_GREY      = 107
-    BACKGROUND_WHITE     = 108
-
-
-# From http://stackoverflow.com/questions/384076/how-can-i-make-the-python-logging-output-to-be-colored
-class Win32TermColor:
-    # wincon.h
-    FOREGROUND_BLACK     = 0x0000
-    FOREGROUND_BLUE      = 0x0001
-    FOREGROUND_GREEN     = 0x0002
-    FOREGROUND_CYAN      = 0x0003
-    FOREGROUND_RED       = 0x0004
-    FOREGROUND_MAGENTA   = 0x0005
-    FOREGROUND_YELLOW    = 0x0006
-    FOREGROUND_GREY      = 0x0007
-    FOREGROUND_INTENSITY = 0x0008 # foreground color is intensified.
-
-    FOREGROUND_WHITE     = FOREGROUND_BLUE|FOREGROUND_GREEN |FOREGROUND_RED
-
-    BACKGROUND_BLACK     = 0x0000
-    BACKGROUND_BLUE      = 0x0010
-    BACKGROUND_GREEN     = 0x0020
-    BACKGROUND_CYAN      = 0x0030
-    BACKGROUND_RED       = 0x0040
-    BACKGROUND_MAGENTA   = 0x0050
-    BACKGROUND_YELLOW    = 0x0060
-    BACKGROUND_GREY      = 0x0070
-    BACKGROUND_INTENSITY = 0x0080 # background color is intensified.
-
-    BACKGROUND_WHITE     = BACKGROUND_BLUE|BACKGROUND_GREEN |BACKGROUND_RED
-
-    ColorDict = {
-        TermColor.FOREGROUND_BLACK      : FOREGROUND_BLACK,
-        TermColor.FOREGROUND_BLUE       : FOREGROUND_BLUE,
-        TermColor.FOREGROUND_GREEN      : FOREGROUND_GREEN,
-        TermColor.FOREGROUND_CYAN       : FOREGROUND_CYAN,
-        TermColor.FOREGROUND_RED        : FOREGROUND_RED,
-        TermColor.FOREGROUND_MAGENTA    : FOREGROUND_MAGENTA,
-        TermColor.FOREGROUND_YELLOW     : FOREGROUND_YELLOW,
-        TermColor.FOREGROUND_GREY       : FOREGROUND_GREY,
-        TermColor.FOREGROUND_WHITE      : FOREGROUND_WHITE,
-
-        TermColor.BACKGROUND_BLACK      : BACKGROUND_BLACK,
-        TermColor.BACKGROUND_BLUE       : BACKGROUND_BLUE,
-        TermColor.BACKGROUND_GREEN      : BACKGROUND_GREEN,
-        TermColor.BACKGROUND_CYAN       : BACKGROUND_CYAN,
-        TermColor.BACKGROUND_RED        : BACKGROUND_RED,
-        TermColor.BACKGROUND_MAGENTA    : BACKGROUND_MAGENTA,
-        TermColor.BACKGROUND_YELLOW     : BACKGROUND_YELLOW,
-        TermColor.BACKGROUND_GREY       : BACKGROUND_GREY,
-        TermColor.BACKGROUND_WHITE      : BACKGROUND_WHITE
-    }
-
-
-class AnsiTermColor:
-    FOREGROUND_BLACK     = ''            # ??
-    FOREGROUND_BLUE      = '\033[0;34m'
-    FOREGROUND_GREEN     = '\033[1;32m'
-    FOREGROUND_CYAN      = '\033[1;36m'
-    FOREGROUND_RED       = '\033[0;31m'
-    FOREGROUND_MAGENTA   = '\033[1;35m'  # Pink?
-    FOREGROUND_YELLOW    = '\033[1;33m'
-    FOREGROUND_GREY      = ''            # ??
-    FOREGROUND_WHITE     = '\033[1;37m'
-
-    BACKGROUND_BLACK     = ''            # ??
-    BACKGROUND_BLUE      = ''            # ??
-    BACKGROUND_GREEN     = ''            # ??
-    BACKGROUND_CYAN      = ''            # ??
-    BACKGROUND_RED       = ''            # ??
-    BACKGROUND_MAGENTA   = ''            # ??
-    BACKGROUND_YELLOW    = ''            # ??
-    BACKGROUND_GREY      = ''            # ??
-    BACKGROUND_INTENSITY = ''            # ??
-    BACKGROUND_WHITE     = ''
-
-    ColorDict = {
-        TermColor.FOREGROUND_BLACK      : FOREGROUND_BLACK,
-        TermColor.FOREGROUND_BLUE       : FOREGROUND_BLUE,
-        TermColor.FOREGROUND_GREEN      : FOREGROUND_GREEN,
-        TermColor.FOREGROUND_CYAN       : FOREGROUND_CYAN,
-        TermColor.FOREGROUND_RED        : FOREGROUND_RED,
-        TermColor.FOREGROUND_MAGENTA    : FOREGROUND_MAGENTA,
-        TermColor.FOREGROUND_YELLOW     : FOREGROUND_YELLOW,
-        TermColor.FOREGROUND_GREY       : FOREGROUND_GREY,
-        TermColor.FOREGROUND_WHITE      : FOREGROUND_WHITE,
-
-        TermColor.BACKGROUND_BLACK      : BACKGROUND_BLACK,
-        TermColor.BACKGROUND_BLUE       : BACKGROUND_BLUE,
-        TermColor.BACKGROUND_GREEN      : BACKGROUND_GREEN,
-        TermColor.BACKGROUND_CYAN       : BACKGROUND_CYAN,
-        TermColor.BACKGROUND_RED        : BACKGROUND_RED,
-        TermColor.BACKGROUND_MAGENTA    : BACKGROUND_MAGENTA,
-        TermColor.BACKGROUND_YELLOW     : BACKGROUND_YELLOW,
-        TermColor.BACKGROUND_GREY       : BACKGROUND_GREY,
-        TermColor.BACKGROUND_WHITE      : BACKGROUND_WHITE
-    }
-
-
-#------------------------------------------------------------------------------
-# Streams
-#------------------------------------------------------------------------------
-
-class TermStream:
-    STDOUT = 1
-    STDERR = 2
+INTENSITY = 100
 
 
 #------------------------------------------------------------------------------
 # Console
 #------------------------------------------------------------------------------
 
+class Stack(list):
+    def push(self, item):
+        self.append(item)
+
+    def is_empty(self):
+        return not self
+
+
+class ConsoleColor(object):
+    def __init__(self):
+        self.stack = Stack()
+        self.value = None
+
+    def push(self, color):
+        self.stack.push(color)
+        self.value = color
+
+    def pop(self):
+        return self.stack.pop()
+
+
+class OutputStreamBase(object):
+    def __init__(self, stream):
+        self.stream = stream
+        self.fg = ConsoleColor()
+        self.bg = ConsoleColor()
+
+    def set_fg(self, color):
+        self.fg.value = color
+
+    def push_fg(self, color):
+        self.fg.push(color)
+
+    def pop_fg(self):
+        return self.fg.pop()
+
+    def set_bg(self, color):
+        self.bg.value = color
+
+    def push_bg(self, color):
+        self.bg.push(color)
+
+    def pop_bg(self):
+        return self.bg.pop()
+
+    def write(self, value):
+        self._apply_colors()
+        self.stream.write(value)
+
+    def flush(self):
+        self.stream.flush()
+
+
 if os.name == 'nt':
-    import msvcrt
-    class Console(object):
+    import ctypes, msvcrt
+
+    class OutputStream(OutputStreamBase):
+
+        # From http://stackoverflow.com/questions/384076/how-can-i-make-the-python-logging-output-to-be-colored
+
+        # wincon.h
+        FG_DICT = {
+            BLACK     : 0x0000,
+            BLUE      : 0x0001,
+            GREEN     : 0x0002,
+            CYAN      : 0x0003,
+            RED       : 0x0004,
+            MAGENTA   : 0x0005,
+            YELLOW    : 0x0006,
+            GREY      : 0x0007,
+            INTENSITY : 0x0008, # foreground color is intensified.
+            WHITE     : 0x0007, # BLUE | GREEN | RED
+        }
+
+        # wincon.h
+        BG_DICT = {
+            BLACK     : 0x0000,
+            BLUE      : 0x0010,
+            GREEN     : 0x0020,
+            CYAN      : 0x0030,
+            RED       : 0x0040,
+            MAGENTA   : 0x0050,
+            YELLOW    : 0x0060,
+            GREY      : 0x0070,
+            INTENSITY : 0x0080, # background color is intensified.
+            WHITE     : 0x0070, # BLUE | GREEN | RED
+        }
+
+        # winbase.h
+        STREAM_DICT = {
+            sys.stdout : -11,
+            sys.stderr : -12
+        }
+
+        def __init__(self, stream):
+            OutputStreamBase.__init__(self, stream)
+
+        def _apply_colors(self):
+            mask = 0
+            if self.fg.value:
+                mask |= OutputStream.FG_DICT[self.fg.value]
+            if self.bg.value:
+                mask |= OutputStream.BG_DICT[self.bg.value]
+            if mask != 0:
+                handle = ctypes.windll.kernel32.GetStdHandle(OutputStream.STREAM_DICT[self.stream])
+                ctypes.windll.kernel32.SetConsoleTextAttribute(handle, mask)
+
+
+    class InputStream(object):
         def __init__(self):
             pass
-
-        def setup(self):
-            pass    # Do nothing for 'nt'
-
-        def cleanup(self):
-            pass    # Do nothing for 'nt'
 
         def getkey(self):
             while True:
@@ -161,15 +151,31 @@ if os.name == 'nt':
                         return '\n'
                     return z
 
-    console = Console()
+    stdout = OutputStream(sys.stdout)
+    stderr = OutputStream(sys.stderr)
+    stdin = InputStream()
 
 elif os.name == 'posix':
-    import termios, sys, os
-    class Console(object):
+    import atexit, os, termios
+
+    class OutputStream(OutputStreamBase):
+        def __init__(self, stream):
+            OutputStreamBase.__init__(self, stream)
+
+        def _apply_bg(self, color):
+            # TODO
+            pass
+
+        def _apply_fg(self, color):
+            # TODO
+            pass
+
+
+    class InputStream(object):
         def __init__(self):
             self.fd = sys.stdin.fileno()
 
-        def setup(self):
+        def _setup(self):
             self.old = termios.tcgetattr(self.fd)
             new = termios.tcgetattr(self.fd)
             new[3] = new[3] & ~termios.ICANON & ~termios.ECHO & ~termios.ISIG
@@ -181,17 +187,20 @@ elif os.name == 'posix':
             c = os.read(self.fd, 1)
             return c
 
-        def cleanup(self):
+        def _cleanup(self):
             termios.tcsetattr(self.fd, termios.TCSAFLUSH, self.old)
 
-    console = Console()
+    stdout = OutputStream(sys.stdout)
+    stderr = OutputStream(sys.stderr)
+    stdin = InputStream()
 
-    def console_cleanup():
-        sys.stderr.write("console_cleanup\n")
-        console.cleanup()
+    def _cleanup():
+        stdin._cleanup()
 
-    console.setup()
-    sys.exitfunc = cleanup_console      # terminal modes have to be restored on exit...
+    stdin._setup()
+
+    # Terminal modes have to be restored on exit
+    atexit.register(_cleanup)
 
 else:
     raise NotImplementedError("Sorry no implementation for your platform (%s) available." % sys.platform)
