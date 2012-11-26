@@ -43,7 +43,6 @@ class Client(object):
         self.socket.connect((self.host, self.port))
         log_debug("Client.__init__ connected")
 
-
     '''
     Send a command, and block until reply is received
     '''
@@ -84,7 +83,11 @@ class Server(object):
         self.queue = Queue.Queue(1)
         self.thread = threading.Thread(target=Server.thread_func,
                                        args=(host, port, self.queue))
+        self.thread.daemon = True
         self.thread.start()
+
+    def __del__(self):
+        self.thread.join()
 
     def get_message(self):
         log_debug("Server.get_message")
