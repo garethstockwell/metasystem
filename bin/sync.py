@@ -121,7 +121,7 @@ import sys
 from time import time
 
 sys.path.append(os.path.join(sys.path[0], '../lib/python'))
-from ColorPrinter import *
+import Console
 
 
 #------------------------------------------------------------------------------
@@ -152,16 +152,18 @@ def check_env():
         if value == None or value == '':
             raise IOError, "Environment variable '{0:s}' not set".format(var)
 
-def PrintToConsole(message, color = TermColor.FOREGROUND_WHITE):
-    ColorPrinter().printToConsole(message, color)
+
+def PrintToConsole(message, color = None):
+    Console.stdout.set_fg(color)
+    Console.stdout.write(message)
 
 
 def PrintError(message):
-    PrintToConsole('Error: ' + message + '\n', TermColor.FOREGROUND_RED)
+    PrintToConsole('Error: ' + message + '\n')
 
 
 def PrintWarning(message):
-    PrintToConsole('Warning: ' + message + '\n', TermColor.FOREGROUND_YELLOW)
+    PrintToConsole('Warning: ' + message + '\n')
 
 
 def Execute(command, options, flag = True):
@@ -213,12 +215,12 @@ def FormatDuration(deltaSecs):
 def PrintDuration(now, then):
     if then:
         deltaSecs = now - then
-        color = TermColor.FOREGROUND_WHITE
+        color = Console.WHITE
         if deltaSecs >= RedThreshold:
-            color = TermColor.FOREGROUND_RED
+            color = Console.RED
         else:
             if deltaSecs >= YellowThreshold:
-                color = TermColor.FOREGROUND_YELLOW
+                color = Console.YELLOW
         PrintToConsole(FormatDuration(deltaSecs), color)
     else:
         sys.stdout.write('never')
@@ -373,9 +375,9 @@ class History:
         sys.stdout.write('Last run:                 ')
         PrintDuration(now, self.lastRun)
         sys.stdout.write('\n')
-        color = TermColor.FOREGROUND_WHITE
+        color = Console.WHITE
         if self.lastSuccessfulRun != self.lastRun:
-            color = TermColor.FOREGROUND_YELLOW
+            color = Console.YELLOW
         PrintToConsole('Last successful run:      ', color)
         PrintDuration(now, self.lastSuccessfulRun)
         sys.stdout.write('\n')
@@ -487,18 +489,18 @@ class Project:
         sys.stdout.write('    Last pull:            ')
         PrintDuration(now, history.lastPull)
         sys.stdout.write('\n')
-        color = TermColor.FOREGROUND_WHITE
+        color = Console.WHITE
         if history.lastSuccessfulPull != history.lastPull:
-            color = TermColor.FOREGROUND_YELLOW
+            color = Console.YELLOW
         PrintToConsole('    Last successful pull: ', color)
         PrintDuration(now, history.lastSuccessfulPull)
         sys.stdout.write('\n')
         sys.stdout.write('    Last push:            ')
         PrintDuration(now, history.lastPush)
         sys.stdout.write('\n')
-        color = TermColor.FOREGROUND_WHITE
+        color = Console.WHITE
         if history.lastSuccessfulPush != history.lastPush:
-            color = TermColor.FOREGROUND_YELLOW
+            color = Console.YELLOW
         PrintToConsole('    Last successful push: ', color)
         PrintDuration(now, history.lastSuccessfulPush)
         sys.stdout.write('\n')
@@ -726,9 +728,9 @@ class UnisonProject(Project):
         sys.stdout.write('    Last sync:            ')
         PrintDuration(now, history.lastPull)
         sys.stdout.write('\n')
-        color = TermColor.FOREGROUND_WHITE
+        color = Console.WHITE
         if history.lastSuccessfulPull != history.lastPull:
-            color = TermColor.FOREGROUND_YELLOW
+            color = Console.YELLOW
         PrintToConsole('    Last successful sync: ', color)
         PrintDuration(now, history.lastSuccessfulPull)
         sys.stdout.write('\n')
@@ -1147,7 +1149,7 @@ def ActionList(commandLine, config):
 
 # Helper for ActionInit, ActionSync
 def PrintResults(timer, result):
-    PrintToConsole(timer.__repr__() + '\n\n', TermColor.FOREGROUND_CYAN)
+    PrintToConsole(timer.__repr__() + '\n\n', Console.CYAN)
 
     if len(result.keys()):
         nameWidth = max([len(x) for x in result.keys()])
@@ -1155,13 +1157,13 @@ def PrintResults(timer, result):
             formatString = "%(name)-" + str(nameWidth) + "s : "
             sys.stdout.write(formatString % {'name' : name})
             if result[name]:
-                PrintToConsole('OK', TermColor.FOREGROUND_GREEN)
+                PrintToConsole('OK', Console.GREEN)
             else:
-                PrintToConsole('FAILED', TermColor.FOREGROUND_RED)
+                PrintToConsole('FAILED', Console.RED)
             sys.stdout.write('\n')
 
 def printLocal(config):
-    PrintToConsole("Local\n\n", TermColor.FOREGROUND_GREEN)
+    PrintToConsole("Local\n\n", Console.GREEN)
     print config['local']
 
 
@@ -1186,11 +1188,11 @@ def ActionInit(commandLine, config):
         project = config['projects'][name]
         if os.path.exists(project.local_path):
             PrintToConsole("\nSkipping project '" + project.name + "' [" + project.type + "]\n", \
-               TermColor.FOREGROUND_CYAN)
+               Console.CYAN)
             print "Local path '" + project.local_path + "' already exists"
         else:
             PrintToConsole("\nInitialising project '" + project.name + "' [" + project.type + "] ...\n\n", \
-                           TermColor.FOREGROUND_GREEN)
+                           Console.GREEN)
             printProject(project, options, config)
             try:
                 timer = DurationTimer("Initialization of project '" + name + "'")
@@ -1231,7 +1233,7 @@ def ActionSync(commandLine, config):
         project = config['projects'][name]
         if len(commandLine['args']) or project.auto or commandLine['options'].all:
             PrintToConsole("\nSynchronising project '" + name + "' [" + project.type + "] ...\n\n", \
-                           TermColor.FOREGROUND_GREEN)
+                           Console.GREEN)
             printProject(project, options, config)
             try:
                 timer = DurationTimer("Sync of project '" + name + "'")
@@ -1245,7 +1247,7 @@ def ActionSync(commandLine, config):
                 success = False
         else:
             PrintToConsole("\nSkipping project '" + name + "' [" + project.type + "] - auto flag not set\n", \
-               TermColor.FOREGROUND_CYAN)
+               Console.CYAN)
 
     history.setLastRun(now, success)
     success &= WriteHistory(history)

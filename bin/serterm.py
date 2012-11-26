@@ -27,7 +27,7 @@ import sys
 import threading
 
 sys.path.append(os.path.join(sys.path[0], '../lib/python'))
-from ColorPrinter import *
+import Console
 
 
 #------------------------------------------------------------------------------
@@ -37,13 +37,6 @@ from ColorPrinter import *
 LINE_WIDTH = 80
 
 EXIT_CHARACTER = '\x1d'   # GS/CTRL+]
-
-
-#------------------------------------------------------------------------------
-# Global variables
-#------------------------------------------------------------------------------
-
-global console
 
 
 #------------------------------------------------------------------------------
@@ -164,8 +157,11 @@ class Miniterm(object):
         self.rts_state = True
         self.break_state = False
 
-        self.rx_console = ColorPrinter(color = TermColor.FOREGROUND_GREEN)
-        self.echo_console = ColorPrinter(color = TermColor.FOREGROUND_YELLOW)
+        self.rx_console = Console.OutputStream(sys.stdout)
+        self.rx_console.set_fg(Console.GREEN)
+
+        self.echo_console = Console.OuputStream(sys.stdout)
+        self.echo_console.set_fg(Console.YELLOW)
 
     def _start_reader(self):
         self._reader_alive = True
@@ -263,7 +259,7 @@ class Miniterm(object):
         try:
             while self.alive:
                 try:
-                    b = console.getkey()
+                    b = Console.stdin.getkey()
                 except KeyboardInterrupt:
                     b = serial.to_bytes([3])
                 c = character(b)
@@ -331,68 +327,6 @@ def key_description(character):
         return 'Ctrl+%c' % (ord('@') + ascii_code)
     else:
         return repr(character)
-
-
-#------------------------------------------------------------------------------
-# Choose console
-#------------------------------------------------------------------------------
-
-if os.name == 'nt':
-    import msvcrt
-    class Console(object):
-        def __init__(self):
-            pass
-
-        def setup(self):
-            pass    # Do nothing for 'nt'
-
-        def cleanup(self):
-            pass    # Do nothing for 'nt'
-
-        def getkey(self):
-            while True:
-                z = msvcrt.getch()
-                if z == '\0' or z == '\xe0':    # functions keys, ignore
-                    msvcrt.getch()
-                else:
-                    if z == '\r':
-                        return '\n'
-                    return z
-
-    console = Console()
-
-elif os.name == 'posix':
-    import termios, sys, os
-    class Console(object):
-        def __init__(self):
-            self.fd = sys.stdin.fileno()
-
-        def setup(self):
-            self.old = termios.tcgetattr(self.fd)
-            new = termios.tcgetattr(self.fd)
-            new[3] = new[3] & ~termios.ICANON & ~termios.ECHO & ~termios.ISIG
-            new[6][termios.VMIN] = 1
-            new[6][termios.VTIME] = 0
-            termios.tcsetattr(self.fd, termios.TCSANOW, new)
-
-        def getkey(self):
-            c = os.read(self.fd, 1)
-            return c
-
-        def cleanup(self):
-            termios.tcsetattr(self.fd, termios.TCSAFLUSH, self.old)
-
-    console = Console()
-
-    def cleanup_console():
-        sys.stderr.write("\ncleanup_console\n")
-        console.cleanup()
-
-    console.setup()
-    sys.exitfunc = cleanup_console      # terminal modes have to be restored on exit...
-
-else:
-    raise NotImplementedError("Sorry no implementation for your platform (%s) available." % sys.platform)
 
 
 #------------------------------------------------------------------------------

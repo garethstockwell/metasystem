@@ -75,8 +75,9 @@ class OutputStreamBase(object):
         return self.bg.pop()
 
     def write(self, value):
-        self._apply_colors()
+        self._apply_colors(self.fg.value, self.bg.value)
         self.stream.write(value)
+        self._apply_colors(WHITE, BLACK)
 
     def flush(self):
         self.stream.flush()
@@ -126,12 +127,12 @@ if os.name == 'nt':
         def __init__(self, stream):
             OutputStreamBase.__init__(self, stream)
 
-        def _apply_colors(self):
+        def _apply_colors(self, fg, bg):
             mask = 0
-            if self.fg.value:
-                mask |= OutputStream.FG_DICT[self.fg.value]
-            if self.bg.value:
-                mask |= OutputStream.BG_DICT[self.bg.value]
+            if fg:
+                mask |= OutputStream.FG_DICT[fg]
+            if bg:
+                mask |= OutputStream.BG_DICT[bg]
             if mask != 0:
                 handle = ctypes.windll.kernel32.GetStdHandle(OutputStream.STREAM_DICT[self.stream])
                 ctypes.windll.kernel32.SetConsoleTextAttribute(handle, mask)
@@ -159,16 +160,41 @@ elif os.name == 'posix':
     import atexit, os, termios
 
     class OutputStream(OutputStreamBase):
+
+        FG_DICT = {
+            BLACK     : '',
+            BLUE      : '\033[0;34m',
+            GREEN     : '\033[1;32m',
+            CYAN      : '\033[1;36m',
+            RED       : '\033[0;31m',
+            MAGENTA   : '\033[1;35m',
+            YELLOW    : '\033[1;33m',
+            GREY      : '',
+            WHITE     : '\033[1;37m',
+            INTENSITY : '',
+        }
+
+        BG_DICT = {
+            BLACK     : '',
+            BLUE      : '',
+            GREEN     : '',
+            CYAN      : '',
+            RED       : '',
+            MAGENTA   : '',
+            YELLOW    : '',
+            GREY      : '',
+            WHITE     : '',
+            INTENSITY : '',
+        }
+
         def __init__(self, stream):
             OutputStreamBase.__init__(self, stream)
 
-        def _apply_bg(self, color):
-            # TODO
-            pass
-
-        def _apply_fg(self, color):
-            # TODO
-            pass
+        def _apply_colors(self, fg, bg):
+            if fg:
+                self.stream.write(OutputStream.FG_DICT[fg])
+            if bg:
+                self.stream.write(OutputStream.BG_DICT[bg])
 
 
     class InputStream(object):

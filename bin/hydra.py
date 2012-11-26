@@ -28,7 +28,7 @@ import sys
 from time import time
 
 sys.path.append(os.path.join(sys.path[0], '../lib/python'))
-from ColorPrinter import *
+import Console
 
 
 #------------------------------------------------------------------------------
@@ -52,11 +52,12 @@ def check_env():
         if value == None or value == '':
             raise IOError, "Environment variable '{0:s}' not set".format(var)
 
-def PrintToConsole(message, color = TermColor.FOREGROUND_WHITE):
-    ColorPrinter().printToConsole(message, color)
+def PrintToConsole(message, color = None):
+    Console.stdout.set_fg(color)
+    Console.stdout.write(message)
 
 def PrintError(message):
-    PrintToConsole('Error: ' + message + '\n', TermColor.FOREGROUND_RED)
+    PrintToConsole('Error: ' + message + '\n', Console.RED)
 
 def UsageError(error):
     parser = CreateCommandLineParser()
@@ -65,7 +66,7 @@ def UsageError(error):
     exit(1)
 
 def PrintWarning(message):
-    PrintToConsole('Warning: ' + message + '\n', TermColor.FOREGROUND_YELLOW)
+    PrintToConsole('Warning: ' + message + '\n', Console.YELLOW)
 
 def Call(command, options):
     print command
