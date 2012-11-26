@@ -355,7 +355,7 @@ def main(args):
                             convert_outgoing=convert_outgoing,
                             repr_mode=repr_mode)
     except serial.SerialException, e:
-        sys.stderr.write("could not open port %r: %s\n" % (port, e))
+        sys.stderr.write("could not open port %r: %s\n" % (args.port, e))
         sys.exit(1)
 
     if not args.quiet:
