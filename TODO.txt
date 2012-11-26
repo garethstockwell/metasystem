@@ -5,6 +5,10 @@ TODO for metasystem
 Definitely
 ---------------------------------------------------------------------------
 
+* Replace METASYSTEM_OPT_* with METASYSTEM_CONFIG_*
+	- Set from ~/.profile
+	- Allows per-machine setup tweaks
+
 
 ---------------------------------------------------------------------------
 Maybe

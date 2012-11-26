@@ -8,8 +8,11 @@ METASYSTEM_OPT_ANDROID=yes
 METASYSTEM_OPT_SYMBIAN=
 METASYSTEM_OPT_QT=yes
 
-#METASYSTEM_OPT_CD=dirinfo
-METASYSTEM_OPT_CD=smartcd
+METASYSTEM_OPT_CD=$METASYSTEM_CONFIG_CD
+if [[ -z $METASYSTEM_OPT_CD ]]; then
+	#METASYSTEM_OPT_CD=dirinfo
+	METASYSTEM_OPT_CD=smartcd
+fi
 
 
 #------------------------------------------------------------------------------
