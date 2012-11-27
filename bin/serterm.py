@@ -160,7 +160,7 @@ class Miniterm(object):
         self.rx_console = Console.OutputStream(sys.stdout)
         self.rx_console.set_fg(Console.GREEN)
 
-        self.echo_console = Console.OuputStream(sys.stdout)
+        self.echo_console = Console.OutputStream(sys.stdout)
         self.echo_console.set_fg(Console.YELLOW)
 
     def _start_reader(self):
