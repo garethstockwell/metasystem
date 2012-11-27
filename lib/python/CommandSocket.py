@@ -35,7 +35,11 @@ def log_debug(msg):
 #------------------------------------------------------------------------------
 
 class Client(object):
-    def __init__(self, host=DEFAULT_HOST, port=DEFAULT_PORT):
+    def __init__(self, host=None, port=None):
+        if not host:
+            host = DEFAULT_HOST
+        if not port:
+            port = DEFAULT_PORT
         log_debug("Client.__init__ host '%s' port %d" % (host, port))
         self.host = host
         self.port = port
@@ -77,7 +81,11 @@ class Message(object):
 
 
 class Server(object):
-    def __init__(self, host=DEFAULT_HOST, port=DEFAULT_PORT):
+    def __init__(self, host=None, port=None):
+        if not host:
+            host = DEFAULT_HOST
+        if not port:
+            port = DEFAULT_PORT
         log_debug("Server.__init__ host '%s' port %d" %
                 (host, port))
         self.queue = Queue.Queue(1)
@@ -87,12 +95,16 @@ class Server(object):
         self.thread.start()
 
     def __del__(self):
-        self.thread.join()
+        self.thread.join(1)
 
-    def get_message(self):
-        log_debug("Server.get_message")
-        msg = self.queue.get()
-        log_debug("Server.get_message msg '%s'" % (msg.msg))
+    def get_message(self, block=True, timeout=None):
+        #log_debug("Server.get_message block %s timeout %s" % (str(block), str(timeout)))
+        msg = None
+        try:
+            msg = self.queue.get(block, timeout)
+            log_debug("Server.get_message msg '%s'" % (msg.msg))
+        except Queue.Empty:
+            pass
         return msg
 
     @classmethod

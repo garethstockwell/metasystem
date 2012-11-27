@@ -7,9 +7,6 @@
 
 # TODO
 # * Implement VT100 display attributes (http://www.termsys.demon.co.uk/vtansi.htm)
-# * Refactor / clean up ColorPrinter library
-#   - Move Console code from this file into library
-#   - Tidy up color / display attribute handling
 # * Add events API
 #   - Listen on local socket
 #   - Install / remove event handler which will respond to rx data
@@ -28,6 +25,7 @@ import threading
 
 sys.path.append(os.path.join(sys.path[0], '../lib/python'))
 import Console
+import CommandSocket
 
 
 #------------------------------------------------------------------------------
@@ -56,16 +54,6 @@ class ArgumentParser(argparse.ArgumentParser):
                                          description = description,
                                          epilog = epilog)
 
-        # Positional arguments
-        self.add_argument('port',
-                          metavar='PORT',
-                          help='Port')
-        self.add_argument('rate',
-                          metavar='RATE',
-                          help='Baud rate (default {0})'.format(self.DEFAULT_RATE),
-                          nargs='?',
-                          default=self.DEFAULT_RATE)
-
         # Options
         self.add_argument('--debug',
                           dest='debug', default=False,
@@ -89,37 +77,80 @@ class ArgumentParser(argparse.ArgumentParser):
                           version=version,
                           help="show program's version number and exit")
 
-        self.add_argument('-p', '--parity',
-                          dest='parity',
-                          action='store',
-                          default='N',
-                          help="parity [N, E, O, S, M] (default N)")
-        self.add_argument('--xonxoff',
-                          dest='xonxoff',
-                          action='store_true',
-                          default=False,
-                          help="enable software flow control (default off)")
-        self.add_argument('--rtscts',
-                          dest='rtscts',
-                          action='store_true',
-                          default=False,
-                          help="enable RTS/CTS flow control (default off)")
-        self.add_argument('--echo',
-                          dest='echo',
-                          action='store_true',
-                          default=False,
-                          help="enable echo (default off)")
+        subparsers = self.add_subparsers(help='subcommands',
+                                         parser_class=argparse.ArgumentParser)
 
-        self.add_argument('--cr',
-                          dest='cr',
-                          action='store_true',
-                          default=False,
-                          help="do not sent CR+LF, send CR only")
-        self.add_argument('--lf',
-                          dest='lf',
-                          action='store_true',
-                          default=False,
-                          help="do not send CR+LF, send LF only")
+        parser_connect = subparsers.add_parser('connect', help='Connect to serial port')
+        parser_connect.add_argument('port',
+                                    metavar='PORT',
+                                    help='Port')
+        parser_connect.add_argument('rate',
+                                    metavar='RATE',
+                                    help='Baud rate (default {0})'.format(self.DEFAULT_RATE),
+                                    nargs='?',
+                                    default=self.DEFAULT_RATE)
+        parser_connect.add_argument('-p', '--parity',
+                                    dest='parity',
+                                    action='store',
+                                    default='N',
+                                    help="parity [N, E, O, S, M] (default N)")
+        parser_connect.add_argument('--xonxoff',
+                                    dest='xonxoff',
+                                    action='store_true',
+                                    default=False,
+                                    help="enable software flow control (default off)")
+        parser_connect.add_argument('--rtscts',
+                                    dest='rtscts',
+                                    action='store_true',
+                                    default=False,
+                                    help="enable RTS/CTS flow control (default off)")
+        parser_connect.add_argument('--echo',
+                                    dest='echo',
+                                    action='store_true',
+                                    default=False,
+                                    help="enable echo (default off)")
+        parser_connect.add_argument('--cr',
+                                    dest='cr',
+                                    action='store_true',
+                                    default=False,
+                                    help="do not sent CR+LF, send CR only")
+        parser_connect.add_argument('--lf',
+                                    dest='lf',
+                                    action='store_true',
+                                    default=False,
+                                    help="do not send CR+LF, send LF only")
+        parser_connect.add_argument('--command-port',
+                                    dest='command_port',
+                                    action='store',
+                                    help='port on which to listen for commands',
+                                    default=None)
+        parser_connect.set_defaults(func=do_connect)
+
+        parser_send = subparsers.add_parser('send', help='Send message to console')
+        parser_send.add_argument('cmd',
+                                 metavar='COMMAND',
+                                 help='command',
+                                 nargs='+')
+        parser_send.add_argument('--host',
+                                 dest='command_host',
+                                 action='store',
+                                 help='host',
+                                 default=None)
+        parser_send.add_argument('--port',
+                                 dest='command_port',
+                                 action='store',
+                                 help='port',
+                                 default=None)
+        parser_send.set_defaults(func=do_send)
+
+
+#------------------------------------------------------------------------------
+# Helper functions
+#------------------------------------------------------------------------------
+
+def log_debug(msg):
+    logging.debug(('[%d] serterm ' %
+                    (threading.current_thread().ident)) + msg)
 
 
 #------------------------------------------------------------------------------
@@ -142,7 +173,7 @@ else:
         return b
 
 class Miniterm(object):
-    def __init__(self, port, baudrate, parity, rtscts, xonxoff, echo=False, convert_outgoing=CONVERT_CRLF, repr_mode=0):
+    def __init__(self, port, baudrate, parity, rtscts, xonxoff, echo=False, convert_outgoing=CONVERT_CRLF, repr_mode=0, command_port=None):
         try:
             self.serial = serial.serial_for_url(port, baudrate, parity=parity, rtscts=rtscts, xonxoff=xonxoff, timeout=1)
         except AttributeError:
@@ -156,6 +187,9 @@ class Miniterm(object):
         self.dtr_state = True
         self.rts_state = True
         self.break_state = False
+        if command_port:
+            command_port = int(command_port)
+        self.command_server = CommandSocket.Server(port=command_port)
 
     def _start_reader(self):
         self._reader_alive = True
@@ -178,6 +212,17 @@ class Miniterm(object):
 
     def stop(self):
         self.alive = False
+
+    def loop(self, transmit_only=False):
+        while self.alive:
+            msg = self.command_server.get_message(block=True, timeout=0.05)
+            if msg:
+                self.handle_msg(msg)
+        self.join(transmit_only)
+
+    def handle_msg(self, msg):
+        log_debug("handle_msg %s" % (msg.msg))
+        msg.send_reply('OK')
 
     def join(self, transmit_only=False):
         self.transmitter_thread.join()
@@ -339,8 +384,7 @@ def key_description(character):
 # The guts
 #------------------------------------------------------------------------------
 
-def main(args):
-
+def do_connect(args):
     convert_outgoing = CONVERT_CRLF
     if args.cr:
         convert_outgoing = CONVERT_CR
@@ -359,7 +403,8 @@ def main(args):
                             xonxoff=args.xonxoff,
                             echo=args.echo,
                             convert_outgoing=convert_outgoing,
-                            repr_mode=repr_mode)
+                            repr_mode=repr_mode,
+                            command_port=args.command_port)
     except serial.SerialException, e:
         sys.stderr.write("could not open port %r: %s\n" % (args.port, e))
         sys.exit(1)
@@ -376,12 +421,24 @@ def main(args):
 
     miniterm.start()
     try:
-        miniterm.join(True)
+        miniterm.loop()
     except KeyboardInterrupt:
         pass
     if not args.quiet:
         sys.stderr.write("\nExiting\n")
     miniterm.join()
+
+
+def do_send(args):
+    host = args.command_host
+    port = args.command_port
+    if port:
+        port = int(port)
+    client = CommandSocket.Client(host=host, port=port)
+    msg = ' '.join(args.cmd)
+    print "Client: sending '" + msg + "'"
+    reply = client.send(msg)
+    print "Reply: '" + reply + "'"
 
 
 #------------------------------------------------------------------------------
@@ -395,5 +452,5 @@ if args.verbose:
 if args.debug:
     logging.getLogger().setLevel(logging.DEBUG)
 
-main(args)
+args.func(args)
 
