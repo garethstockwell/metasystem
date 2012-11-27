@@ -157,12 +157,6 @@ class Miniterm(object):
         self.rts_state = True
         self.break_state = False
 
-        self.rx_console = Console.OutputStream(sys.stdout)
-        self.rx_console.set_fg(Console.GREEN)
-
-        self.echo_console = Console.OutputStream(sys.stdout)
-        self.echo_console.set_fg(Console.YELLOW)
-
     def _start_reader(self):
         self._reader_alive = True
         # start serial->console thread
@@ -217,6 +211,18 @@ class Miniterm(object):
                 REPR_MODES[self.repr_mode],
                 LF_MODES[self.convert_outgoing]))
 
+    def write_rx(self, msg):
+        sys.stdout.push_state()
+        sys.stdout.set_fg(Console.Color.GREEN)
+        sys.stdout.write(msg)
+        sys.stdout.pop_state()
+
+    def write_echo(self, msg):
+        sys.stdout.push_state()
+        sys.stdout.set_fg(Console.Color.YELLOW)
+        sys.stdout.write(msg)
+        sys.stdout.pop_state()
+
     def reader(self):
         try:
             while self.alive and self._reader_alive:
@@ -225,30 +231,30 @@ class Miniterm(object):
                 if self.repr_mode == 0:
                     # direct output, just have to care about newline setting
                     if data == '\r' and self.convert_outgoing == CONVERT_CR:
-                        self.rx_console.write('\n')
+                        self.write_rx('\n')
                     else:
-                        self.rx_console.write(data)
+                        self.write_rx(data)
                 elif self.repr_mode == 1:
                     # escape non-printable, let pass newlines
                     if self.convert_outgoing == CONVERT_CRLF and data in '\r\n':
                         if data == '\n':
-                            self.rx_console.write('\n')
+                            self.write_rx('\n')
                         elif data == '\r':
                             pass
                     elif data == '\n' and self.convert_outgoing == CONVERT_LF:
-                        self.rx_console.write('\n')
+                        self.write_rx('\n')
                     elif data == '\r' and self.convert_outgoing == CONVERT_CR:
-                        self.rx_console.write('\n')
+                        self.write_rx('\n')
                     else:
-                        self.rx_console.write(repr(data)[1:-1])
+                        self.write_rx(repr(data)[1:-1])
                 elif self.repr_mode == 2:
                     # escape all non-printable, including newline
-                    self.rx_console.write(repr(data)[1:-1])
+                    self.write_rx(repr(data)[1:-1])
                 elif self.repr_mode == 3:
                     # escape everything (hexdump)
                     for c in data:
-                        self.rx_console.write("%s " % c.encode('hex'))
-                self.rx_console.flush()
+                        self.write_rx("%s " % c.encode('hex'))
+                sys.stdout.flush()
         except serial.SerialException, e:
             self.alive = False
             # would be nice if the console reader could be interruptted at this
@@ -259,7 +265,7 @@ class Miniterm(object):
         try:
             while self.alive:
                 try:
-                    b = Console.stdin.getkey()
+                    b = sys.stdin.get_key()
                 except KeyboardInterrupt:
                     b = serial.to_bytes([3])
                 c = character(b)
@@ -269,13 +275,13 @@ class Miniterm(object):
                 elif c == '\n':
                     self.serial.write(self.newline)         # send newline character(s)
                     if self.echo:
-                        self.echo_console.write(c)          # local echo is a real newline in any case
-                        self.echo_console.flush()
+                        self.write_echo(c)          # local echo is a real newline in any case
+                        sys.stdout.flush()
                 else:
                     self.serial.write(b)                    # send byte
                     if self.echo:
-                        self.echo_console.write(c)
-                        self.echo_console.flush()
+                        self.write_echo(c)
+                        sys.stdout.flush()
         except:
             self.alive = False
             raise

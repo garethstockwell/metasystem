@@ -122,6 +122,7 @@ from time import time
 
 sys.path.append(os.path.join(sys.path[0], '../lib/python'))
 import Console
+from Console import Color
 
 
 #------------------------------------------------------------------------------
@@ -154,8 +155,11 @@ def check_env():
 
 
 def PrintToConsole(message, color = None):
-    Console.stdout.set_fg(color)
-    Console.stdout.write(message)
+    #print "PRINT [%s] color %s" % (message, str(color))
+    sys.stdout.push_state()
+    sys.stdout.set_fg(color)
+    sys.stdout.write(message)
+    sys.stdout.pop_state()
 
 
 def PrintError(message):
@@ -215,12 +219,12 @@ def FormatDuration(deltaSecs):
 def PrintDuration(now, then):
     if then:
         deltaSecs = now - then
-        color = Console.WHITE
+        color = Color.WHITE
         if deltaSecs >= RedThreshold:
-            color = Console.RED
+            color = Color.RED
         else:
             if deltaSecs >= YellowThreshold:
-                color = Console.YELLOW
+                color = Color.YELLOW
         PrintToConsole(FormatDuration(deltaSecs), color)
     else:
         sys.stdout.write('never')
@@ -375,9 +379,9 @@ class History:
         sys.stdout.write('Last run:                 ')
         PrintDuration(now, self.lastRun)
         sys.stdout.write('\n')
-        color = Console.WHITE
+        color = Color.WHITE
         if self.lastSuccessfulRun != self.lastRun:
-            color = Console.YELLOW
+            color = Color.YELLOW
         PrintToConsole('Last successful run:      ', color)
         PrintDuration(now, self.lastSuccessfulRun)
         sys.stdout.write('\n')
@@ -489,18 +493,18 @@ class Project:
         sys.stdout.write('    Last pull:            ')
         PrintDuration(now, history.lastPull)
         sys.stdout.write('\n')
-        color = Console.WHITE
+        color = Color.WHITE
         if history.lastSuccessfulPull != history.lastPull:
-            color = Console.YELLOW
+            color = Color.YELLOW
         PrintToConsole('    Last successful pull: ', color)
         PrintDuration(now, history.lastSuccessfulPull)
         sys.stdout.write('\n')
         sys.stdout.write('    Last push:            ')
         PrintDuration(now, history.lastPush)
         sys.stdout.write('\n')
-        color = Console.WHITE
+        color = Color.WHITE
         if history.lastSuccessfulPush != history.lastPush:
-            color = Console.YELLOW
+            color = Color.YELLOW
         PrintToConsole('    Last successful push: ', color)
         PrintDuration(now, history.lastSuccessfulPush)
         sys.stdout.write('\n')
@@ -728,9 +732,9 @@ class UnisonProject(Project):
         sys.stdout.write('    Last sync:            ')
         PrintDuration(now, history.lastPull)
         sys.stdout.write('\n')
-        color = Console.WHITE
+        color = Color.WHITE
         if history.lastSuccessfulPull != history.lastPull:
-            color = Console.YELLOW
+            color = Color.YELLOW
         PrintToConsole('    Last successful sync: ', color)
         PrintDuration(now, history.lastSuccessfulPull)
         sys.stdout.write('\n')
@@ -1149,7 +1153,7 @@ def ActionList(commandLine, config):
 
 # Helper for ActionInit, ActionSync
 def PrintResults(timer, result):
-    PrintToConsole(timer.__repr__() + '\n\n', Console.CYAN)
+    PrintToConsole(timer.__repr__() + '\n\n', Color.CYAN)
 
     if len(result.keys()):
         nameWidth = max([len(x) for x in result.keys()])
@@ -1157,13 +1161,13 @@ def PrintResults(timer, result):
             formatString = "%(name)-" + str(nameWidth) + "s : "
             sys.stdout.write(formatString % {'name' : name})
             if result[name]:
-                PrintToConsole('OK', Console.GREEN)
+                PrintToConsole('OK', Color.GREEN)
             else:
-                PrintToConsole('FAILED', Console.RED)
+                PrintToConsole('FAILED', Color.RED)
             sys.stdout.write('\n')
 
 def printLocal(config):
-    PrintToConsole("Local\n\n", Console.GREEN)
+    PrintToConsole("Local\n\n", Color.GREEN)
     print config['local']
 
 
@@ -1188,11 +1192,11 @@ def ActionInit(commandLine, config):
         project = config['projects'][name]
         if os.path.exists(project.local_path):
             PrintToConsole("\nSkipping project '" + project.name + "' [" + project.type + "]\n", \
-               Console.CYAN)
+               Color.CYAN)
             print "Local path '" + project.local_path + "' already exists"
         else:
             PrintToConsole("\nInitialising project '" + project.name + "' [" + project.type + "] ...\n\n", \
-                           Console.GREEN)
+                           Color.GREEN)
             printProject(project, options, config)
             try:
                 timer = DurationTimer("Initialization of project '" + name + "'")
@@ -1233,7 +1237,7 @@ def ActionSync(commandLine, config):
         project = config['projects'][name]
         if len(commandLine['args']) or project.auto or commandLine['options'].all:
             PrintToConsole("\nSynchronising project '" + name + "' [" + project.type + "] ...\n\n", \
-                           Console.GREEN)
+                           Color.GREEN)
             printProject(project, options, config)
             try:
                 timer = DurationTimer("Sync of project '" + name + "'")
@@ -1247,7 +1251,7 @@ def ActionSync(commandLine, config):
                 success = False
         else:
             PrintToConsole("\nSkipping project '" + name + "' [" + project.type + "] - auto flag not set\n", \
-               Console.CYAN)
+               Color.CYAN)
 
     history.setLastRun(now, success)
     success &= WriteHistory(history)

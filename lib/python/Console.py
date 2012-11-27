@@ -2,29 +2,93 @@
 # Modules
 #------------------------------------------------------------------------------
 
+import copy
 import os
 import sys
+from types import BuiltinMethodType, MethodType
 
-__all__ = ['stdout', 'stderr', 'stdin']
+from Wrapper import Wrapper
+
+__all__ = ['Color', 'Intensity']
 
 
 #------------------------------------------------------------------------------
-# Colors
+# Enums
 #------------------------------------------------------------------------------
 
-BLACK     = 0
+class Color:
+    BLACK     = 0
+    RED       = 1
+    GREEN     = 2
+    YELLOW    = 3
+    BLUE      = 4
+    MAGENTA   = 5
+    CYAN      = 6
+    WHITE     = 7
 
-RED       = 1
-GREEN     = 2
-YELLOW    = 3
-BLUE      = 4
-MAGENTA   = 5
-CYAN      = 6
-WHITE     = 7
+class Intensity:
+    DIM       = 1
+    NORMAL    = 2
+    BRIGHT    = 3
 
-GREY      = 8
 
-INTENSITY = 100
+#------------------------------------------------------------------------------
+# RenderState
+#------------------------------------------------------------------------------
+
+class RenderState(object):
+    def __init__(self):
+        self.fg = Color.WHITE
+        self.bg = Color.BLACK
+        self.intensity = Intensity.NORMAL
+
+    def __repr__(self):
+        return 'fg %d bg %d intensity %d' % (self.fg, self.bg, self.intensity)
+
+
+#------------------------------------------------------------------------------
+# ANSI
+#------------------------------------------------------------------------------
+
+class Ansi(object):
+    FG = {
+        Color.BLACK       : 30,
+        Color.RED         : 31,
+        Color.GREEN       : 32,
+        Color.YELLOW      : 33,
+        Color.BLUE        : 34,
+        Color.MAGENTA     : 35,
+        Color.CYAN        : 36,
+        Color.WHITE       : 37,
+    }
+
+    BG = {
+        Color.BLACK       : 40,
+        Color.RED         : 41,
+        Color.GREEN       : 42,
+        Color.YELLOW      : 43,
+        Color.BLUE        : 44,
+        Color.MAGENTA     : 45,
+        Color.CYAN        : 46,
+        Color.WHITE       : 47,
+    }
+
+    INTENSITY = {
+        Intensity.DIM     : 2,
+        Intensity.NORMAL  : 22,
+        Intensity.BRIGHT  : 1,
+    }
+
+    @classmethod
+    def renderstate_to_ansi(rs):
+        ret = '\033['
+        if rs.fg:
+            ret += '%d;' % (ANSI.FG[rs.fg])
+        if rs.bg:
+            ret += '%d;' % (ANSI.BG[rs.bg])
+        if rs.intensity:
+            ret += '%d;' % (ANSI.INTENSITY[rs.intensity])
+        ret += 'm'
 
 
 #------------------------------------------------------------------------------
@@ -35,54 +99,56 @@ class Stack(list):
     def push(self, item):
         self.append(item)
 
+    def pop(self):
+        item = list.pop(self)
+        return item
+
     def is_empty(self):
         return not self
 
 
-class ConsoleColor(object):
-    def __init__(self):
-        self.stack = Stack()
-        self.value = None
-
-    def push(self, color):
-        self.stack.push(color)
-        self.value = color
-
-    def pop(self):
-        return self.stack.pop()
-
-
-class OutputStreamBase(object):
+class OutputStreamBase(Wrapper):
     def __init__(self, stream):
+        Wrapper.__init__(self, stream)
         self.stream = stream
-        self.fg = ConsoleColor()
-        self.bg = ConsoleColor()
+        self.rs = RenderState()
+        self.rs_dirty = False
+        self.rs_stack = Stack()
+
+    def get_fg(self):
+        return self.rs.fg
 
     def set_fg(self, color):
-        self.fg.value = color
+        self.rs.fg = color
+        self.rs_dirty = True
 
-    def push_fg(self, color):
-        self.fg.push(color)
-
-    def pop_fg(self):
-        return self.fg.pop()
+    def get_bg(self):
+        return self.rs.bg
 
     def set_bg(self, color):
-        self.bg.value = color
+        self.rs.bg = color
+        self.rs_dirty = True
 
-    def push_bg(self, color):
-        self.bg.push(color)
+    def get_intensity(self):
+        return self.rs.intensity
 
-    def pop_bg(self):
-        return self.bg.pop()
+    def set_intensity(self, value):
+        self.rs.intensity = value
+        self.rs_dirty = True
 
-    def write(self, value):
-        self._apply_colors(self.fg.value, self.bg.value)
-        self.stream.write(value)
-        self._apply_colors(WHITE, BLACK)
+    def push_state(self):
+        self.rs_stack.push(copy.copy(self.rs))
 
-    def flush(self):
-        self.stream.flush()
+    def pop_state(self):
+        if not self.rs_stack.is_empty():
+            self.rs = copy.copy(self.rs_stack.pop())
+            self.rs_dirty = True
+
+    def _wrap_pre(self, func, args, kwargs):
+        if type(func) == BuiltinMethodType and func.__name__ == 'write':
+            if self.rs_dirty:
+                self._apply_state()
+                self.rs_dirty = False
 
 
 if os.name == 'nt':
@@ -93,58 +159,64 @@ if os.name == 'nt':
         # From http://stackoverflow.com/questions/384076/how-can-i-make-the-python-logging-output-to-be-colored
 
         # wincon.h
-        FG_DICT = {
-            BLACK     : 0x0000,
-            BLUE      : 0x0001,
-            GREEN     : 0x0002,
-            CYAN      : 0x0003,
-            RED       : 0x0004,
-            MAGENTA   : 0x0005,
-            YELLOW    : 0x0006,
-            GREY      : 0x0007,
-            INTENSITY : 0x0008, # foreground color is intensified.
-            WHITE     : 0x0007, # BLUE | GREEN | RED
+        FG = {
+            Color.BLACK     : 0x0000,
+            Color.BLUE      : 0x0001,
+            Color.GREEN     : 0x0002,
+            Color.CYAN      : 0x0003,
+            Color.RED       : 0x0004,
+            Color.MAGENTA   : 0x0005,
+            Color.YELLOW    : 0x0006,
+            Color.WHITE     : 0x0007,
         }
+
+        FG_BRIGHT = 0x0008
 
         # wincon.h
-        BG_DICT = {
-            BLACK     : 0x0000,
-            BLUE      : 0x0010,
-            GREEN     : 0x0020,
-            CYAN      : 0x0030,
-            RED       : 0x0040,
-            MAGENTA   : 0x0050,
-            YELLOW    : 0x0060,
-            GREY      : 0x0070,
-            INTENSITY : 0x0080, # background color is intensified.
-            WHITE     : 0x0070, # BLUE | GREEN | RED
+        BG = {
+            Color.BLACK     : 0x0000,
+            Color.BLUE      : 0x0010,
+            Color.GREEN     : 0x0020,
+            Color.CYAN      : 0x0030,
+            Color.RED       : 0x0040,
+            Color.MAGENTA   : 0x0050,
+            Color.YELLOW    : 0x0060,
+            Color.WHITE     : 0x0070,
         }
 
+        BG_BRIGHT = 0x0080
+
         # winbase.h
-        STREAM_DICT = {
-            sys.stdout : -11,
-            sys.stderr : -12
+        STREAM = {
+            sys.__stdout__  : -11,
+            sys.__stderr__  : -12
         }
 
         def __init__(self, stream):
             OutputStreamBase.__init__(self, stream)
 
-        def _apply_colors(self, fg, bg):
+        def _apply_state(self):
             mask = 0
-            if fg:
-                mask |= OutputStream.FG_DICT[fg]
-            if bg:
-                mask |= OutputStream.BG_DICT[bg]
+            if self.rs.fg:
+                mask |= OutputStream.FG[self.rs.fg]
+            if self.rs.bg:
+                mask |= OutputStream.BG[self.rs.bg]
+            if self.rs.intensity == Intensity.BRIGHT:
+                mask |= FG_BRIGHT
             if mask != 0:
-                handle = ctypes.windll.kernel32.GetStdHandle(OutputStream.STREAM_DICT[self.stream])
+                handle = ctypes.windll.kernel32.GetStdHandle(OutputStream.STREAM[self.stream])
                 ctypes.windll.kernel32.SetConsoleTextAttribute(handle, mask)
+                if self == sys.stdout:
+                    sys.stderr.rs_dirty = True
+                if self == sys.stderr:
+                    sys.stdout.rs_dirty = True
 
 
-    class InputStream(object):
+    class InputStream(Wrapper):
         def __init__(self):
-            pass
+            Wrapper.__init__(self, sys.__stdin__)
 
-        def getkey(self):
+        def get_key(self):
             while True:
                 z = msvcrt.getch()
                 if z == '\0' or z == '\xe0':    # functions keys, ignore
@@ -154,54 +226,26 @@ if os.name == 'nt':
                         return '\n'
                     return z
 
-    stdout = OutputStream(sys.stdout)
-    stderr = OutputStream(sys.stderr)
-    stdin = InputStream()
+    sys.stdout = OutputStream(sys.__stdout__)
+    sys.stderr = OutputStream(sys.__stderr__)
+    sys.stdin = InputStream()
 
 elif os.name == 'posix':
     import atexit, os, termios
 
     class OutputStream(OutputStreamBase):
-
-        FG_DICT = {
-            BLACK     : '',
-            RED       : '\033[0;31m',
-            GREEN     : '\033[1;32m',
-            YELLOW    : '\033[1;33m',
-            BLUE      : '\033[0;34m',
-            MAGENTA   : '\033[1;35m',
-            CYAN      : '\033[1;36m',
-            WHITE     : '\033[1;37m',
-            GREY      : '',
-            INTENSITY : '',
-        }
-
-        BG_DICT = {
-            BLACK     : '',
-            RED       : '',
-            GREEN     : '',
-            YELLOW    : '',
-            BLUE      : '',
-            MAGENTA   : '',
-            CYAN      : '',
-            WHITE     : '',
-            GREY      : '',
-            INTENSITY : '',
-        }
-
         def __init__(self, stream):
             OutputStreamBase.__init__(self, stream)
 
-        def _apply_colors(self, fg, bg):
-            if fg:
-                self.stream.write(OutputStream.FG_DICT[fg])
-            if bg:
-                self.stream.write(OutputStream.BG_DICT[bg])
+        def _apply_state(self):
+            self.stream.write(Ansi.renderstate_to_ansi(self.rs))
 
 
-    class InputStream(object):
+    class InputStream(Wrapper):
         def __init__(self):
-            self.fd = sys.stdin.fileno()
+            fd = sys.stdin.fileno()
+            Wrapper.__init__(self, sys.__stdin__)
+            self.fd = fd
 
         def _setup(self):
             self.old = termios.tcgetattr(self.fd)
@@ -211,16 +255,16 @@ elif os.name == 'posix':
             new[6][termios.VTIME] = 0
             termios.tcsetattr(self.fd, termios.TCSANOW, new)
 
-        def getkey(self):
+        def get_key(self):
             c = os.read(self.fd, 1)
             return c
 
         def _cleanup(self):
             termios.tcsetattr(self.fd, termios.TCSAFLUSH, self.old)
 
-    stdout = OutputStream(sys.stdout)
-    stderr = OutputStream(sys.stderr)
-    stdin = InputStream()
+    sys.stdout = OutputStream(sys.__stdout__)
+    sys.stderr = OutputStream(sys.__stderr__)
+    sys.stdin = InputStream()
 
     def _cleanup():
         stdin._cleanup()
@@ -232,5 +276,4 @@ elif os.name == 'posix':
 
 else:
     raise NotImplementedError("Sorry no implementation for your platform (%s) available." % sys.platform)
-
 
