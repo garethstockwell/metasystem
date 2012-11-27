@@ -13,14 +13,16 @@ __all__ = ['stdout', 'stderr', 'stdin']
 #------------------------------------------------------------------------------
 
 BLACK     = 0
-BLUE      = 1
+
+RED       = 1
 GREEN     = 2
-CYAN      = 3
-RED       = 4
+YELLOW    = 3
+BLUE      = 4
 MAGENTA   = 5
-YELLOW    = 6
-GREY      = 7
-WHITE     = 8
+CYAN      = 6
+WHITE     = 7
+
+GREY      = 8
 
 INTENSITY = 100
 
@@ -163,27 +165,27 @@ elif os.name == 'posix':
 
         FG_DICT = {
             BLACK     : '',
-            BLUE      : '\033[0;34m',
-            GREEN     : '\033[1;32m',
-            CYAN      : '\033[1;36m',
             RED       : '\033[0;31m',
-            MAGENTA   : '\033[1;35m',
+            GREEN     : '\033[1;32m',
             YELLOW    : '\033[1;33m',
-            GREY      : '',
+            BLUE      : '\033[0;34m',
+            MAGENTA   : '\033[1;35m',
+            CYAN      : '\033[1;36m',
             WHITE     : '\033[1;37m',
+            GREY      : '',
             INTENSITY : '',
         }
 
         BG_DICT = {
             BLACK     : '',
-            BLUE      : '',
-            GREEN     : '',
-            CYAN      : '',
             RED       : '',
-            MAGENTA   : '',
+            GREEN     : '',
             YELLOW    : '',
-            GREY      : '',
+            BLUE      : '',
+            MAGENTA   : '',
+            CYAN      : '',
             WHITE     : '',
+            GREY      : '',
             INTENSITY : '',
         }
 
