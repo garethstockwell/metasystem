@@ -154,6 +154,75 @@ def log_debug(msg):
 
 
 #------------------------------------------------------------------------------
+# Filter
+#------------------------------------------------------------------------------
+
+class Filter(object):
+    def __init__(self):
+        pass
+
+    def filter(self, msg):
+        pass
+
+
+class TestFilter(object):
+    def __init__(self):
+        log_debug("TestFilter.__init__")
+        self.idx = -1
+        self.match = 'u-boot>'
+
+    @classmethod
+    def name(self):
+        return 'test'
+
+    def filter(self, msg):
+        for i in range(0, len(msg)):
+            idx = self.idx + 1
+            if msg[i] == self.match[idx]:
+                self.idx = idx
+                if self.idx+1 == len(self.match):
+                    sys.stdout.push_state()
+                    sys.stdout.set_fg(Console.Color.RED)
+                    sys.stdout.write("\nU-BOOT\n\n")
+                    sys.stdout.pop_state()
+                    self.idx = -1
+            else:
+                self.idx = -1
+
+
+class FilterChain(object):
+    def __init__(self):
+        self.filters = []
+
+    def append(self, filter):
+        self.filters.append(filter)
+
+    def filter(self, msg):
+        for f in self.filters:
+            f.filter(msg)
+
+
+class FilterFactory(object):
+    def __init__(self):
+        self.classes = {}
+        self.register(TestFilter)
+
+    def register(self, cls):
+        key = cls.name()
+        log_debug("FilterFactory.register cls %s key %s" % (str(cls), key))
+        self.classes[key] = cls
+
+    def build(self, key):
+        obj = None
+        if key in self.classes.keys():
+            obj = self.classes[key]()
+            log_debug("FilterFactory.build key %s obj %s" % (key, str(obj)))
+        else:
+            log_debug("FilterFactory.build key %s not found" % (key))
+        return obj
+
+
+#------------------------------------------------------------------------------
 # Miniterm
 #------------------------------------------------------------------------------
 
@@ -190,6 +259,9 @@ class Miniterm(object):
         if command_port:
             command_port = int(command_port)
         self.command_server = CommandSocket.Server(port=command_port)
+        self.filter_factory = FilterFactory()
+        self.filter_chain = FilterChain()
+        self.filter_chain.append(self.filter_factory.build('test'))
 
     def _start_reader(self):
         self._reader_alive = True
@@ -300,6 +372,10 @@ class Miniterm(object):
                     for c in data:
                         self.write_rx("%s " % c.encode('hex'))
                 sys.stdout.flush()
+
+                if data:
+                    self.filter_chain.filter(data)
+
         except serial.SerialException, e:
             self.alive = False
             # would be nice if the console reader could be interruptted at this
