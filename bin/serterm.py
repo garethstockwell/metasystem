@@ -6,10 +6,8 @@
 # Based on miniterm example, part of PySerial distribution
 
 # TODO
-# * Implement VT100 display attributes (http://www.termsys.demon.co.uk/vtansi.htm)
-# * Add events API
-#   - Listen on local socket
-#   - Install / remove event handler which will respond to rx data
+# * Allow filters to be loaded dynamically
+# * Add 'write to file' option
 
 
 #------------------------------------------------------------------------------
