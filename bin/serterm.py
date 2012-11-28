@@ -262,6 +262,8 @@ class Miniterm(object):
         self.filter_factory = FilterFactory()
         self.filter_chain = FilterChain()
         self.filter_chain.append(self.filter_factory.build('test'))
+        self.rx_state = Console.OutputStreamState()
+        self.rx_state.set_fg(Console.Color.GREEN)
 
     def _start_reader(self):
         self._reader_alive = True
@@ -330,7 +332,7 @@ class Miniterm(object):
 
     def write_rx(self, msg):
         sys.stdout.state.push()
-        sys.stdout.state.set_fg(Console.Color.GREEN)
+        sys.stdout.state.set(self.rx_state.current)
         sys.stdout.write(msg)
         sys.stdout.state.pop()
 

@@ -13,6 +13,13 @@ __all__ = ['Color', 'Intensity']
 
 
 #------------------------------------------------------------------------------
+# Constants
+#------------------------------------------------------------------------------
+
+STDERR_HOOK = 1
+
+
+#------------------------------------------------------------------------------
 # Enums
 #------------------------------------------------------------------------------
 
@@ -41,6 +48,11 @@ class RenderState(object):
         self.fg = Color.WHITE
         self.bg = Color.BLACK
         self.intensity = Intensity.NORMAL
+
+    def __eq__(self, other):
+        return self.fg == other.fg and \
+               self.bg == other.bg and \
+               self.intensity == other.intensity
 
     def __repr__(self):
         return 'fg %d bg %d intensity %d' % (self.fg, self.bg, self.intensity)
@@ -137,13 +149,18 @@ class OutputStreamState(object):
             self.current.intensity = value
             self.dirty = True
 
+    def set(self, state):
+        if self.current != state:
+            self.current = copy.copy(state)
+            self.dirty = True
+
     def push(self):
         self.stack.push(copy.copy(self.current))
 
     def pop(self):
         if not self.stack.is_empty():
-            self.current = copy.copy(self.stack.pop())
-            self.dirty = True
+            state = copy.copy(self.stack.pop())
+            self.set(state)
 
 
 class OutputStreamBase(Wrapper):
@@ -214,7 +231,7 @@ if os.name == 'nt':
             if mask != 0:
                 handle = ctypes.windll.kernel32.GetStdHandle(OutputStream.STREAM[self.stream])
                 ctypes.windll.kernel32.SetConsoleTextAttribute(handle, mask)
-                if self == sys.stdout:
+                if self == sys.stdout and STDERR_HOOK:
                     sys.stderr.state.dirty = True
                 if self == sys.stderr:
                     sys.stdout.state.dirty = True
@@ -235,7 +252,8 @@ if os.name == 'nt':
                     return z
 
     sys.stdout = OutputStream(sys.__stdout__)
-    sys.stderr = OutputStream(sys.__stderr__)
+    if STDERR_HOOK:
+        sys.stderr = OutputStream(sys.__stderr__)
     sys.stdin = InputStream()
 
 elif os.name == 'posix':
@@ -271,7 +289,8 @@ elif os.name == 'posix':
             termios.tcsetattr(self.fd, termios.TCSAFLUSH, self.old)
 
     sys.stdout = OutputStream(sys.__stdout__)
-    sys.stderr = OutputStream(sys.__stderr__)
+    if STDERR_HOOK:
+        sys.stderr = OutputStream(sys.__stderr__)
     sys.stdin = InputStream()
 
     def _cleanup():
