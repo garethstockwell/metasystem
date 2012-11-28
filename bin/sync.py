@@ -156,10 +156,10 @@ def check_env():
 
 def PrintToConsole(message, color = None):
     #print "PRINT [%s] color %s" % (message, str(color))
-    sys.stdout.push_state()
-    sys.stdout.set_fg(color)
+    sys.stdout.state.push()
+    sys.stdout.state.set_fg(color)
     sys.stdout.write(message)
-    sys.stdout.pop_state()
+    sys.stdout.state.pop()
 
 
 def PrintError(message):

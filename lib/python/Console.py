@@ -82,12 +82,12 @@ class Ansi(object):
     @classmethod
     def renderstate_to_ansi(rs):
         ret = '\033['
-        if rs.fg:
-            ret += '%d;' % (ANSI.FG[rs.fg])
-        if rs.bg:
-            ret += '%d;' % (ANSI.BG[rs.bg])
-        if rs.intensity:
-            ret += '%d;' % (ANSI.INTENSITY[rs.intensity])
+        if state.fg():
+            ret += '%d;' % (ANSI.FG[state.fg()])
+        if state.bg():
+            ret += '%d;' % (ANSI.BG[state.bg()])
+        if state.intensity():
+            ret += '%d;' % (ANSI.INTENSITY[state.intensity()])
         ret += 'm'
 
 
@@ -107,48 +107,56 @@ class Stack(list):
         return not self
 
 
+class OutputStreamState(object):
+    def __init__(self):
+        self.current = RenderState()
+        self.dirty = False
+        self.stack = Stack()
+
+    def fg(self):
+        return self.current.fg
+
+    def set_fg(self, color):
+        if color != self.current.fg:
+            self.current.fg = color
+            self.dirty = True
+
+    def bg(self):
+        return self.current.bg
+
+    def set_bg(self, color):
+        if color != self.current.bg:
+            self.current.bg = color
+            self.dirty = True
+
+    def intensity(self):
+        return self.current.intensity
+
+    def set_intensity(self, value):
+        if value != self.current.intensity:
+            self.current.intensity = value
+            self.dirty = True
+
+    def push(self):
+        self.stack.push(copy.copy(self.current))
+
+    def pop(self):
+        if not self.stack.is_empty():
+            self.current = copy.copy(self.stack.pop())
+            self.dirty = True
+
+
 class OutputStreamBase(Wrapper):
     def __init__(self, stream):
         Wrapper.__init__(self, stream)
         self.stream = stream
-        self.rs = RenderState()
-        self.rs_dirty = False
-        self.rs_stack = Stack()
-
-    def get_fg(self):
-        return self.rs.fg
-
-    def set_fg(self, color):
-        self.rs.fg = color
-        self.rs_dirty = True
-
-    def get_bg(self):
-        return self.rs.bg
-
-    def set_bg(self, color):
-        self.rs.bg = color
-        self.rs_dirty = True
-
-    def get_intensity(self):
-        return self.rs.intensity
-
-    def set_intensity(self, value):
-        self.rs.intensity = value
-        self.rs_dirty = True
-
-    def push_state(self):
-        self.rs_stack.push(copy.copy(self.rs))
-
-    def pop_state(self):
-        if not self.rs_stack.is_empty():
-            self.rs = copy.copy(self.rs_stack.pop())
-            self.rs_dirty = True
+        self.state = OutputStreamState()
 
     def _wrap_pre(self, func, args, kwargs):
         if type(func) == BuiltinMethodType and func.__name__ == 'write':
-            if self.rs_dirty:
+            if self.state.dirty:
                 self._apply_state()
-                self.rs_dirty = False
+                self.state.dirty = False
 
 
 if os.name == 'nt':
@@ -197,19 +205,19 @@ if os.name == 'nt':
 
         def _apply_state(self):
             mask = 0
-            if self.rs.fg:
-                mask |= OutputStream.FG[self.rs.fg]
-            if self.rs.bg:
-                mask |= OutputStream.BG[self.rs.bg]
-            if self.rs.intensity == Intensity.BRIGHT:
+            if self.state.fg():
+                mask |= OutputStream.FG[self.state.fg()]
+            if self.state.bg():
+                mask |= OutputStream.BG[self.state.bg()]
+            if self.state.intensity() == Intensity.BRIGHT:
                 mask |= FG_BRIGHT
             if mask != 0:
                 handle = ctypes.windll.kernel32.GetStdHandle(OutputStream.STREAM[self.stream])
                 ctypes.windll.kernel32.SetConsoleTextAttribute(handle, mask)
                 if self == sys.stdout:
-                    sys.stderr.rs_dirty = True
+                    sys.stderr.state.dirty = True
                 if self == sys.stderr:
-                    sys.stdout.rs_dirty = True
+                    sys.stdout.state.dirty = True
 
 
     class InputStream(Wrapper):
@@ -238,7 +246,7 @@ elif os.name == 'posix':
             OutputStreamBase.__init__(self, stream)
 
         def _apply_state(self):
-            self.stream.write(Ansi.renderstate_to_ansi(self.rs))
+            self.stream.write(Ansi.renderstate_to_ansi(self.state.current))
 
 
     class InputStream(Wrapper):

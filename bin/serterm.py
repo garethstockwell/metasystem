@@ -181,10 +181,10 @@ class TestFilter(object):
             if msg[i] == self.match[idx]:
                 self.idx = idx
                 if self.idx+1 == len(self.match):
-                    sys.stdout.push_state()
-                    sys.stdout.set_fg(Console.Color.RED)
+                    sys.stdout.state.push()
+                    sys.stdout.state.set_fg(Console.Color.RED)
                     sys.stdout.write("\nU-BOOT\n\n")
-                    sys.stdout.pop_state()
+                    sys.stdout.state.pop()
                     self.idx = -1
             else:
                 self.idx = -1
@@ -329,16 +329,16 @@ class Miniterm(object):
                 LF_MODES[self.convert_outgoing]))
 
     def write_rx(self, msg):
-        sys.stdout.push_state()
-        sys.stdout.set_fg(Console.Color.GREEN)
+        sys.stdout.state.push()
+        sys.stdout.state.set_fg(Console.Color.GREEN)
         sys.stdout.write(msg)
-        sys.stdout.pop_state()
+        sys.stdout.state.pop()
 
     def write_echo(self, msg):
-        sys.stdout.push_state()
-        sys.stdout.set_fg(Console.Color.YELLOW)
+        sys.stdout.state.push()
+        sys.stdout.state.set_fg(Console.Color.YELLOW)
         sys.stdout.write(msg)
-        sys.stdout.pop_state()
+        sys.stdout.state.pop()
 
     def reader(self):
         try:
