@@ -54,6 +54,11 @@ class RenderState(object):
                self.bg == other.bg and \
                self.intensity == other.intensity
 
+    def __ne__(self, other):
+        return self.fg != other.fg or \
+               self.bg != other.bg or \
+               self.intensity != other.intensity
+
     def __repr__(self):
         return 'fg %d bg %d intensity %d' % (self.fg, self.bg, self.intensity)
 
