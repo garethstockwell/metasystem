@@ -297,6 +297,16 @@ function metasystem_android_push_binary()
 	return $ret
 }
 
+function metasystem_android_devices()
+{
+	adb devices 2>/dev/null | while read line; do
+		if [[ -n $line ]] && [[ $(echo $line | awk '{print $2}') == device ]]; then
+			device=$(echo $line | awk '{print $1}')
+			echo -n "$device "
+		fi
+	done
+}
+
 
 #------------------------------------------------------------------------------
 # Exported variables
@@ -330,6 +340,7 @@ export -f metasystem_android_ssh_adb_forward
 export -f metasystem_android_ssh_adb
 export -f metasystem_android_sync
 export -f metasystem_android_pull_kconfig
+export -f metasystem_android_devices
 
 alias acds=metasystem_android_cd_src
 alias acdb=metasystem_android_cd_build
@@ -344,6 +355,7 @@ alias adb=android-adb.sh
 alias android-sync=metasystem_android_sync
 alias android-pull-kconfig=metasystem_android_pull_kconfig
 alias android-push-binary=metasystem_android_push_binary
+alias android-devices=metasystem_android_devices
 
 
 #------------------------------------------------------------------------------
