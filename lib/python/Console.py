@@ -79,6 +79,8 @@ class Ansi(object):
         Color.WHITE       : 37,
     }
 
+    FG_REV = dict((v,k) for k,v in FG.items())
+
     BG = {
         Color.BLACK       : 40,
         Color.RED         : 41,
@@ -90,23 +92,38 @@ class Ansi(object):
         Color.WHITE       : 47,
     }
 
+    BG_REV = dict((v,k) for k,v in BG.items())
+
     INTENSITY = {
         Intensity.DIM     : 2,
         Intensity.NORMAL  : 22,
         Intensity.BRIGHT  : 1,
     }
 
-    @classmethod
-    def renderstate_to_ansi(rs):
-        ret = '\033['
-        if state.fg():
-            ret += '%d;' % (ANSI.FG[state.fg()])
-        if state.bg():
-            ret += '%d;' % (ANSI.BG[state.bg()])
-        if state.intensity():
-            ret += '%d;' % (ANSI.INTENSITY[state.intensity()])
-        ret += 'm'
+    INTENSITY_REV = dict((v,k) for k,v in INTENSITY.items())
 
+    @classmethod
+    def renderstate_to_ansi(self, rs):
+        esc = '\033['
+        if state.fg():
+            esc += '%d;' % (ANSI.FG[state.fg()])
+        if state.bg():
+            esc += '%d;' % (ANSI.BG[state.bg()])
+        if state.intensity():
+            esc += '%d;' % (ANSI.INTENSITY[state.intensity()])
+        esc += 'm'
+
+    @classmethod
+    def ansi_to_renderstate(self, esc):
+        esc = esc.lstrip('\033[')
+        esc = esc.rstrip('m')
+        tokens = esc.split(';')
+        rs = RenderState()
+        for t in tokens:
+            rs.fg = Ansi.FG_REV.get(int(t), rs.fg)
+            rs.bg = Ansi.BG_REV.get(int(t), rs.bg)
+            rs.intensity = Ansi.INTENSITY_REV.get(int(t), rs.intensity)
+        return rs
 
 #------------------------------------------------------------------------------
 # Console
@@ -125,10 +142,17 @@ class Stack(list):
 
 
 class OutputStreamState(object):
-    def __init__(self):
-        self.current = RenderState()
+    def __init__(self, default=RenderState()):
+        self.default = default
+        self.current = default
         self.dirty = False
         self.stack = Stack()
+
+    def reset(self):
+        self.set(self.default)
+
+    def save_default(self):
+        self.default = copy.copy(self.current)
 
     def fg(self):
         return self.current.fg
@@ -232,7 +256,7 @@ if os.name == 'nt':
             if self.state.bg():
                 mask |= OutputStream.BG[self.state.bg()]
             if self.state.intensity() == Intensity.BRIGHT:
-                mask |= FG_BRIGHT
+                mask |= OutputStream.FG_BRIGHT
             if mask != 0:
                 handle = ctypes.windll.kernel32.GetStdHandle(OutputStream.STREAM[self.stream])
                 ctypes.windll.kernel32.SetConsoleTextAttribute(handle, mask)

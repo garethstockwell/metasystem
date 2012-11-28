@@ -153,59 +153,163 @@ def log_debug(msg):
                     (threading.current_thread().ident)) + msg)
 
 
+# http://stackoverflow.com/questions/36932/whats-the-best-way-to-implement-an-enum-in-python
+def enum(*sequential, **named):
+    enums = dict(zip(sequential, range(len(sequential))), **named)
+    return type('Enum', (), enums)
+
+
 #------------------------------------------------------------------------------
 # Filter
 #------------------------------------------------------------------------------
 
 class Filter(object):
     def __init__(self):
+        self.enabled = True
         pass
 
     def filter(self, msg):
         pass
 
 
-class TestFilter(object):
+'''
+Filter which handles ANSI control codes
+For SGR codes, the provided OutputStreamState is modified appropriately
+Other codes are removed from the stream
+
+http://en.wikipedia.org/wiki/ANSI_escape_code
+'''
+class AnsiFilter(Filter):
+    ESC = '\x1b'
+    CSI = '['
+
+    State = enum('BASE', 'ESC', 'CSI')
+
+    @classmethod
+    def name(self):
+        return 'ansi'
+
+    def __init__(self, console_state):
+        log_debug("AnsiFilter.__init__")
+        Filter.__init__(self)
+        self.console_state = console_state
+        self.state = AnsiFilter.State.BASE
+        self.csi_buf = ''
+        self.out_buf = ''
+
+    def filter(self, msg):
+        self.out_buf = ''
+        for char in msg:
+            log_debug("AnsiFilter.filter char '%s'" % (char))
+            {AnsiFilter.State.BASE: AnsiFilter._handle_base,
+             AnsiFilter.State.ESC:  AnsiFilter._handle_esc,
+             AnsiFilter.State.CSI:  AnsiFilter._handle_csi
+            }.get(self.state)(self, char)
+        log_debug("AnsiFilter.filter out '%s'" % (self.out_buf))
+        return self.out_buf
+
+    def _handle_base(self, char):
+        log_debug("AnsiFilter._handle_base")
+        if char == AnsiFilter.ESC:
+            self.state = AnsiFilter.State.ESC
+        else:
+            self.out_buf += char
+
+    def _handle_esc(self, char):
+        log_debug("AnsiFilter._handle_esc")
+        if char == AnsiFilter.CSI:
+            self.csi_buf = ''
+            self.state = AnsiFilter.State.CSI
+        else:
+            # Ignore single-char code
+            self.state = AnsiFilter.State.BASE
+
+    def _handle_csi(self, char):
+        log_debug("AnsiFilter._handle_csi")
+        if str.isdigit(char) or char == ';':
+            self.csi_buf += char
+        elif char == 'm':
+            self._handle_sgr()
+            self.state = AnsiFilter.State.BASE
+        else:
+            # Ignore other CSI
+            self.state = AnsiFilter.State.BASE
+
+    def _handle_sgr(self):
+        log_debug("AnsiFilter._handle_sgr '%s'" % (self.csi_buf))
+        if self.csi_buf == '0':
+            self.console_state.reset()
+        else:
+            rs = Console.Ansi.ansi_to_renderstate(self.csi_buf)
+            self.console_state.set(rs)
+
+
+'''
+Filter which searches for a single string in the stream
+'''
+class SimpleMatchFilter(Filter):
+    def __init__(self, pat):
+        Filter.__init__(self)
+        self.idx = -1
+        self.pat = pat
+
+    def filter(self, msg):
+        for i in range(0, len(msg)):
+            idx = self.idx + 1
+            if msg[i] == self.pat[idx]:
+                self.idx = idx
+                if self.idx+1 == len(self.pat):
+                    self.match()
+                    self.idx = -1
+            else:
+                self.idx = -1
+        return msg
+
+    def match(self):
+        pass
+
+
+class TestFilter(SimpleMatchFilter):
     def __init__(self):
         log_debug("TestFilter.__init__")
-        self.idx = -1
-        self.match = 'u-boot>'
+        SimpleMatchFilter.__init__(self, 'u-boot>')
 
     @classmethod
     def name(self):
         return 'test'
 
-    def filter(self, msg):
-        for i in range(0, len(msg)):
-            idx = self.idx + 1
-            if msg[i] == self.match[idx]:
-                self.idx = idx
-                if self.idx+1 == len(self.match):
-                    sys.stdout.state.push()
-                    sys.stdout.state.set_fg(Console.Color.RED)
-                    sys.stdout.write("\nU-BOOT\n\n")
-                    sys.stdout.state.pop()
-                    self.idx = -1
-            else:
-                self.idx = -1
+    def match(self):
+        sys.stdout.state.push()
+        sys.stdout.state.set_fg(Console.Color.RED)
+        sys.stdout.write("\nU-BOOT\n\n")
+        sys.stdout.state.pop()
 
 
 class FilterChain(object):
     def __init__(self):
         self.filters = []
 
-    def append(self, filter):
-        self.filters.append(filter)
+    def append(self, f):
+        if self.find_filter(f.name()):
+            raise Exception, 'Filter %s is already in the chain' % (f.name())
+        self.filters.append(f)
+
+    def find_filter(self, key):
+        for f in self.filters:
+            if f.name() == key:
+                return f
+        return None
 
     def filter(self, msg):
         for f in self.filters:
-            f.filter(msg)
+            if f.enabled:
+                msg = f.filter(msg)
+        return msg
 
 
 class FilterFactory(object):
     def __init__(self):
         self.classes = {}
-        self.register(TestFilter)
 
     def register(self, cls):
         key = cls.name()
@@ -259,11 +363,20 @@ class Miniterm(object):
         if command_port:
             command_port = int(command_port)
         self.command_server = CommandSocket.Server(port=command_port)
-        self.filter_factory = FilterFactory()
-        self.filter_chain = FilterChain()
-        self.filter_chain.append(self.filter_factory.build('test'))
         self.rx_state = Console.OutputStreamState()
         self.rx_state.set_fg(Console.Color.GREEN)
+        self.rx_state.save_default()
+        self._init_filters()
+
+    def _init_filters(self):
+        self.filter_factory = FilterFactory()
+        # TODO: do this by introspection
+        self.filter_factory.register(TestFilter)
+        self.filter_chain = FilterChain()
+        if os.name == 'nt':
+            self.filter_chain.append(AnsiFilter(self.rx_state))
+        # TODO: accept a command-line parameter specifying the filters to load
+        self.filter_chain.append(self.filter_factory.build('test'))
 
     def _start_reader(self):
         self._reader_alive = True
@@ -347,6 +460,9 @@ class Miniterm(object):
             while self.alive and self._reader_alive:
                 data = character(self.serial.read(1))
 
+                if data:
+                    data = self.filter_chain.filter(data)
+
                 if self.repr_mode == 0:
                     # direct output, just have to care about newline setting
                     if data == '\r' and self.convert_outgoing == CONVERT_CR:
@@ -374,9 +490,6 @@ class Miniterm(object):
                     for c in data:
                         self.write_rx("%s " % c.encode('hex'))
                 sys.stdout.flush()
-
-                if data:
-                    self.filter_chain.filter(data)
 
         except serial.SerialException, e:
             self.alive = False
