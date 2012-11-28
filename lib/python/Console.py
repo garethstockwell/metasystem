@@ -143,8 +143,8 @@ class Stack(list):
 
 class OutputStreamState(object):
     def __init__(self, default=RenderState()):
-        self.default = default
-        self.current = default
+        self.default = copy.copy(default)
+        self.current = copy.copy(default)
         self.dirty = False
         self.stack = Stack()
 

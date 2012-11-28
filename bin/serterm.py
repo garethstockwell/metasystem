@@ -26,6 +26,7 @@ import threading
 sys.path.append(os.path.join(sys.path[0], '../lib/python'))
 import Console
 import CommandSocket
+import Threading
 
 
 #------------------------------------------------------------------------------
@@ -159,17 +160,30 @@ def enum(*sequential, **named):
     return type('Enum', (), enums)
 
 
+def write_stdout(msg, fg=None):
+    if fg:
+        sys.stdout.state.push()
+        sys.stdout.state.set_fg(fg)
+    sys.stdout.write(msg)
+    if fg:
+        sys.stdout.state.pop()
+
+
 #------------------------------------------------------------------------------
 # Filter
 #------------------------------------------------------------------------------
 
 class Filter(object):
-    def __init__(self):
+    def __init__(self, miniterm):
         self.enabled = True
-        pass
+        self.miniterm = miniterm
 
     def filter(self, msg):
         pass
+
+    def command(self, tokens):
+        log_debug("Filter.command %s" % (str(tokens)))
+        return 'Not implemented'
 
 
 '''
@@ -189,9 +203,9 @@ class AnsiFilter(Filter):
     def name(self):
         return 'ansi'
 
-    def __init__(self, console_state):
+    def __init__(self, miniterm, console_state):
         log_debug("AnsiFilter.__init__")
-        Filter.__init__(self)
+        Filter.__init__(self, miniterm)
         self.console_state = console_state
         self.state = AnsiFilter.State.BASE
         self.csi_buf = ''
@@ -200,23 +214,23 @@ class AnsiFilter(Filter):
     def filter(self, msg):
         self.out_buf = ''
         for char in msg:
-            log_debug("AnsiFilter.filter char '%s'" % (char))
+            #log_debug("AnsiFilter.filter char '%s'" % (char))
             {AnsiFilter.State.BASE: AnsiFilter._handle_base,
              AnsiFilter.State.ESC:  AnsiFilter._handle_esc,
              AnsiFilter.State.CSI:  AnsiFilter._handle_csi
             }.get(self.state)(self, char)
-        log_debug("AnsiFilter.filter out '%s'" % (self.out_buf))
+        #log_debug("AnsiFilter.filter out '%s'" % (self.out_buf))
         return self.out_buf
 
     def _handle_base(self, char):
-        log_debug("AnsiFilter._handle_base")
+        #log_debug("AnsiFilter._handle_base")
         if char == AnsiFilter.ESC:
             self.state = AnsiFilter.State.ESC
         else:
             self.out_buf += char
 
     def _handle_esc(self, char):
-        log_debug("AnsiFilter._handle_esc")
+        #log_debug("AnsiFilter._handle_esc")
         if char == AnsiFilter.CSI:
             self.csi_buf = ''
             self.state = AnsiFilter.State.CSI
@@ -225,7 +239,7 @@ class AnsiFilter(Filter):
             self.state = AnsiFilter.State.BASE
 
     def _handle_csi(self, char):
-        log_debug("AnsiFilter._handle_csi")
+        #log_debug("AnsiFilter._handle_csi")
         if str.isdigit(char) or char == ';':
             self.csi_buf += char
         elif char == 'm':
@@ -236,7 +250,7 @@ class AnsiFilter(Filter):
             self.state = AnsiFilter.State.BASE
 
     def _handle_sgr(self):
-        log_debug("AnsiFilter._handle_sgr '%s'" % (self.csi_buf))
+        #log_debug("AnsiFilter._handle_sgr '%s'" % (self.csi_buf))
         if self.csi_buf == '0':
             self.console_state.reset()
         else:
@@ -248,8 +262,8 @@ class AnsiFilter(Filter):
 Filter which searches for a single string in the stream
 '''
 class SimpleMatchFilter(Filter):
-    def __init__(self, pat):
-        Filter.__init__(self)
+    def __init__(self, miniterm, pat):
+        Filter.__init__(self, miniterm)
         self.idx = -1
         self.pat = pat
 
@@ -269,20 +283,60 @@ class SimpleMatchFilter(Filter):
         pass
 
 
-class TestFilter(SimpleMatchFilter):
-    def __init__(self):
-        log_debug("TestFilter.__init__")
-        SimpleMatchFilter.__init__(self, 'u-boot>')
+'''
+Filter which sends newlines to the bootloader, to enter u-boot mode, then
+sends the fastboot command.
+'''
+class UbootFastbootFilter(SimpleMatchFilter):
+    def __init__(self, miniterm):
+        log_debug("UbootFastbootFilter.__init__")
+        SimpleMatchFilter.__init__(self, miniterm, 'u-boot>')
+        self.enabled = False
+        self.timer = None
 
     @classmethod
     def name(self):
-        return 'test'
+        return 'uboot-fastboot'
 
     def match(self):
-        sys.stdout.state.push()
-        sys.stdout.state.set_fg(Console.Color.RED)
-        sys.stdout.write("\nU-BOOT\n\n")
-        sys.stdout.state.pop()
+        log_debug("UbootFastbootFilter.match")
+        self.disable()
+        write_stdout('\n[UbootFastbootFilter] Sending fastboot ...\n\n', Console.Color.RED)
+        self.miniterm.serial.write('fastboot')
+        self.miniterm.serial.write(self.miniterm.newline)
+
+    def command(self, tokens):
+        log_debug("UbootFastbootFilter.command %s" % (str(tokens)))
+        reply = 'Command not supported'
+        if len(tokens):
+            if tokens[0] == 'on':
+                log_debug("UbootFastbootFilter.command on")
+                self.enable()
+                reply = 'OK'
+            elif tokens[0] == 'off':
+                log_debug("UbootFastbootFilter.command off")
+                self.disable()
+                reply = 'OK'
+        return reply
+
+    def send_newline(self):
+        log_debug("UbootFastbootFilter.send_newline")
+        write_stdout('\n[UbootFastbootFilter] Sending newline ...\n\n', Console.Color.RED)
+        self.miniterm.serial.write(self.miniterm.newline)
+
+    def enable(self):
+        if not self.timer:
+            self.timer = Threading.RepeatTimer(0.5, self.send_newline)
+            self.timer.daemon = True
+            self.timer.start()
+        self.enabled = True
+
+    def disable(self):
+        if self.timer:
+            self.timer.cancel()
+            self.timer.join()
+            self.timer = None
+        self.enabled = False
 
 
 class FilterChain(object):
@@ -308,8 +362,9 @@ class FilterChain(object):
 
 
 class FilterFactory(object):
-    def __init__(self):
+    def __init__(self, miniterm):
         self.classes = {}
+        self.miniterm = miniterm
 
     def register(self, cls):
         key = cls.name()
@@ -319,7 +374,7 @@ class FilterFactory(object):
     def build(self, key):
         obj = None
         if key in self.classes.keys():
-            obj = self.classes[key]()
+            obj = self.classes[key](self.miniterm)
             log_debug("FilterFactory.build key %s obj %s" % (key, str(obj)))
         else:
             log_debug("FilterFactory.build key %s not found" % (key))
@@ -364,19 +419,19 @@ class Miniterm(object):
             command_port = int(command_port)
         self.command_server = CommandSocket.Server(port=command_port)
         self.rx_state = Console.OutputStreamState()
-        self.rx_state.set_fg(Console.Color.GREEN)
-        self.rx_state.save_default()
+        #self.rx_state.set_fg(Console.Color.GREEN)
+        #self.rx_state.save_default()
         self._init_filters()
 
     def _init_filters(self):
-        self.filter_factory = FilterFactory()
+        self.filter_factory = FilterFactory(self)
         # TODO: do this by introspection
-        self.filter_factory.register(TestFilter)
+        self.filter_factory.register(UbootFastbootFilter)
         self.filter_chain = FilterChain()
         if os.name == 'nt':
-            self.filter_chain.append(AnsiFilter(self.rx_state))
+            self.filter_chain.append(AnsiFilter(self, self.rx_state))
         # TODO: accept a command-line parameter specifying the filters to load
-        self.filter_chain.append(self.filter_factory.build('test'))
+        self.filter_chain.append(self.filter_factory.build('uboot-fastboot'))
 
     def _start_reader(self):
         self._reader_alive = True
@@ -409,7 +464,15 @@ class Miniterm(object):
 
     def handle_msg(self, msg):
         log_debug("handle_msg %s" % (msg.msg))
-        msg.send_reply('OK')
+        tokens = msg.msg.split(' ')
+        name = tokens.pop(0)
+        filter = self.filter_chain.find_filter(name)
+        if filter:
+            reply = filter.command(tokens)
+            msg.send_reply(reply)
+        else:
+            log_debug("handle_msg filter %s not found" % (name))
+            msg.send_reply('Filter %s not found' % (name))
 
     def join(self, transmit_only=False):
         self.transmitter_thread.join()
