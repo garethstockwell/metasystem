@@ -29,7 +29,7 @@ function get_filename()
 # Print an error message and exit
 function error()
 {
-    echo -e "\nError: $*"
+    echo -e "\nError: $*" >&2
     if [[ "$opt_dryrun" != yes ]]; then
         exit 1
     fi
@@ -41,19 +41,19 @@ function error()
 #------------------------------------------------------------------------------
 
 file=$(get_filename)
-echo -e "Log filename $file"
+echo -e "Log filename $file" >&2
 
-echo -en "Waiting for device ... "
+echo -en "Waiting for device ... " >&2
 adb wait-for-device
-echo -e "OK"
+echo -e "OK" >&2
 
 devices=$(metasystem_android_devices)
 [[ -z $devices ]] && error "No ADB device found"
 [[ $(echo $devices | wc -w) != 1 ]] && error "Multiple ADB devices found: $devices"
 
-echo -e "Clearing device log ..."
+echo -e "Clearing device log ..." >&2
 adb shell logcat -c
 
-echo -e "Starting logcat ..."
+echo -e "Starting logcat ..." >&2
 adb logcat -v threadtime | tee $file
 
