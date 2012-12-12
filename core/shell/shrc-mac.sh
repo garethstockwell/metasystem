@@ -1,4 +1,4 @@
-# bashrc-mac
+# shrc-mac.sh
 
 function gvim()
 {

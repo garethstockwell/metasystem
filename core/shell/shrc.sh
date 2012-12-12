@@ -1,4 +1,4 @@
-# bashrc
+# shrc.sh
 
 #==============================================================================
 # Core setup 1/2
@@ -109,7 +109,7 @@ source $METASYSTEM_CORE_LIB/bash/string.sh
 # Profile
 #------------------------------------------------------------------------------
 
-source $METASYSTEM_CORE_SHELL/profile
+source $METASYSTEM_CORE_SHELL/profile.sh
 
 
 #------------------------------------------------------------------------------
@@ -204,8 +204,8 @@ export -f metasystem_run_bg
 # Platform
 #------------------------------------------------------------------------------
 
-source $METASYSTEM_CORE_SHELL/bashrc-$METASYSTEM_PLATFORM
-os_rc=$METASYSTEM_CORE_SHELL/bashrc-$METASYSTEM_OS
+source $METASYSTEM_CORE_SHELL/shrc-$METASYSTEM_PLATFORM.sh
+os_rc=$METASYSTEM_CORE_SHELL/shrc-$METASYSTEM_OS.sh
 [[ -e $os_rc ]] && source $os_rc
 unset os_rc
 
@@ -544,7 +544,7 @@ source $METASYSTEM_CORE_SHELL/opt/config
 #==============================================================================
 
 if [[ -n $METASYSTEM_LOCAL_SHELL ]]; then
-	source $METASYSTEM_LOCAL_SHELL/bashrc
+	source $METASYSTEM_LOCAL_SHELL/shrc.sh
 	PATH=$(path_prepend $METASYSTEM_LOCAL_BIN $PATH)
 else
 	echo -e "\n${NAKED_LIGHT_RED}$metasystem_local_root not found${NAKED_NO_COLOR}"

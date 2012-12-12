@@ -1,5 +1,4 @@
 # Sourced from ~/.bashrc
 
-me=${BASH_SOURCE[0]}
-source $(dirname $me)/../core/shell/$(basename $me)
+source $(dirname ${BASH_SOURCE[0]})/../core/shell/shrc.sh
 
