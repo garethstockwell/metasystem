@@ -1,0 +1,5 @@
+if [[ -n $PS1 ]]; then
+	. ${METASYSTEM_CORE_SHELL}/bashrc
+	metasystem_cd ~
+fi
+

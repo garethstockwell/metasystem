@@ -1,0 +1,41 @@
+# .metasystem-dirinfo
+
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
+# Label which will be displayed in the shell prompt
+#
+# Syntax:
+# label <value>
+
+# Identities used for SCM tools
+#
+# Syntax:
+# id hg <value>
+# id git <value>
+#
+# <value> can be one of '${METASYSTEM_IDS}'
+# For more details, see
+# ${METASYSTEM_CORE_CONFIG}/id.ini
+
+# Tools
+#
+# Syntax:
+# tool <type> <value>
+#
+# <type> can be one of '${METASYSTEM_TOOL_TYPES}'
+# For more details, see
+# ${METASYSTEM_CORE_CONFIG}/tools.ini
+
+
+#------------------------------------------------------------------------------
+# Projects
+#------------------------------------------------------------------------------
+
+# Projects
+#
+# Syntax:
+# project <name> dir=<value>
+# project <name> sourcedir=<value> builddir=<value>
+

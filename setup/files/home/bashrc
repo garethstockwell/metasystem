@@ -1,5 +1,0 @@
-if [[ -n $PS1 ]]; then
-	. ${METASYSTEM_HOME}/bashrc
-	metasystem_cd ~
-fi
-

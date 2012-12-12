@@ -1,0 +1,256 @@
+===============================================================================
+System setup
+===============================================================================
+
+-------------------------------------------------------------------------------
+Initial setup
+-------------------------------------------------------------------------------
+
+* Copy SSH keys from USB drive
+* Clone metasystem-local, or create from template (run metasystem_create_local)
+
+
+-------------------------------------------------------------------------------
+Installing metasystem on a Windows host
+-------------------------------------------------------------------------------
+
+Install MinGW / MSYS
+Change home directory 
+	Edit /etc/profile to contain "HOME=/c/Users/$LOGNAME"
+
+Install
+	GIT (c:\apps\git)
+	Python 2.7 (c:\apps\python\2.7)
+	MinGW (c:\mingw)
+	Unison (c:\apps\bin)
+
+Install SSH key
+
+Clone metasystem.git
+
+Run metasystem/setup/setup.sh
+
+Add host to $METASYSTEM_CORE_CONFIG/profiles.ini
+Run 'profile-update' to generate ~/.metasystem-profile
+
+Install unison.exe to /c/apps/bin
+
+Resize partitions (see Partitions section below)
+	Create work folder in data partition, with requisite subdirectory structure
+	junction.exe %USERPROFILE%\work z:\work
+
+Add host to $METASYSTEM_CORE_CONFIG/sync.ini
+Run 'sync init'
+
+Install Console2
+Add tab definitions for MinGW, Cygwin:
+	MSYS: C:\MinGW\msys\1.0\bin\bash.exe --login -i
+	DOS:  cmd.exe
+
+Set up mount points in /etc/fstab
+C:\MinGW\   /mingw
+c:/Users/$USER/work/sync/git         /c/Users/$USER/git
+c:/Users/$USER/work/sync/hg          /c/Users/$USER/hg
+c:/Users/$USER/work/sync/unison      /c/Users/$USER/unison
+
+Install firefox
+Set up firefox (see below)
+
+
+-------------------------------------------------------------------------------
+Using Cygwin instead of MSYS
+-------------------------------------------------------------------------------
+
+Install Python >=2.7
+http://superuser.com/questions/394236/how-to-install-python-2-7-with-unix-libraries-on-cygwin
+
+
+-------------------------------------------------------------------------------
+Other system setup for Windows
+-------------------------------------------------------------------------------
+
+Install 7-zip (c:\apps\7-zip)
+
+Install RVCT 2.2, 4.0
+Install FlexLM
+Add virtual ethernet adapter
+Install RVCT license file
+
+Install the following into c:/apps/bin (should have been created by metasystem
+setup.sh)
+	depends.exe (SysInternals dependency walker)
+	putty.exe
+	runonphone.exe
+	unison.exe
+
+Essential installs
+	FileZilla
+	GVim
+	IRC client (Quassel / KVIrc)
+	Jom
+	Mercurial
+	MSVC
+	OpenVPN
+		Copy certificates into <OpenVPN dir>/config
+		Remember to tick 'Always run as Administrator'
+	ProcExplorer (SysInternals)
+	QtSDK
+	Quassel
+	WinDirStat
+
+Non-essential installs
+	Audacity
+	Beyond Compare
+	CutePDF (printer driver)
+	Eclipse
+	GCCE
+	GIMP
+	Incredibuild
+	MinTTY
+	Qt devtools
+	Skype
+	Spotify
+	TrueCrypt
+	VMWare player
+	YUV Player Deluxe
+	VspMgr
+	WireShark
+
+Perl modules (non-essential)
+	perl -MCPAN -eshell
+	cpan> o conf http_proxy <http_proxy>
+	cpan> o conf ftp_proxy <ftp_proxy>
+	cpan> install Exception::Class
+	cpan> install IO::CaptureOutput
+
+Install printer
+http://locps1304/printers/OB-Follow-Me/.printer
+Ricoh Aficio MP C4000 PCL 5c
+
+Optional
+
+Create build directory
+Add host and build directory to $METASYSTEM_CORE_SHELL/bin/subst-drives.sh
+Run 'subst-drives.sh'
+
+
+-------------------------------------------------------------------------------
+Installing metasystem on a Linux host
+-------------------------------------------------------------------------------
+
+Install graphics drivers
+
+Run metasystem/setup/ams-post-install.sh
+
+Clone git@github.com:${MY_NAME_NO_DOTS}/smartcd.git
+	cd smartcd
+	make install
+	source ~/.smartcd/lib/core/smartcd
+	smartcd config
+
+Clone metasystem.git
+
+Run metasystem/setup/setup.sh
+Run metasystem/setup/setup-linux.sh
+
+smartcd_install_templates
+
+Set up firefox (see below)
+
+Set GRUB_TIMEOUT=-1 in /etc/default/grub (then run 'sudo update-grub')
+
+To resolve windows network names:
+* Edit /etc/nsswitch.conf and add 'wins' to the hosts: variable
+
+Create SMB mountpoints:
+* sudo mkdir /mnt/acn-lon-dsk-win/ntfs-data
+* //MW7HXQS1YQVAL3/ntfs-data /mnt/acn-lon-dsk-win/ntfs-data smbfs credentials=/etc/samba/credentials,noauto,user 0 0
+
+Mount ntfs-data
+/dev/sda2	/media/ntfs-data	ntfs-3g	defaults	0	0	
+
+Install software updates
+
+
+-------------------------------------------------------------------------------
+Firefox setup
+-------------------------------------------------------------------------------
+
+Import firefox bookmarks from $METASYSTEM_CORE_SHELL/lib/firefox/bookmarks.json
+Install firefox addons
+	Xmarks
+	IE Tab Plus
+	Tree-style tab
+	Ubiquity
+		Note: for new versions of Firefox, use community version (https://bitbucket.org/satyr/ubiquity/downloads/tip.xpi)
+	New tab toolbar button
+	Password Exporter
+	Redirector
+	FoxyProxy
+Install ubiquity commands from $METASYSTEM_CORE_SHELL/lib/firefox/ubiquity
+
+
+-------------------------------------------------------------------------------
+RVCT NLL setup
+-------------------------------------------------------------------------------
+
+Install flexlm 10.8.5
+Run lmutils and add a new service, specifying path to lmgrd.exe and license file
+Install TAP-Win32 Adapter V9
+Configure with MAC address from NLL file
+
+
+-------------------------------------------------------------------------------
+Partitions
+-------------------------------------------------------------------------------
+
+To modify the partition table on an ACN Win7 installation:
+
+1. Delete the BDEDrive partition
+a. bcdboot c:\windows /s c:
+b. Mark C: partition as active
+c. Reboot
+d. Delete BDEDrive
+
+2. Disable hibernation (deletes hiberfile.sys)
+powercfg -h off
+
+3. Disable system protection
+Right-click My Computer | Advanced | System Protection | Off
+
+Remember to reverse (2) and (3) once partitions have been adjusted.
+
+
+Partition table
+
+Machine			Desktop		Laptop
+RAM /GB			12			8
+Disk size /GB	1500		500
+---------------------------------------
+Windows OS		125			80
+NTFS data		450			150
+Linux /root		100			65
+Linux swap		25			15
+Linux /home		450			150
+Unallocated		250			0
+---------------------------------------
+Total			1400		460
+---------------------------------------
+
+
+NTFS data partition layout
+
+work
+	local
+		data
+			documents
+			music
+			pictures
+			other
+			videos
+	sync
+		git
+		unison
+
+On Linux, ~/work/sync/unison -> /media/ntfs-data/work/sync/unison
+
