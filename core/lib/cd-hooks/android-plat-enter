@@ -116,7 +116,7 @@ if [[ -e $ANDROID_SRC/build/envsetup.sh ]]; then
 	autostash LUNCH_CONFIG=__PATH__/.lunch
 
 	# Wrap lunch function
-	# Relies on rename_function, defined in $METASYSTEM_LIB/bash/func.sh
+	# Relies on rename_function, defined in $METASYSTEM_CORE_LIB/bash/func.sh
 	rename_function lunch android_lunch
 	function lunch()
 	{

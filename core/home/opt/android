@@ -362,7 +362,7 @@ alias android-devices=metasystem_android_devices
 # Main
 #------------------------------------------------------------------------------
 
-source $METASYSTEM_HOME/bash-completion/android
+source $METASYSTEM_CORE_HOME/bash-completion/android
 
 if [[ -d $ANDROID_SDK_DIR ]]; then
 	PATH=$(path_prepend $ANDROID_SDK_DIR/platform-tools $PATH)

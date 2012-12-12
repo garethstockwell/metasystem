@@ -30,7 +30,7 @@ Clone metasystem.git
 
 Run metasystem/setup/setup.sh
 
-Add host to $METASYSTEM_CONFIG/profiles.ini
+Add host to $METASYSTEM_CORE_CONFIG/profiles.ini
 Run 'profile-update' to generate ~/.metasystem-profile
 
 Install unison.exe to /c/apps/bin
@@ -39,7 +39,7 @@ Resize partitions (see Partitions section below)
 	Create work folder in data partition, with requisite subdirectory structure
 	junction.exe %USERPROFILE%\work z:\work
 
-Add host to $METASYSTEM_CONFIG/sync.ini
+Add host to $METASYSTEM_CORE_CONFIG/sync.ini
 Run 'sync init'
 
 Install Console2
@@ -130,7 +130,7 @@ Ricoh Aficio MP C4000 PCL 5c
 Optional
 
 Create build directory
-Add host and build directory to $METASYSTEM_HOME/bin/subst-drives.sh
+Add host and build directory to $METASYSTEM_CORE_HOME/bin/subst-drives.sh
 Run 'subst-drives.sh'
 
 
@@ -176,7 +176,7 @@ Install software updates
 Firefox setup
 -------------------------------------------------------------------------------
 
-Import firefox bookmarks from $METASYSTEM_HOME/lib/firefox/bookmarks.json
+Import firefox bookmarks from $METASYSTEM_CORE_HOME/lib/firefox/bookmarks.json
 Install firefox addons
 	Xmarks
 	IE Tab Plus
@@ -187,7 +187,7 @@ Install firefox addons
 	Password Exporter
 	Redirector
 	FoxyProxy
-Install ubiquity commands from $METASYSTEM_HOME/lib/firefox/ubiquity
+Install ubiquity commands from $METASYSTEM_CORE_HOME/lib/firefox/ubiquity
 
 
 -------------------------------------------------------------------------------

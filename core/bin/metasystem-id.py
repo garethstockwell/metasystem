@@ -21,7 +21,7 @@ LINE_WIDTH = 80
 SEPARATOR = '-'
 HOME_PATH = os.path.expanduser('~')
 
-REQUIRED_VARS = ['METASYSTEM_CONFIG', 'METASYSTEM_TEMPLATES']
+REQUIRED_VARS = ['METASYSTEM_CORE_CONFIG', 'METASYSTEM_CORE_TEMPLATES']
 
 #------------------------------------------------------------------------------
 # Classes
@@ -155,7 +155,7 @@ def parse_ini(args):
     config['types'] = { }
     config['ids'] = { }
 
-    fileName = os.path.join(os.environ.get('METASYSTEM_CONFIG'), 'id.ini')
+    fileName = os.path.join(os.environ.get('METASYSTEM_CORE_CONFIG'), 'id.ini')
     parser = ConfigParser.RawConfigParser()
     if len(parser.read(fileName)) == 0:
         raise IOError, "Failed to read config file " + fileName
@@ -211,7 +211,7 @@ def write_config_file(args, type, id):
     if 'METASYSTEM_LOCAL_TEMPLATES' in os.environ.keys():
         sourceFileName = os.path.join(os.environ.get('METASYSTEM_LOCAL_TEMPLATES'), 'home', type.config_file)
     if not os.path.isfile(sourceFileName):
-        sourceFileName = os.path.join(os.environ.get('METASYSTEM_TEMPLATES'), 'home', type.config_file)
+        sourceFileName = os.path.join(os.environ.get('METASYSTEM_CORE_TEMPLATES'), 'home', type.config_file)
     destFileName = os.path.join(HOME_PATH, '.' + type.config_file)
     if not args.quiet:
         print "Generating file ~/." + type.config_file

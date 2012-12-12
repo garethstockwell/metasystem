@@ -67,17 +67,17 @@ export METASYSTEM_HOSTNAME=$HOSTNAME
 cd $HOME
 
 # Find location of this script
-export METASYSTEM_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
+export METASYSTEM_CORE_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
 
-export METASYSTEM_BIN=$METASYSTEM_ROOT/bin
-export METASYSTEM_HOME=$METASYSTEM_ROOT/home
-export METASYSTEM_LIB=$METASYSTEM_ROOT/lib
-export METASYSTEM_TEMPLATES=$METASYSTEM_ROOT/templates
+export METASYSTEM_CORE_BIN=$METASYSTEM_CORE_ROOT/bin
+export METASYSTEM_CORE_HOME=$METASYSTEM_CORE_ROOT/home
+export METASYSTEM_CORE_LIB=$METASYSTEM_CORE_ROOT/lib
+export METASYSTEM_CORE_TEMPLATES=$METASYSTEM_CORE_ROOT/templates
 
 if [[ -n $METASYSTEM_LOCAL_ROOT ]]; then
 	metasystem_local_root=$METASYSTEM_LOCAL_ROOT
 else
-	metasystem_local_root=$METASYSTEM_ROOT/../metasystem-local
+	metasystem_local_root=$METASYSTEM_CORE_ROOT/../metasystem-local
 fi
 
 if [[ -d $metasystem_local_root ]]; then
@@ -86,22 +86,30 @@ if [[ -d $metasystem_local_root ]]; then
 	export METASYSTEM_LOCAL_HOME=$METASYSTEM_LOCAL_ROOT/home
 	export METASYSTEM_LOCAL_LIB=$METASYSTEM_LOCAL_ROOT/lib
 	export METASYSTEM_LOCAL_TEMPLATES=$METASYSTEM_LOCAL_ROOT/templates
-	export METASYSTEM_CONFIG=$METASYSTEM_LOCAL_ROOT/config
+	export METASYSTEM_CORE_CONFIG=$METASYSTEM_LOCAL_ROOT/config
 else
-	export METASYSTEM_CONFIG=$METASYSTEM_TEMPLATES/local/config
+	export METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config
 fi
 
+# Compatibility for pre-modularisation metasystem-local
+export METASYSTEM_ROOT=$METASYSTEM_CORE_ROOT
+export METASYSTEM_BIN=$METASYSTEM_CORE_BIN
+export METASYSTEM_CONFIG=$METASYSTEM_CORE_CONFIG
+export METASYSTEM_HOME=$METASYSTEM_CORE_HOME
+export METASYSTEM_LIB=$METASYSTEM_CORE_LIB
+export METASYSTEM_TEMPLATES=$METASYSTEM_CORE_TEMPLATES
+
 # Import utility functions
-source $METASYSTEM_LIB/bash/utils.sh
-source $METASYSTEM_LIB/bash/path.sh
-source $METASYSTEM_LIB/bash/string.sh
+source $METASYSTEM_CORE_LIB/bash/utils.sh
+source $METASYSTEM_CORE_LIB/bash/path.sh
+source $METASYSTEM_CORE_LIB/bash/string.sh
 
 
 #------------------------------------------------------------------------------
 # Profile
 #------------------------------------------------------------------------------
 
-source $METASYSTEM_HOME/profile
+source $METASYSTEM_CORE_HOME/profile
 
 
 #------------------------------------------------------------------------------
@@ -196,8 +204,8 @@ export -f metasystem_run_bg
 # Platform
 #------------------------------------------------------------------------------
 
-source $METASYSTEM_HOME/bashrc-$METASYSTEM_PLATFORM
-os_rc=$METASYSTEM_HOME/bashrc-$METASYSTEM_OS
+source $METASYSTEM_CORE_HOME/bashrc-$METASYSTEM_PLATFORM
+os_rc=$METASYSTEM_CORE_HOME/bashrc-$METASYSTEM_OS
 [[ -e $os_rc ]] && source $os_rc
 unset os_rc
 
@@ -260,13 +268,13 @@ METASYSTEM_EDITOR=vi
 PATH=$(path_prepend_if_exists $_METASYSTEM_APPS/bin $PATH)
 
 # Misc tools
-PATH=$METASYSTEM_BIN:${PATH}
+PATH=$METASYSTEM_CORE_BIN:${PATH}
 
 # Templater
 PATH=$(path_append_if_exists ~/work/sync/git/templater/bin $PATH)
 
 # stuff
-[[ -d $METASYSTEM_ROOT/../stuff ]] && source $METASYSTEM_ROOT/../stuff/bashrc-stuff
+[[ -d $METASYSTEM_CORE_ROOT/../stuff ]] && source $METASYSTEM_CORE_ROOT/../stuff/bashrc-stuff
 
 PATH=$(path_remove '^\.$' $PATH)
 
@@ -432,11 +440,11 @@ export -f _metasystem_print_banner
 
 echo -e "$_METASYSTEM_RULE\n"
 echo "Hostname:   $METASYSTEM_HOSTNAME"
-[[ -n $have_python ]] && echo "Domain:     $($METASYSTEM_BIN/network-info.py domain)"
+[[ -n $have_python ]] && echo "Domain:     $($METASYSTEM_CORE_BIN/network-info.py domain)"
 if [[ $METASYSTEM_OS == linux ]]; then
 	echo "IP address: "`ifconfig | grep 'inet addr' | head -n1 | awk ' { print $2 } ' | sed -e 's/addr://'`
 else
-	echo "IP address: $($METASYSTEM_BIN/network-info.py ip)"
+	echo "IP address: $($METASYSTEM_CORE_BIN/network-info.py ip)"
 fi
 echo "OS:         $METASYSTEM_OS"
 echo "OS vendor:  $METASYSTEM_OS_VENDOR"
@@ -508,7 +516,7 @@ function _metasystem_dirinfo_install()
 	local force=
 	[[ "$1" == "-force" ]] && force=1
 	[[ "$1" == "--force" ]] && force=1
-	local src=$METASYSTEM_ROOT/templates/metasystem-dirinfo
+	local src=$METASYSTEM_CORE_ROOT/templates/metasystem-dirinfo
 	local dst=$PWD/.metasystem-dirinfo
 	if [[ -e $dst && -z $force ]]; then
 		echo "$PWD/.metasystem-dirinfo already exists"
@@ -528,7 +536,7 @@ alias dirinfo-init='_metasystem_dirinfo_init'
 #==============================================================================
 
 _metasystem_print_banner "Optional packages"
-source $METASYSTEM_HOME/opt/config
+source $METASYSTEM_CORE_HOME/opt/config
 
 
 #==============================================================================
@@ -540,7 +548,7 @@ if [[ -n $METASYSTEM_LOCAL_HOME ]]; then
 	PATH=$(path_prepend $METASYSTEM_LOCAL_BIN $PATH)
 else
 	echo -e "\n${NAKED_LIGHT_RED}$metasystem_local_root not found${NAKED_NO_COLOR}"
-	echo "Using template config files from $METASYSTEM_CONFIG"
+	echo "Using template config files from $METASYSTEM_CORE_CONFIG"
 	echo "To create a metasystem-local repo, run 'metasystem_create_local'"
 fi
 
@@ -550,8 +558,8 @@ function metasystem_create_local()
 		echo "Error: $metasystem_local_root already exists"
 		return 1
 	else
-		cp -rv $METASYSTEM_TEMPLATES/local $metasystem_local_root
-		cp -v $METASYSTEM_ROOT/.gitignore $metasystem_local_root
+		cp -rv $METASYSTEM_CORE_TEMPLATES/local $metasystem_local_root
+		cp -v $METASYSTEM_CORE_ROOT/.gitignore $metasystem_local_root
 		cd $metasystem_local_root
 		git init
 		git add -A
@@ -964,7 +972,7 @@ function metasystem_install_git_hooks()
 		builtin cd $hook_dir
 		for sample in $('ls' *.sample); do
 			dst=${sample//.sample/}
-			src=$METASYSTEM_LIB/git-hooks/$dst
+			src=$METASYSTEM_CORE_LIB/git-hooks/$dst
 			[[ -e $src ]] && rm -f $dst && ln -s $src $dst
 		done
 		builtin cd ../..
@@ -1167,8 +1175,8 @@ function do_rc_update()
 	echo "Updating ~/.$rc"
 	if [[ -e $METASYSTEM_LOCAL_TEMPLATES/home/$rc ]]; then
 		subst-vars.sh --force $METASYSTEM_LOCAL_TEMPLATES/home/$rc ~/.$rc
-	elif [[ -e $METASYSTEM_TEMPLATES/home/$rc ]]; then
-		subst-vars.sh --force $METASYSTEM_TEMPLATES/home/$rc ~/.$rc
+	elif [[ -e $METASYSTEM_CORE_TEMPLATES/home/$rc ]]; then
+		subst-vars.sh --force $METASYSTEM_CORE_TEMPLATES/home/$rc ~/.$rc
 	fi
 }
 

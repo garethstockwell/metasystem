@@ -28,7 +28,7 @@ class Verbosity:
 
 CATEGORIES = ['host', 'location', 'rvct']
 
-REQUIRED_VARS = ['METASYSTEM_CONFIG', 'METASYSTEM_OS']
+REQUIRED_VARS = ['METASYSTEM_CORE_CONFIG', 'METASYSTEM_OS']
 
 #------------------------------------------------------------------------------
 # Classes
@@ -261,7 +261,7 @@ def print_summary(args):
 def parse_ini_file(args):
     config = {}
     config['parser'] = ConfigParser.RawConfigParser()
-    ini_file = os.path.abspath(os.path.join(os.environ.get('METASYSTEM_CONFIG'), 'profile.ini'))
+    ini_file = os.path.abspath(os.path.join(os.environ.get('METASYSTEM_CORE_CONFIG'), 'profile.ini'))
     if len(config['parser'].read(ini_file)) == 0:
         raise IOError, "Failed to read config file " + ini_file
     return config

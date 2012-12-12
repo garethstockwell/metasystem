@@ -21,7 +21,7 @@ LINE_WIDTH = 80
 SEPARATOR = '-'
 HOME_PATH = os.path.expanduser('~')
 
-REQUIRED_VARS = ['METASYSTEM_CONFIG', 'METASYSTEM_OS']
+REQUIRED_VARS = ['METASYSTEM_CORE_CONFIG', 'METASYSTEM_OS']
 
 #------------------------------------------------------------------------------
 # Classes
@@ -163,7 +163,7 @@ def parse_ini(args):
     config = { }
     config['tools'] = { }
     config['types'] = { }
-    fileName = os.path.join(os.environ.get('METASYSTEM_CONFIG'), 'tools.ini')
+    fileName = os.path.join(os.environ.get('METASYSTEM_CORE_CONFIG'), 'tools.ini')
     parser = ConfigParser.RawConfigParser()
     if len(parser.read(fileName)) == 0:
         raise IOError, "Failed to read config file " + fileName

@@ -7,12 +7,12 @@
 ruler='-------------------------------------------------------------------------------'
 
 dir=$1
-[[ -z $dir ]] && dir=$METASYSTEM_ROOT
+[[ -z $dir ]] && dir=$METASYSTEM_CORE_ROOT
 echo -e "Scanning $dir ... \n"
 builtin cd $dir
 
 words=
-blacklist=$METASYSTEM_CONFIG/blacklist.txt
+blacklist=$METASYSTEM_CORE_CONFIG/blacklist.txt
 if [[ -e $blacklist ]]; then
 	while read line; do
 		line=$(echo $line | sed -e 's/#.*//')

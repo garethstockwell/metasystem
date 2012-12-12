@@ -77,7 +77,7 @@
 #    root = ssh://me@some.gitorious.server:22
 #    scm_bare = true
 #
-# See $METASYSTEM_CONFIG/sync.ini for an example INI file.
+# See $METASYSTEM_CORE_CONFIG/sync.ini for an example INI file.
 
 #------------------------------------------------------------------------------
 # TODO
@@ -140,7 +140,7 @@ RedThreshold = YellowThreshold * 2
 LeftColumnWidth = 30
 Indent = 4
 
-REQUIRED_VARS = ['METASYSTEM_CONFIG']
+REQUIRED_VARS = ['METASYSTEM_CORE_CONFIG']
 
 
 #------------------------------------------------------------------------------
@@ -1079,7 +1079,7 @@ def ProcessCommandLine():
             options.verbosity = Verbosity.Silent
 
     if None == result['options'].ini_filename:
-        result['options'].ini_filename = os.path.join(os.environ.get('METASYSTEM_CONFIG'), 'sync.ini')
+        result['options'].ini_filename = os.path.join(os.environ.get('METASYSTEM_CORE_CONFIG'), 'sync.ini')
 
     return result
 

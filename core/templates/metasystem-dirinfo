@@ -17,7 +17,7 @@
 #
 # <value> can be one of '${METASYSTEM_IDS}'
 # For more details, see
-# ${METASYSTEM_CONFIG}/id.ini
+# ${METASYSTEM_CORE_CONFIG}/id.ini
 
 # Tools
 #
@@ -26,7 +26,7 @@
 #
 # <type> can be one of '${METASYSTEM_TOOL_TYPES}'
 # For more details, see
-# ${METASYSTEM_CONFIG}/tools.ini
+# ${METASYSTEM_CORE_CONFIG}/tools.ini
 
 
 #------------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 # Executed on load
 #------------------------------------------------------------------------------
 
-[[ -z $METASYSTEM_LIB ]] && echo "Error: METASYSTEM_LIB not defined" >&2
+[[ -z $METASYSTEM_CORE_LIB ]] && echo "Error: METASYSTEM_CORE_LIB not defined" >&2
 
 
 #------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ function metasystem_load_lib()
 {
 	local lib=$1
 	[[ -n $METASYSTEM_DEBUG ]] && echo "[$$] load_lib $lib" >&2
-	eval "source $METASYSTEM_LIB/bash/$lib"
+	eval "source $METASYSTEM_CORE_LIB/bash/$lib"
 }
 
 export -f metasystem_declare_stub

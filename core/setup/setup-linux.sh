@@ -7,8 +7,8 @@
 #------------------------------------------------------------------------------
 
 SCRIPT_DIR=$(dirname $(readlink -f $0))
-[[ -z $METASYSTEM_LIB ]] && export METASYSTEM_LIB=$SCRIPT_DIR/../lib
-source $METASYSTEM_LIB/bash/utils.sh
+[[ -z $METASYSTEM_CORE_LIB ]] && export METASYSTEM_CORE_LIB=$SCRIPT_DIR/../lib
+source $METASYSTEM_CORE_LIB/bash/utils.sh
 
 #------------------------------------------------------------------------------
 # Constants

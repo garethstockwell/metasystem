@@ -26,7 +26,7 @@ LINE_WIDTH = 80
 COLOR_LIGHT_RED = '${NAKED_LIGHT_RED}'
 COLOR_NONE = '${NAKED_NO_COLOR}'
 
-REQUIRED_VARS = ['METASYSTEM_CONFIG', 'METASYSTEM_PLATFORM']
+REQUIRED_VARS = ['METASYSTEM_CORE_CONFIG', 'METASYSTEM_PLATFORM']
 
 #------------------------------------------------------------------------------
 # Classes

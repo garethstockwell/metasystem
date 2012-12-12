@@ -18,7 +18,7 @@
 #------------------------------------------------------------------------------
 
 # This file has a high churn, so we centralise it
-_smartcd_exec_file $METASYSTEM_LIB/cd-hooks/android-plat-enter $(pwd -P)
+_smartcd_exec_file $METASYSTEM_CORE_LIB/cd-hooks/android-plat-enter $(pwd -P)
 
 # Enter any bash_leave commands below here: (leave this line!)
 #------------------------------------------------------------------------------

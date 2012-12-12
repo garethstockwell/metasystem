@@ -204,7 +204,7 @@ Verbosity ............................... $option_verbosity
 Dry run ................................. $dryrun
 Windows ................................. $windows
 
-Metasystem source path.. ................ $METASYSTEM_ROOT
+Metasystem source path.. ................ $METASYSTEM_CORE_ROOT
 HOME .................................... $HOME
 EOF
 	for arg in $ARGUMENTS
@@ -277,7 +277,7 @@ function install_files()
 	print_banner Installing files
 	login_file=profile
 	test $METASYSTEM_OS != "windows" && login_file=bashrc
-	local cmd="$METASYSTEM_BIN/subst-vars.sh \
+	local cmd="$METASYSTEM_CORE_BIN/subst-vars.sh \
 		$METASYSTEM_SETUP/files/home/$login_file $HOME/.$login_file"
 	execute $cmd
 	if [ "$METASYSTEM_OS" == "linux" ]
@@ -292,11 +292,11 @@ function install_rc_files()
 	print_banner Installing rc files
 	for file in $INSTALL_FILES
 	do
-		src=$METASYSTEM_TEMPLATES/home/$file
+		src=$METASYSTEM_CORE_TEMPLATES/home/$file
 		dest=$HOME/.$file
 		destdir=$(dirname $dest)
 		test ! -d $destdir && execute mkdir -p $destdir
-		execute $METASYSTEM_BIN/subst-vars.sh $src $dest
+		execute $METASYSTEM_CORE_BIN/subst-vars.sh $src $dest
 	done
 }
 
@@ -307,7 +307,7 @@ function setup_windows()
 	test $METASYSTEM_PLATFORM == "mingw" && cygwrapper_dir=/c/Apps/bin
 	test ! -e $cygwrapper_dir && execute mkdir $cygwrapper_dir
 	execute rm -f $cygwrapper_dir/cygwrapper.bat
-	execute cp $METASYSTEM_BIN/cygwrapper.bat $cygwrapper_dir/cygwrapper.bat
+	execute cp $METASYSTEM_CORE_BIN/cygwrapper.bat $cygwrapper_dir/cygwrapper.bat
 }
 
 
@@ -318,7 +318,7 @@ function setup_cygwin()
 	for file in $files
 	do
 		execute mv /usr/bin/$file $ARCHIVE_DIR/usr/bin/$file
-		execute cp $METASYSTEM_BIN/cyg$file /usr/bin/$file
+		execute cp $METASYSTEM_CORE_BIN/cyg$file /usr/bin/$file
 	done
 	setup_windows
 }
@@ -338,12 +338,12 @@ function setup_todo()
 {
 	print_banner Setting up todo.sh
 	execute mkdir $HOME/.todo
-	execute ln -s $METASYSTEM_CONFIG/todo.cfg $HOME/.todo/config
+	execute ln -s $METASYSTEM_CORE_CONFIG/todo.cfg $HOME/.todo/config
 	execute mkdir $HOME/.todo.actions.d
 	todo_cmds='edit sync'
 	for cmd in $todo_cmds
 	do
-		execute ln -s $METASYSTEM_BIN/todo-$cmd.sh $HOME/.todo.actions.d/$cmd
+		execute ln -s $METASYSTEM_CORE_BIN/todo-$cmd.sh $HOME/.todo.actions.d/$cmd
 	done
 }
 
@@ -351,12 +351,12 @@ function setup_generate_dot_files()
 {
 	print_banner Generating .metasystem-xxx files
 	METASYSTEM_HOSTNAME=$HOSTNAME \
-	METASYSTEM_CONFIG=$METASYSTEM_TEMPLATES/local/config \
-		execute $METASYSTEM_BIN/metasystem-profile.py set --reset --auto all
-	METASYSTEM_CONFIG=$METASYSTEM_TEMPLATES/local/config \
-		execute $METASYSTEM_BIN/metasystem-id.py generate
-	METASYSTEM_CONFIG=$METASYSTEM_TEMPLATES/local/config \
-		execute $METASYSTEM_BIN/metasystem-tools.py generate
+	METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config \
+		execute $METASYSTEM_CORE_BIN/metasystem-profile.py set --reset --auto all
+	METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config \
+		execute $METASYSTEM_CORE_BIN/metasystem-id.py generate
+	METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config \
+		execute $METASYSTEM_CORE_BIN/metasystem-tools.py generate
 }
 
 function do_it()
@@ -401,19 +401,19 @@ then
     METASYSTEM_PLATFORM=unix
 fi
 
-# Ensure these are exported, as tools in $METASYSTEM_BIN may rely on them
+# Ensure these are exported, as tools in $METASYSTEM_CORE_BIN may rely on them
 export METASYSTEM_OS
 export METASYSTEM_PLATFORM
 
-export METASYSTEM_ROOT=`cd $(dirname $0)/.. && echo $PWD`
-export METASYSTEM_BIN=$METASYSTEM_ROOT/bin
-export METASYSTEM_CONFIG=$METASYSTEM_ROOT/config
-export METASYSTEM_HOME=$METASYSTEM_ROOT/home
-export METASYSTEM_LIB=$METASYSTEM_ROOT/lib
-export METASYSTEM_TEMPLATES=$METASYSTEM_ROOT/templates
-export METASYSTEM_SETUP=$METASYSTEM_ROOT/setup
+export METASYSTEM_CORE_ROOT=`cd $(dirname $0)/.. && echo $PWD`
+export METASYSTEM_CORE_BIN=$METASYSTEM_CORE_ROOT/bin
+export METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_ROOT/config
+export METASYSTEM_CORE_HOME=$METASYSTEM_CORE_ROOT/home
+export METASYSTEM_CORE_LIB=$METASYSTEM_CORE_ROOT/lib
+export METASYSTEM_CORE_TEMPLATES=$METASYSTEM_CORE_ROOT/templates
+export METASYSTEM_SETUP=$METASYSTEM_CORE_ROOT/setup
 
-INSTALL_FILES=$(cd $METASYSTEM_ROOT/templates/home && find . -type f | sed -e 's/\.\///g')
+INSTALL_FILES=$(cd $METASYSTEM_CORE_ROOT/templates/home && find . -type f | sed -e 's/\.\///g')
 ARCHIVE_FILES='bashrc bash_profile profile todo todo.actions.d'
 
 ARCHIVE_DIR=$HOME/metasystem-setup-archive

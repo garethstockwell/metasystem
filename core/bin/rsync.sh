@@ -6,5 +6,5 @@ if [[ $METASYSTEM_PLATFORM == mingw ]]; then
 	[[ -n $SSH_AUTH_SOCK ]] && export SSH_AUTH_SOCK=/c/cygwin/$SSH_AUTH_SOCK
 fi
 
-$METASYSTEM_BIN/rsync.py "$@"
+$METASYSTEM_CORE_BIN/rsync.py "$@"
 

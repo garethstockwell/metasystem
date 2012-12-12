@@ -1,2 +1,2 @@
-. ${METASYSTEM_HOME}/profile
+. ${METASYSTEM_CORE_HOME}/profile
 
