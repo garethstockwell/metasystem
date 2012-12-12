@@ -1,5 +1,5 @@
 # Sourced from ~/.bashrc
 
 me=${BASH_SOURCE[0]}
-source $(dirname $me)/../core/home/$(basename $me)
+source $(dirname $me)/../core/shell/$(basename $me)
 

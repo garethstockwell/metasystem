@@ -130,7 +130,7 @@ Ricoh Aficio MP C4000 PCL 5c
 Optional
 
 Create build directory
-Add host and build directory to $METASYSTEM_CORE_HOME/bin/subst-drives.sh
+Add host and build directory to $METASYSTEM_CORE_SHELL/bin/subst-drives.sh
 Run 'subst-drives.sh'
 
 
@@ -176,7 +176,7 @@ Install software updates
 Firefox setup
 -------------------------------------------------------------------------------
 
-Import firefox bookmarks from $METASYSTEM_CORE_HOME/lib/firefox/bookmarks.json
+Import firefox bookmarks from $METASYSTEM_CORE_SHELL/lib/firefox/bookmarks.json
 Install firefox addons
 	Xmarks
 	IE Tab Plus
@@ -187,7 +187,7 @@ Install firefox addons
 	Password Exporter
 	Redirector
 	FoxyProxy
-Install ubiquity commands from $METASYSTEM_CORE_HOME/lib/firefox/ubiquity
+Install ubiquity commands from $METASYSTEM_CORE_SHELL/lib/firefox/ubiquity
 
 
 -------------------------------------------------------------------------------

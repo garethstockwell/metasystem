@@ -191,7 +191,7 @@ Exported environment variable
 
 Leading underscore
 e.g. _metasystem_foo
-Non-exported function name, used only by the scripts inside $METASYSTEM_CORE_HOME/home
+Non-exported function name, used only by the scripts inside $METASYSTEM_CORE_SHELL/home
 
 Lower case, underscore-separated
 e.g. metasystem_foo

@@ -70,8 +70,8 @@ cd $HOME
 export METASYSTEM_CORE_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
 
 export METASYSTEM_CORE_BIN=$METASYSTEM_CORE_ROOT/bin
-export METASYSTEM_CORE_HOME=$METASYSTEM_CORE_ROOT/home
 export METASYSTEM_CORE_LIB=$METASYSTEM_CORE_ROOT/lib
+export METASYSTEM_CORE_SHELL=$METASYSTEM_CORE_ROOT/shell
 export METASYSTEM_CORE_TEMPLATES=$METASYSTEM_CORE_ROOT/templates
 
 if [[ -n $METASYSTEM_LOCAL_ROOT ]]; then
@@ -83,8 +83,8 @@ fi
 if [[ -d $metasystem_local_root ]]; then
 	export METASYSTEM_LOCAL_ROOT=$(cd $metasystem_local_root && pwd)
 	export METASYSTEM_LOCAL_BIN=$METASYSTEM_LOCAL_ROOT/bin
-	export METASYSTEM_LOCAL_HOME=$METASYSTEM_LOCAL_ROOT/home
 	export METASYSTEM_LOCAL_LIB=$METASYSTEM_LOCAL_ROOT/lib
+	export METASYSTEM_LOCAL_SHELL=$METASYSTEM_LOCAL_ROOT/shell
 	export METASYSTEM_LOCAL_TEMPLATES=$METASYSTEM_LOCAL_ROOT/templates
 	export METASYSTEM_CORE_CONFIG=$METASYSTEM_LOCAL_ROOT/config
 else
@@ -95,7 +95,7 @@ fi
 export METASYSTEM_ROOT=$METASYSTEM_CORE_ROOT
 export METASYSTEM_BIN=$METASYSTEM_CORE_BIN
 export METASYSTEM_CONFIG=$METASYSTEM_CORE_CONFIG
-export METASYSTEM_HOME=$METASYSTEM_CORE_HOME
+export METASYSTEM_HOME=$METASYSTEM_CORE_SHELL
 export METASYSTEM_LIB=$METASYSTEM_CORE_LIB
 export METASYSTEM_TEMPLATES=$METASYSTEM_CORE_TEMPLATES
 
@@ -109,7 +109,7 @@ source $METASYSTEM_CORE_LIB/bash/string.sh
 # Profile
 #------------------------------------------------------------------------------
 
-source $METASYSTEM_CORE_HOME/profile
+source $METASYSTEM_CORE_SHELL/profile
 
 
 #------------------------------------------------------------------------------
@@ -204,8 +204,8 @@ export -f metasystem_run_bg
 # Platform
 #------------------------------------------------------------------------------
 
-source $METASYSTEM_CORE_HOME/bashrc-$METASYSTEM_PLATFORM
-os_rc=$METASYSTEM_CORE_HOME/bashrc-$METASYSTEM_OS
+source $METASYSTEM_CORE_SHELL/bashrc-$METASYSTEM_PLATFORM
+os_rc=$METASYSTEM_CORE_SHELL/bashrc-$METASYSTEM_OS
 [[ -e $os_rc ]] && source $os_rc
 unset os_rc
 
@@ -536,15 +536,15 @@ alias dirinfo-init='_metasystem_dirinfo_init'
 #==============================================================================
 
 _metasystem_print_banner "Optional packages"
-source $METASYSTEM_CORE_HOME/opt/config
+source $METASYSTEM_CORE_SHELL/opt/config
 
 
 #==============================================================================
 # Local config
 #==============================================================================
 
-if [[ -n $METASYSTEM_LOCAL_HOME ]]; then
-	source $METASYSTEM_LOCAL_HOME/bashrc
+if [[ -n $METASYSTEM_LOCAL_SHELL ]]; then
+	source $METASYSTEM_LOCAL_SHELL/bashrc
 	PATH=$(path_prepend $METASYSTEM_LOCAL_BIN $PATH)
 else
 	echo -e "\n${NAKED_LIGHT_RED}$metasystem_local_root not found${NAKED_NO_COLOR}"

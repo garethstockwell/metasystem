@@ -61,10 +61,10 @@ export -f _metasystem_unset
 # Source
 #------------------------------------------------------------------------------
 
-[[ -n $METASYSTEM_OPT_ANDROID ]] && source $METASYSTEM_CORE_HOME/opt/android
-[[ -n $METASYSTEM_OPT_SYMBIAN ]] && source $METASYSTEM_CORE_HOME/opt/symbian
-[[ -n $METASYSTEM_OPT_QT ]] && source $METASYSTEM_CORE_HOME/opt/qt
+[[ -n $METASYSTEM_OPT_ANDROID ]] && source $METASYSTEM_CORE_SHELL/opt/android
+[[ -n $METASYSTEM_OPT_SYMBIAN ]] && source $METASYSTEM_CORE_SHELL/opt/symbian
+[[ -n $METASYSTEM_OPT_QT ]] && source $METASYSTEM_CORE_SHELL/opt/qt
 
-[[ $METASYSTEM_OPT_CD == dirinfo ]] && source $METASYSTEM_CORE_HOME/opt/cd-dirinfo
-[[ $METASYSTEM_OPT_CD == smartcd ]] && source $METASYSTEM_CORE_HOME/opt/cd-smartcd
+[[ $METASYSTEM_OPT_CD == dirinfo ]] && source $METASYSTEM_CORE_SHELL/opt/cd-dirinfo
+[[ $METASYSTEM_OPT_CD == smartcd ]] && source $METASYSTEM_CORE_SHELL/opt/cd-smartcd
 
