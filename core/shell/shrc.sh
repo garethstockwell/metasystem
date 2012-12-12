@@ -67,8 +67,9 @@ export METASYSTEM_HOSTNAME=$HOSTNAME
 cd $HOME
 
 # Find location of this script
-export METASYSTEM_CORE_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
+export METASYSTEM_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
+export METASYSTEM_CORE_ROOT=$METASYSTEM_ROOT/core
 export METASYSTEM_CORE_BIN=$METASYSTEM_CORE_ROOT/bin
 export METASYSTEM_CORE_LIB=$METASYSTEM_CORE_ROOT/lib
 export METASYSTEM_CORE_SHELL=$METASYSTEM_CORE_ROOT/shell
@@ -90,14 +91,6 @@ if [[ -d $metasystem_local_root ]]; then
 else
 	export METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config
 fi
-
-# Compatibility for pre-modularisation metasystem-local
-export METASYSTEM_ROOT=$METASYSTEM_CORE_ROOT
-export METASYSTEM_BIN=$METASYSTEM_CORE_BIN
-export METASYSTEM_CONFIG=$METASYSTEM_CORE_CONFIG
-export METASYSTEM_HOME=$METASYSTEM_CORE_SHELL
-export METASYSTEM_LIB=$METASYSTEM_CORE_LIB
-export METASYSTEM_TEMPLATES=$METASYSTEM_CORE_TEMPLATES
 
 # Import utility functions
 source $METASYSTEM_CORE_LIB/bash/utils.sh
@@ -529,6 +522,13 @@ function _metasystem_dirinfo_install()
 }
 
 alias dirinfo-init='_metasystem_dirinfo_init'
+
+
+#==============================================================================
+# Modules
+#==============================================================================
+
+source $METASYSTEM_CORE_SHELL/modules.sh
 
 
 #==============================================================================
