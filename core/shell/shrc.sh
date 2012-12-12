@@ -67,7 +67,7 @@ export METASYSTEM_HOSTNAME=$HOSTNAME
 cd $HOME
 
 # Find location of this script
-export METASYSTEM_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
+export METASYSTEM_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
 
 export METASYSTEM_CORE_ROOT=$METASYSTEM_ROOT/core
 export METASYSTEM_CORE_BIN=$METASYSTEM_CORE_ROOT/bin
@@ -543,11 +543,14 @@ source $METASYSTEM_CORE_SHELL/opt/config
 # Local config
 #==============================================================================
 
+_metasystem_print_banner "Local config"
+
 if [[ -n $METASYSTEM_LOCAL_SHELL ]]; then
+	echo -e "Loading $METASYSTEM_LOCAL_SHELL/shrc.sh ..."
 	source $METASYSTEM_LOCAL_SHELL/shrc.sh
 	PATH=$(path_prepend $METASYSTEM_LOCAL_BIN $PATH)
 else
-	echo -e "\n${NAKED_LIGHT_RED}$metasystem_local_root not found${NAKED_NO_COLOR}"
+	echo -e "${NAKED_LIGHT_RED}$metasystem_local_root not found${NAKED_NO_COLOR}"
 	echo "Using template config files from $METASYSTEM_CORE_CONFIG"
 	echo "To create a metasystem-local repo, run 'metasystem_create_local'"
 fi
