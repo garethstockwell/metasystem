@@ -1,26 +1,44 @@
 # metasystem/shell/modules.sh
 
-module_first=1
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
 
 function metasystem_module_load()
 {
 	local module=$1
-	local shrc=$METASYSTEM_ROOT/modules/$module/shell/shrc.sh
-	if [[ -e $shrc ]]; then
-		echo "Loading module $module ..."
-		source $shrc
-	else
-		echo "Error: module $module not found"
+	local file=$METASYSTEM_ROOT/modules/$module.sh
+	local dir=$METASYSTEM_ROOT/modules/$module
+	[[ ! -f $METASYSTEM_ROOT/modules/$module.sh ]] && unset file
+	[[ ! -d $METASYSTEM_ROOT/modules/$module ]] && unset dir
+	if [[ -n $file && -n $dir ]]; then
+		echo "Error: $module is ambiguous" >&2
+		return 1
 	fi
+	if [[ -z $file && -z $dir ]]; then
+		echo "Error: $module not found" >&2
+		return 1
+	fi
+	local script=$file
+	[[ -n $dir ]] && script=$dir/module.sh
+	echo "Loading module $module ..."
+	source $script
 }
 
-export -f metasystem_module_load
+function metasystem_module_load_all()
+{
+	local first=1
+	for entry in $('ls' $METASYSTEM_ROOT/modules | grep -v ^template); do
+		[[ -n $first ]] && _metasystem_print_banner Modules
+		unset first
+		metasystem_module_load ${entry/.sh/}
+	done
+}
 
-for module in $METASYSTEM_MODULES; do
-	[[ -n $module_first ]] && _metasystem_print_banner Modules
-	metasystem_module_load $module
-	unset module_first
-done
 
-unset module_first
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
+metasystem_module_load_all
 
