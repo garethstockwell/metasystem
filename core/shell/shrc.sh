@@ -357,54 +357,6 @@ alias path='path_split \\n $PATH'
 
 
 #------------------------------------------------------------------------------
-# TODO
-#------------------------------------------------------------------------------
-
-function _metasystem_todo()
-{
-	local todo_dir=~/work/sync/unison/todo
-	chmod -R 700 $todo_dir
-	todo.sh $*
-}
-
-export -f _metasystem_todo
-alias todo=_metasystem_todo
-
-function _metasystem_todo_complete()
-{
-    local cur prev opts
-    COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
-
-    COMMANDS="add a addto addm append app archive command del  \
-              rm depri dp do help list ls listall lsa listcon  \
-              lsc listfile lf listpri lsp listproj lsproj move \
-              mv prepend prep pri p replace report"
-
-    # Add custom commands from add-ons, if installed.
-    COMMANDS="$COMMANDS $('ls' ${TODO_ACTIONS_DIR:-$HOME/.todo.actions.d}/ 2>/dev/null)"
-
-    OPTS="-@ -@@ -+ -++ -d -f -h -p -P -PP -a -n -t -v -vv -V -x"
-
-    if [ $COMP_CWORD -eq 1 ]; then
-	completions="$COMMANDS $OPTS"
-    else
-	case "${prev}" in
-	    -*) completions="$COMMANDS $OPTS";;
-	    *)  return 0;;
-	esac
-    fi
-
-    COMPREPLY=( $( compgen -W "$completions" -- $cur ))
-    return 0
-}
-
-complete -F _metasystem_todo_complete todo.sh
-complete -F _metasystem_todo_complete todo
-
-
-#------------------------------------------------------------------------------
 # Command-line completion
 #------------------------------------------------------------------------------
 
@@ -443,56 +395,6 @@ echo "OS:         $METASYSTEM_OS"
 echo "OS vendor:  $METASYSTEM_OS_VENDOR"
 echo "OS version: $METASYSTEM_OS_VERSION"
 echo "Platform:   $METASYSTEM_PLATFORM"
-
-
-#------------------------------------------------------------------------------
-# ssh-agent
-#------------------------------------------------------------------------------
-
-SSH_AGENT_ENV="$HOME/.ssh/agent-env-${HOSTNAME}-${METASYSTEM_OS}-${METASYSTEM_PLATFORM}"
-
-function ssh_agent_pid()
-{
-	if [[ -n ${SSH_AGENT_PID} ]]; then
-		ps -ef | grep $SSH_AGENT_PID | grep ssh-agent$ > /dev/null
-		[[ $? == 0 ]] && echo $SSH_AGENT_PID
-	fi
-}
-
-function ssh_agent_start()
-{
-	echo -n "Starting ssh-agent ... "
-	local pid=$(ssh_agent_pid)
-	if [[ -n $pid ]]; then
-		echo "already active PID $pid"
-	else
-		rm -f ${SSH_AGENT_ENV}
-		ssh-agent | sed 's/^echo/#echo/' > ${SSH_AGENT_ENV}
-		chmod 600 "${SSH_AGENT_ENV}"
-		export SSH_AGENT_PID=
-		. ${SSH_AGENT_ENV} > /dev/null
-		if [[ -n $SSH_AGENT_PID ]]; then
-			echo "PID $SSH_AGENT_PID"
-			ssh-add
-		else
-			echo "failed"
-		fi
-	fi
-}
-
-function ssh_agent_stop()
-{
-	echo "Stopping ssh-agent ..."
-	local pid=$(ssh_agent_pid)
-	[[ -n $pid ]] && kill -9 $pid
-	rm -f ${SSH_AGENT_ENV}
-}
-
-if [[ -z $METASYSTEM_DISABLE_SSH_AGENT ]]; then
-	_metasystem_print_banner "ssh-agent"
-	[[ -f ${SSH_AGENT_ENV} ]] && source ${SSH_AGENT_ENV} > /dev/null
-	ssh_agent_start
-fi
 
 
 #------------------------------------------------------------------------------
@@ -574,6 +476,13 @@ function metasystem_create_local()
 #==============================================================================
 # Core setup 2/2
 #==============================================================================
+
+#------------------------------------------------------------------------------
+# ssh-agent
+#------------------------------------------------------------------------------
+
+[[ -n $SSH_AGENT_ENV ]] && ssh_agent_init
+
 
 #------------------------------------------------------------------------------
 # Profile
