@@ -23,9 +23,7 @@ function metasystem_module_load()
 	fi
 	local script=$file
 	[[ -n $dir ]] && script=$dir/module.sh
-	if [[ -n $quiet ]]; then
-		echo $module
-	else
+	if [[ -z $quiet ]]; then
 		echo "Loading module $module ..."
 	fi
 	source $script
@@ -33,13 +31,18 @@ function metasystem_module_load()
 
 function metasystem_module_load_all()
 {
-	local quiet=
-	[[ $1 == "-quiet" ]] && quiet=-quiet
 	local first=1
 	for entry in $('ls' $METASYSTEM_ROOT/modules | grep -v ^templates); do
 		[[ -n $first ]] && _metasystem_print_banner Modules
 		unset first
-		metasystem_module_load ${entry/.sh/} $quiet
+		local module=${entry/.sh/}
+		echo -n $module
+		if [[ -z $(list_contains $module $METASYSTEM_MODULES_DISABLE) ]]; then
+			echo
+			metasystem_module_load $module -quiet
+		else
+			echo " (disabled)"
+		fi
 	done
 }
 
@@ -48,5 +51,5 @@ function metasystem_module_load_all()
 # Main
 #------------------------------------------------------------------------------
 
-metasystem_module_load_all -quiet
+metasystem_module_load_all
 
