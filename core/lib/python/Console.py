@@ -105,13 +105,14 @@ class Ansi(object):
     @classmethod
     def renderstate_to_ansi(self, rs):
         esc = '\033['
-        if state.fg():
-            esc += '%d;' % (ANSI.FG[state.fg()])
-        if state.bg():
-            esc += '%d;' % (ANSI.BG[state.bg()])
-        if state.intensity():
-            esc += '%d;' % (ANSI.INTENSITY[state.intensity()])
+        if rs.fg:
+            esc += '%d;' % (Ansi.FG[rs.fg])
+        if rs.bg:
+            esc += '%d;' % (Ansi.BG[rs.bg])
+        if rs.intensity:
+            esc += '%d;' % (Ansi.INTENSITY[rs.intensity])
         esc += 'm'
+        return esc
 
     @classmethod
     def ansi_to_renderstate(self, esc):
@@ -323,9 +324,9 @@ elif os.name == 'posix':
     sys.stdin = InputStream()
 
     def _cleanup():
-        stdin._cleanup()
+        sys.stdin._cleanup()
 
-    stdin._setup()
+    sys.stdin._setup()
 
     # Terminal modes have to be restored on exit
     atexit.register(_cleanup)
