@@ -594,7 +594,7 @@ function profile_update()
 	echo $cmd
 
 	local path=$PATH
-	[[ -n $METASYSTEM_OPT_SYMBIAN ]] && path=$(path_remove_epoc $path)
+	[[ -n $METASYSTEM_SYMBIAN_ROOT ]] && path=$(path_remove_epoc $path)
 
 	PATH=$path $cmd
 
@@ -784,7 +784,7 @@ function _metasystem_set_projectdirs()
 	local build_dir=$2
 	local source_dir=$3
 
-	if [[ -n $METASYSTEM_OPT_QT ]]; then
+	if [[ -n $METASYSTEM_QT_ROOT ]]; then
 		if [[ $project == qt ]]; then
 			_metasystem_set_qtdirs "$build_dir" "$source_dir"
 		else
@@ -792,9 +792,10 @@ function _metasystem_set_projectdirs()
 				_metasystem_export QTMOBILITY_BUILD_DIR=$build_dir
 				_metasystem_export QTMOBILITY_SOURCE_DIR=$source_dir
 			fi
-			_metasystem_do_set_projectdirs $project "$build_dir" "$source_dir"
 		fi
 	fi
+
+	_metasystem_do_set_projectdirs $project "$build_dir" "$source_dir"
 }
 
 function _metasystem_update_projects()
@@ -1003,9 +1004,10 @@ alias eclipse="metasystem_run_bg eclipsec"
 
 _METASYSTEM_PROMPT_ELEMENTS='ids epocroot git projects tools'
 
-_metasystem_prompt_android_enabled=$METASYSTEM_OPT_ANDROID
+# TODO: make this configurable
+_metasystem_prompt_android_enabled=$METASYSTEM_ANDROID_ROOT
 _metasystem_prompt_ids_enabled=yes
-_metasystem_prompt_epocroot_enabled=$METASYSTEM_OPT_SYMBIAN
+_metasystem_prompt_epocroot_enabled=$METASYSTEM_SYMBIAN_ROOT
 _metasystem_prompt_git_enabled=yes
 _metasystem_prompt_projects_enabled=no
 _metasystem_prompt_tools_enabled=yes
