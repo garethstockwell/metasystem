@@ -1,14 +1,12 @@
 #!/bin/bash
 
-# qt-makesis
-
-# Qt installation script
+# qt-signsis
 
 #------------------------------------------------------------------------------
 # Imports
 #------------------------------------------------------------------------------
 
-. `dirname "$0"`/qt-functions.sh
+source $METASYSTEM_QT_LIB/functions.sh
 
 #------------------------------------------------------------------------------
 # Constants
@@ -17,7 +15,9 @@
 SCRIPT_VERSION=0.1
 
 # Arguments
-ARGUMENTS=''
+ARGUMENTS='cert'
+
+CERT_DIR=~/work/sync/unison/live/projects/qt/certs
 
 #------------------------------------------------------------------------------
 # Variables populated by command-line
@@ -28,11 +28,7 @@ option_help=
 option_version=
 option_verbosity=normal
 option_dryrun=no
-option_qmake=no
-option_rnd=yes
-option_cert=yes
-option_install=no
-option_upgrade=no
+option_pkg=
 
 for arg in $ARGUMENTS; do eval "arg_$arg="; done
 
@@ -95,18 +91,21 @@ function print_banner()
 		print_rule
 		echo $*
 		print_rule
-		echo
 	fi
 }
 
 function print_usage()
 {
+	# [CHANGE] Modify descriptions of arguments and options
 	cat << EOF
-qt-makesis script
+qt-signsis script
 
 Usage: $0 [options] $ARGUMENTS
 
 Default values for options are specified in brackets.
+
+Arguments:
+    cert                    Certificate name
 
 Options:
     -h, --help, --usage     Display this help and exit
@@ -115,13 +114,7 @@ Options:
     -v, --verbose           Verbose output
     -V, --version           Display version information and exit
 
-    --qmake                 Run qmake
-    --no-qmake              Do not run qmake
-    --rnd                   Use R&D certificate
-    --no-rnd                Don't use R&D certificate
-    --no-cert               Don't use any certificate
-    --install               Install SIS file to device
-    --upgrade               Add TYPE=SA,NR,RU to .pkg file header
+	--pkg=PKG               Specify .pkg file name
 
 EOF
 }
@@ -129,7 +122,7 @@ EOF
 function print_version()
 {
 	cat << EOF
-qt-makesis script version $SCRIPT_VERSION
+qt-signsis script version $SCRIPT_VERSION
 EOF
 }
 
@@ -164,30 +157,19 @@ function parse_command_line()
 				option_version=yes
 				;;
 
-            -qmake | --qmake)
-				option_qmake=yes
+			-pkg | --pkg)
+				prev=option_pkg
 				;;
-			-no-qmake | --no-qmake)
-				option_qmake=no
-				;;
-
-			-rnd | --rnd)
-				option_rnd=yes
-				;;
-			-no-rnd | --no-rnd)
-				option_rnd=no
+			-pkg=* | --pkg=*)
+				option_pkg=$optarg
 				;;
 
-			-no-cert | --no-cert)
-				option_cert=no
-				;;
-
-			-install | --install)
-				option_install=yes
-				;;
-
-			--upgrade)
-				option_upgrade=yes
+			# Environment variables
+			*=*)
+				envvar=`expr "x$token" : 'x\([^=]*\)='`
+				optarg=`echo "$optarg" | sed "s/'/'\\\\\\\\''/g"`
+				eval "$envvar='$optarg'"
+				export $envvar
 				;;
 
 			# Unrecognized options
@@ -232,6 +214,7 @@ function print_summary()
 	print_banner 'Summary'
 	local total_num_dots=40
 	cat << EOF
+
 Verbosity ............................... $option_verbosity
 Dry run ................................. $option_dryrun
 
@@ -247,21 +230,36 @@ EOF
 	done
 
 	cat << EOF
-Run qmake ............................... $option_qmake
-Use certificate ......................... $option_cert
-Sign with R&D certificate ............... $option_rnd
-Use upgrade flags ....................... $option_upgrade
-Install to device ....................... $option_install
+Package file ............................ $option_pkg
 EOF
+}
+
+function sign_sis {
+    sis_input=$1
+    cert_name=$2
+
+    sis_output=`echo $sis_input | sed -e 's/\.sis/_signed.sis/'`
+
+    cert=
+    key=
+    case $arg_cert in
+		rnd) cert=rd.cer; key=rd-key.pem ;;
+		*) error 1 "invalid cert '$cert_name'" ;;
+    esac
+
+	test ! -e "$sis_input" && error 1 "SIS file '$sis_input' not found"
+    echo "Signing $sis_input -> $sis_output with cert $arg_cert ..."
+
+    execute rm -f $sis_output
+    execute winwrapper signsis $sis_input $sis_output \
+		$(metasystem_nativepath $CERT_DIR/$arg_cert/$cert) \
+		$(metasystem_nativepath $CERT_DIR/$arg_cert/$key)
+	echo
 }
 
 #------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
-
-# In its present version, this script can only be run on Windows
-# This is due in part to its usage of the metasystem_drivepath function
-metasystem_assert_os windows $0
 
 parse_command_line $*
 
@@ -269,64 +267,18 @@ test "$option_help" == yes && print_usage && exit 0
 test "$option_version" == yes && print_version && exit 0
 test "$option_verbosity" != silent && print_summary
 
-test "$option_dryrun" == "no" && echo "Running in $PWD"
+print_banner Starting execution
+echo
 
-if [ "$option_qmake" == "yes" ]
+if [ -z "$option_pkg" ]
 then
-	print_banner Running qmake
-	execute winwrapper qmake
-fi
-
-qt_version=`winwrapper qmake -v | grep 'Qt version' | awk '{print $4}' | sed -e 's/\./ /g'`
-qt_major=`echo $qt_version | awk '{print $1}'`
-qt_minor=`echo $qt_version | awk '{print $2}'`
-if [ ! -z "$qt_major" -a ! -z "$qt_minor" ]
-then
-	if [ "$qt_major" -lt 5 -a "$qt_minor" -lt 7 ] # Qt < 4.7.0
-	then
-		print_banner Patching capabilities
-		execute qt-patch-caps.sh --silent
-
-		if [ "$rnd" == "1" ]
-		then
-			print_banner Removing SQLite from .pkg file
-			execute qt-remove-sqlite.sh --silent
-		fi
-	fi
-fi
-
-if [ "$option_upgrade" == "yes" ]
-then
-	echo "Adding upgrade flags to PKG file"
 	for pkg in `'ls' *_template.pkg`
 	do
-		echo "$pkg"
-		execute symbian-patch-pkg.sh $pkg --upgrade --quiet
+	    sis_input=`echo $pkg | sed -e 's/_template.pkg/.sis/'`
+		sign_sis $sis_input $cert_name
 	done
-fi
-
-print_banner Building SIS file
-if [ "$option_cert" == "no" ]
-then
-	echo "Setting QT_SIS_CERTIFICATE and QT_SIS_KEY to empty strings"
-	export QT_SIS_CERTIFICATE=
-	export QT_SIS_KEY=
-fi
-execute make sis
-
-project=`'ls' *_template.pkg | sed -e 's/_template\.pkg//'`
-sis=$project.sis
-if [ "$option_cert" == "yes" -a "$option_rnd" == "yes" ]
-then
-	print_banner Signing SIS file with RnD02 certificate
-	execute qt-signsis.sh rnd_02 --silent
-	signed_sis=${project}_signed.sis
-	test -e ${signed_sis} && rm -f $sis && mv -v $signed_sis $sis
-fi
-
-if [ "$option_install" == "yes" ]
-then
-	print_banner Installing on device
-	execute symbian-install.sh -q $sis
+else
+	sis_input=`echo $pkg | sed -e 's/.pkg/.sis/'`
+	sign_sis $sis_input $cert_name
 fi
 

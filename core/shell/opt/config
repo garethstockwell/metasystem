@@ -4,10 +4,6 @@
 # Define which packages are enabled
 #------------------------------------------------------------------------------
 
-METASYSTEM_OPT_ANDROID=yes
-METASYSTEM_OPT_SYMBIAN=
-METASYSTEM_OPT_QT=yes
-
 METASYSTEM_OPT_CD=$METASYSTEM_CORE_CONFIG_CD
 if [[ -z $METASYSTEM_OPT_CD ]]; then
 	#METASYSTEM_OPT_CD=dirinfo
@@ -60,10 +56,6 @@ export -f _metasystem_unset
 #------------------------------------------------------------------------------
 # Source
 #------------------------------------------------------------------------------
-
-[[ -n $METASYSTEM_OPT_ANDROID ]] && source $METASYSTEM_CORE_SHELL/opt/android
-[[ -n $METASYSTEM_OPT_SYMBIAN ]] && source $METASYSTEM_CORE_SHELL/opt/symbian
-[[ -n $METASYSTEM_OPT_QT ]] && source $METASYSTEM_CORE_SHELL/opt/qt
 
 [[ $METASYSTEM_OPT_CD == dirinfo ]] && source $METASYSTEM_CORE_SHELL/opt/cd-dirinfo
 [[ $METASYSTEM_OPT_CD == smartcd ]] && source $METASYSTEM_CORE_SHELL/opt/cd-smartcd

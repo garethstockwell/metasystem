@@ -1,9 +1,7 @@
-# opt/qt
-
-echo "qt"
+# modules/qt/module.sh
 
 #------------------------------------------------------------------------------
-# Cross-platform
+# Cross-platform functions
 #------------------------------------------------------------------------------
 
 function _metasystem_set_qtdirs()
@@ -42,23 +40,16 @@ alias qcdb='_metasystem_qt_cd_build'
 alias qcds='_metasystem_qt_cd_source'
 alias qcd='qcdb'
 
-#complete -F complete_qcdb qcd
-#complete -F complete_qcdb qcdb
-#complete -F complete_qcds qcds
-
-# Qt DevTools
-#PATH=$(path_prepend_if_exists ~/work/sync/git/trolltech/devtools/shell)
-
 
 #------------------------------------------------------------------------------
-# Unix
+# Unix functions
 #------------------------------------------------------------------------------
 
 [[ $METASYSTEM_PLATFORM == unix ]] && alias qtcreator="metasystem_run_bg $(which qtcreator)"
 
 
 #------------------------------------------------------------------------------
-# Windows
+# Windows functions
 #------------------------------------------------------------------------------
 
 if [[ $METASYSTEM_PLATFORM == windows ]]; then
@@ -110,9 +101,12 @@ fi
 # Exported variables
 #------------------------------------------------------------------------------
 
+export METASYSTEM_QT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export METASYSTEM_QT_BIN=$METASYSTEM_QT_ROOT/bin
+export METASYSTEM_QT_LIB=$METASYSTEM_QT_ROOT/lib
+
 export QTSDK=$_METASYSTEM_APPS/qtsdk
 export QT_CREATOR_DIR=$QTSDK/QtCreator
-
 export QT_DEFAULT_NATIVE_BUILD_DIR
 
 
@@ -121,5 +115,9 @@ export QT_DEFAULT_NATIVE_BUILD_DIR
 #------------------------------------------------------------------------------
 
 
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
 
+PATH=$(path_append $METASYSTEM_QT_BIN $PATH)
 

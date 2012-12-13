@@ -36,7 +36,7 @@ function metasystem_module_load_all()
 	local quiet=
 	[[ $1 == "-quiet" ]] && quiet=-quiet
 	local first=1
-	for entry in $('ls' $METASYSTEM_ROOT/modules | grep -v ^template); do
+	for entry in $('ls' $METASYSTEM_ROOT/modules | grep -v ^templates); do
 		[[ -n $first ]] && _metasystem_print_banner Modules
 		unset first
 		metasystem_module_load ${entry/.sh/} $quiet

@@ -1,9 +1,7 @@
-# opt/symbian
-
-echo "symbian"
+# modules/symbian/module.sh
 
 #------------------------------------------------------------------------------
-# Cross-platform
+# Cross-platform functions
 #------------------------------------------------------------------------------
 
 function _metasystem_check_epocroot()
@@ -48,8 +46,6 @@ function path_remove_epoc()
 	echo $path
 }
 
-
-
 alias ecd='metasystem_cd_epocroot'
 alias sf-downloadkit='$SF_TOOLS_DIR/downloadkit/downloadkit.py --user $SF_USERNAME'
 alias epocroot='echo $EPOCROOT'
@@ -59,7 +55,7 @@ alias sr=symbian-runonphone.sh
 
 
 #------------------------------------------------------------------------------
-# Windows
+# Windows functions
 #------------------------------------------------------------------------------
 
 if [[ $METASYSTEM_PLATFORM == windows ]]; then
@@ -102,6 +98,9 @@ fi
 # Exported variables
 #------------------------------------------------------------------------------
 
+export METASYSTEM_SYMBIAN_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export METASYSTEM_SYMBIAN_BIN=$METASYSTEM_SYMBIAN_ROOT/bin
+
 export SF_TOOLS_DIR=~/work/sync/hg/sf/oss/MCL/sftools/fbf/utilities
 
 
@@ -112,4 +111,10 @@ export SF_TOOLS_DIR=~/work/sync/hg/sf/oss/MCL/sftools/fbf/utilities
 export -f path_prepend_epoc
 export -f path_remove_epoc
 
+
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
+PATH=$(path_append $METASYSTEM_SYMBIAN_BIN $PATH)
 

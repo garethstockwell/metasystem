@@ -1,6 +1,4 @@
-# opt/scratchbox
-
-echo "scratchbox"
+# modules/git/module.sh
 
 #------------------------------------------------------------------------------
 # Functions
@@ -11,7 +9,8 @@ echo "scratchbox"
 # Exported variables
 #------------------------------------------------------------------------------
 
-export SCRATCHBOX_ROOT=/scratchbox
+export METASYSTEM_GIT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export METASYSTEM_GIT_BIN=$METASYSTEM_GIT_ROOT/bin
 
 
 #------------------------------------------------------------------------------
@@ -20,10 +19,8 @@ export SCRATCHBOX_ROOT=/scratchbox
 
 
 #------------------------------------------------------------------------------
-# Aliases
+# Main
 #------------------------------------------------------------------------------
 
-alias scratchbox=$SCRATCHBOX_ROOT/login
-alias sbox=scratchbox
-alias sb=scratchbox
+PATH=$(path_append $METASYSTEM_GIT_BIN $PATH)
 

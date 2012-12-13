@@ -1,6 +1,4 @@
-# opt/android
-
-echo "android"
+# modules/android/module.sh
 
 #------------------------------------------------------------------------------
 # Functions
@@ -308,9 +306,13 @@ function metasystem_android_devices()
 }
 
 
+
 #------------------------------------------------------------------------------
 # Exported variables
 #------------------------------------------------------------------------------
+
+export METASYSTEM_ANDROID_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export METASYSTEM_ANDROID_BIN=$METASYSTEM_ANDROID_ROOT/bin
 
 export ANDROID_HOST_SSH_PORT=9999
 export ANDROID_TARGET_SSH_PORT=2222
@@ -362,7 +364,9 @@ alias android-devices=metasystem_android_devices
 # Main
 #------------------------------------------------------------------------------
 
-source $METASYSTEM_CORE_SHELL/bash-completion/android
+PATH=$(path_append $METASYSTEM_ANDROID_BIN $PATH)
+
+source $METASYSTEM_ANDROID_ROOT/shell/bash-completion.sh
 
 if [[ -d $ANDROID_SDK_DIR ]]; then
 	PATH=$(path_prepend $ANDROID_SDK_DIR/platform-tools $PATH)

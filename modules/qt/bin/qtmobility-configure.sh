@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# qt-signsis
+# qtmobility-configure
 
 #------------------------------------------------------------------------------
 # Imports
 #------------------------------------------------------------------------------
 
-. `dirname "$0"`/qt-functions.sh
+source $METASYSTEM_QT_LIB/functions.sh
 
 #------------------------------------------------------------------------------
 # Constants
@@ -15,9 +15,7 @@
 SCRIPT_VERSION=0.1
 
 # Arguments
-ARGUMENTS='cert'
-
-CERT_DIR=~/work/sync/unison/live/projects/qt/certs
+ARGUMENTS=''
 
 #------------------------------------------------------------------------------
 # Variables populated by command-line
@@ -28,7 +26,16 @@ option_help=
 option_version=
 option_verbosity=normal
 option_dryrun=no
-option_pkg=
+option_prefix=
+
+option_platform=
+option_build_target=release
+option_build_examples=no
+option_build_demos=no
+option_build_tests=no
+option_build_docs=no
+option_build_tools=yes
+option_modules=multimedia
 
 for arg in $ARGUMENTS; do eval "arg_$arg="; done
 
@@ -65,7 +72,7 @@ function usage_error()
 function execute()
 {
 	cmd="$*"
-	test "$option_verbosity" != silent && echo -e "$cmd"
+	test "$option_verbosity" != silent && echo -e "\n$cmd"
 	if [ "$option_dryrun" != yes ]
 	then
 		$cmd
@@ -96,16 +103,12 @@ function print_banner()
 
 function print_usage()
 {
-	# [CHANGE] Modify descriptions of arguments and options
 	cat << EOF
-qt-signsis script
+qtmobility-configure script
 
 Usage: $0 [options] $ARGUMENTS
 
 Default values for options are specified in brackets.
-
-Arguments:
-    cert                    Certificate name
 
 Options:
     -h, --help, --usage     Display this help and exit
@@ -114,7 +117,27 @@ Options:
     -v, --verbose           Verbose output
     -V, --version           Display version information and exit
 
-	--pkg=PKG               Specify .pkg file name
+    --prefix PREFIX         Set installation prefix
+
+    --debug                 Build with debugging symbols
+	--debug-and-release     Build both
+
+    --examples              Build examples
+*   --no-examples           Do not build examples
+
+    --demos                 Build demos
+*   --no-demos              Do not build demos
+
+    --tests                 Build tests
+*   --no-tests              Do not build tests
+
+    --docs                  Build docs
+*   --no-docs               Do not build docs
+
+*   --tools                 Build tools
+    --no-tools              Do not build tools
+
+    --harmattan             Build for harmattan
 
 EOF
 }
@@ -122,7 +145,7 @@ EOF
 function print_version()
 {
 	cat << EOF
-qt-signsis script version $SCRIPT_VERSION
+qtmobility-configure script version $SCRIPT_VERSION
 EOF
 }
 
@@ -140,28 +163,105 @@ function parse_command_line()
 		optarg=`expr "x$token" : 'x[^=]*=\(.*\)'`
 
 		case $token in
+			# Modules
+			bearer|contacts|location|messaging|multimedia|publishsubscribe|serviceframework|systeminfo|sensors|gallery|versit|feedback|organizer)
+				if [ -z "$in_modules" ]
+				then
+					warn "Additional argument '$token' ignored"
+				else
+					option_modules="$option_modules $token"
+				fi
+				;;
+
 			# Options
 			-h | -help | --help | -usage | --usage)
 				option_help=yes
+				in_modules=
 				;;
 			-q | -quiet | --quiet | -silent | --silent)
 				option_verbosity=silent
+				in_modules=
 				;;
 			-v | -verbose | --verbose)
 				option_verbosity=verbose
+				in_modules=
 				;;
 			-n | -dry-run | --dry-run | -dryrun | --dry-run)
 				option_dryrun=yes
+				in_modules=
 				;;
 			-V | -version | --version)
 				option_version=yes
+				in_modules=
 				;;
 
-			-pkg | --pkg)
-				prev=option_pkg
+			-prefix | --prefix)
+				prev=option_prefix
 				;;
-			-pkg=* | --pkg=*)
-				option_pkg=$optarg
+			-prefix=* | --prefix=*)
+				option_prefix=$optarg
+				;;
+
+			-debug | --debug)
+				option_build_target=debug
+				;;
+
+			-debug-and-release | --debug-and-release)
+				option_build_target='debug -release'
+				;;
+
+			-examples | --examples)
+				option_build_examples=yes
+				in_modules=
+				;;
+			-no-examples | --no-examples)
+				option_build_examples=no
+				in_modules=
+				;;
+			-demos | --demos)
+				option_build_demos=yes
+				in_modules=
+				;;
+			-no-demos | --no-demos)
+				option_build_demos=no
+				in_modules=
+				;;
+			-tests | --tests)
+				option_build_tests=yes
+				in_modules=
+				;;
+			-no-tests | --no-tests)
+				option_build_tests=no
+				in_modules=
+				;;
+			-docs | --docs)
+				option_build_docs=yes
+				in_modules=
+				;;
+			-no-docs | --no-docs)
+				option_build_docs=no
+				in_modules=
+				;;
+			-tools | --tools)
+				option_build_tools=yes
+				in_modules=
+				;;
+			-no-tools | --no-tools)
+				option_build_tools=no
+				in_modules=
+				;;
+
+			-modules=* | --modules=*)
+				option_modules="$optarg"
+				in_modules=1
+				;;
+			-modules | --modules)
+				prev=option_modules
+				in_modules=1
+				;;
+
+			-harmattan | --harmattan)
+				option_platform=harmattan
 				;;
 
 			# Environment variables
@@ -174,7 +274,7 @@ function parse_command_line()
 
 			# Unrecognized options
 			-*)
-				warn Unrecognized option '$token' ignored
+				warn Unrecognized option "$token" ignored
 				;;
 
 			# Normal arguments
@@ -189,7 +289,7 @@ function parse_command_line()
 						break
 					fi
 				done
-				test -z "$arg_used" && warn Additional argument '$token' ignored
+				test -z "$arg_used" && warn "Additional argument '$token' ignored"
 				;;
 		esac
 	done
@@ -217,7 +317,6 @@ function print_summary()
 
 Verbosity ............................... $option_verbosity
 Dry run ................................. $option_dryrun
-
 EOF
 	for arg in $ARGUMENTS
 	do
@@ -230,36 +329,25 @@ EOF
 	done
 
 	cat << EOF
-Package file ............................ $option_pkg
+
+Build target ............................ $option_build_target
+Modules ................................. $option_modules
+Prefix .................................. $option_prefix
+
+Build examples .......................... $option_build_examples
+Build demos... .......................... $option_build_demos
+Build tests ............................. $option_build_tests
+Build docs .............................. $option_build_docs
+Build tools ............................. $option_build_tools
 EOF
-}
-
-function sign_sis {
-    sis_input=$1
-    cert_name=$2
-
-    sis_output=`echo $sis_input | sed -e 's/\.sis/_signed.sis/'`
-
-    cert=
-    key=
-    case $arg_cert in
-		rnd) cert=rd.cer; key=rd-key.pem ;;
-		*) error 1 "invalid cert '$cert_name'" ;;
-    esac
-
-	test ! -e "$sis_input" && error 1 "SIS file '$sis_input' not found"
-    echo "Signing $sis_input -> $sis_output with cert $arg_cert ..."
-
-    execute rm -f $sis_output
-    execute winwrapper signsis $sis_input $sis_output \
-		$(metasystem_nativepath $CERT_DIR/$arg_cert/$cert) \
-		$(metasystem_nativepath $CERT_DIR/$arg_cert/$key)
-	echo
 }
 
 #------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
+
+check_qtmobility_source_dir
+check_pwd_in_qtmobility_build_dir
 
 parse_command_line $*
 
@@ -268,17 +356,36 @@ test "$option_version" == yes && print_version && exit 0
 test "$option_verbosity" != silent && print_summary
 
 print_banner Starting execution
-echo
 
-if [ -z "$option_pkg" ]
+if [ "$METASYSTEM_OS" == "windows" ]
 then
-	for pkg in `'ls' *_template.pkg`
-	do
-	    sis_input=`echo $pkg | sed -e 's/_template.pkg/.sis/'`
-		sign_sis $sis_input $cert_name
-	done
+	command="winwrapper $METASYSTEM_PROJECT_QTMOBILITY_SOURCE_DIR/configure.bat"
 else
-	sis_input=`echo $pkg | sed -e 's/.pkg/.sis/'`
-	sign_sis $sis_input $cert_name
+	command="$METASYSTEM_PROJECT_QTMOBILITY_SOURCE_DIR/configure"
 fi
+
+command="$command -$option_build_target"
+
+test "$option_build_examples" == "yes" && command="$command -examples"
+test "$option_build_demos" == "yes" && command="$command -demos"
+test "$option_build_tests" == "yes" && command="$command -tests"
+test "$option_build_docs" == "no" && command="$command -no-docs"
+test "$option_build_tools" == "no" && command="$command -no-tools"
+test -n "$option_modules" && test "$option_modules" != "all" && command="$command -modules $option_modules"
+
+if [ ! -z "$option_prefix" ]
+then
+	build_dir=`pwd`
+	if [ -d "$option_prefix" ]
+	then
+		cd $option_prefix
+		option_prefix=$(metasystem_nativepath `pwd`)
+		cd $build_dir
+	fi
+	command="$command -prefix $option_prefix"
+fi
+
+test "$option_platform" == "harmattan" && command="$command -maemo6"
+
+execute $command
 

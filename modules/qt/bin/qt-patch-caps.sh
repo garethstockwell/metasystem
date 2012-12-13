@@ -1,12 +1,14 @@
 #!/bin/bash
 
-# qtmobility-configure
+# qt-patch-caps
+
+# Script for patching capabilities of Qt binaries
 
 #------------------------------------------------------------------------------
 # Imports
 #------------------------------------------------------------------------------
 
-. `dirname "$0"`/qt-functions.sh
+source $METASYSTEM_QT_LIB/functions.sh
 
 #------------------------------------------------------------------------------
 # Constants
@@ -26,16 +28,6 @@ option_help=
 option_version=
 option_verbosity=normal
 option_dryrun=no
-option_prefix=
-
-option_platform=
-option_build_target=release
-option_build_examples=no
-option_build_demos=no
-option_build_tests=no
-option_build_docs=no
-option_build_tools=yes
-option_modules=multimedia
 
 for arg in $ARGUMENTS; do eval "arg_$arg="; done
 
@@ -98,13 +90,14 @@ function print_banner()
 		print_rule
 		echo $*
 		print_rule
+		echo
 	fi
 }
 
 function print_usage()
 {
 	cat << EOF
-qtmobility-configure script
+qt-patch-caps script
 
 Usage: $0 [options] $ARGUMENTS
 
@@ -117,35 +110,13 @@ Options:
     -v, --verbose           Verbose output
     -V, --version           Display version information and exit
 
-    --prefix PREFIX         Set installation prefix
-
-    --debug                 Build with debugging symbols
-	--debug-and-release     Build both
-
-    --examples              Build examples
-*   --no-examples           Do not build examples
-
-    --demos                 Build demos
-*   --no-demos              Do not build demos
-
-    --tests                 Build tests
-*   --no-tests              Do not build tests
-
-    --docs                  Build docs
-*   --no-docs               Do not build docs
-
-*   --tools                 Build tools
-    --no-tools              Do not build tools
-
-    --harmattan             Build for harmattan
-
 EOF
 }
 
 function print_version()
 {
 	cat << EOF
-qtmobility-configure script version $SCRIPT_VERSION
+qt-patch-caps script version $SCRIPT_VERSION
 EOF
 }
 
@@ -163,105 +134,21 @@ function parse_command_line()
 		optarg=`expr "x$token" : 'x[^=]*=\(.*\)'`
 
 		case $token in
-			# Modules
-			bearer|contacts|location|messaging|multimedia|publishsubscribe|serviceframework|systeminfo|sensors|gallery|versit|feedback|organizer)
-				if [ -z "$in_modules" ]
-				then
-					warn "Additional argument '$token' ignored"
-				else
-					option_modules="$option_modules $token"
-				fi
-				;;
-
 			# Options
 			-h | -help | --help | -usage | --usage)
 				option_help=yes
-				in_modules=
 				;;
 			-q | -quiet | --quiet | -silent | --silent)
 				option_verbosity=silent
-				in_modules=
 				;;
 			-v | -verbose | --verbose)
 				option_verbosity=verbose
-				in_modules=
 				;;
 			-n | -dry-run | --dry-run | -dryrun | --dry-run)
 				option_dryrun=yes
-				in_modules=
 				;;
 			-V | -version | --version)
 				option_version=yes
-				in_modules=
-				;;
-
-			-prefix | --prefix)
-				prev=option_prefix
-				;;
-			-prefix=* | --prefix=*)
-				option_prefix=$optarg
-				;;
-
-			-debug | --debug)
-				option_build_target=debug
-				;;
-
-			-debug-and-release | --debug-and-release)
-				option_build_target='debug -release'
-				;;
-
-			-examples | --examples)
-				option_build_examples=yes
-				in_modules=
-				;;
-			-no-examples | --no-examples)
-				option_build_examples=no
-				in_modules=
-				;;
-			-demos | --demos)
-				option_build_demos=yes
-				in_modules=
-				;;
-			-no-demos | --no-demos)
-				option_build_demos=no
-				in_modules=
-				;;
-			-tests | --tests)
-				option_build_tests=yes
-				in_modules=
-				;;
-			-no-tests | --no-tests)
-				option_build_tests=no
-				in_modules=
-				;;
-			-docs | --docs)
-				option_build_docs=yes
-				in_modules=
-				;;
-			-no-docs | --no-docs)
-				option_build_docs=no
-				in_modules=
-				;;
-			-tools | --tools)
-				option_build_tools=yes
-				in_modules=
-				;;
-			-no-tools | --no-tools)
-				option_build_tools=no
-				in_modules=
-				;;
-
-			-modules=* | --modules=*)
-				option_modules="$optarg"
-				in_modules=1
-				;;
-			-modules | --modules)
-				prev=option_modules
-				in_modules=1
-				;;
-
-			-harmattan | --harmattan)
-				option_platform=harmattan
 				;;
 
 			# Environment variables
@@ -274,7 +161,7 @@ function parse_command_line()
 
 			# Unrecognized options
 			-*)
-				warn Unrecognized option "$token" ignored
+				warn Unrecognized option '$token' ignored
 				;;
 
 			# Normal arguments
@@ -289,7 +176,7 @@ function parse_command_line()
 						break
 					fi
 				done
-				test -z "$arg_used" && warn "Additional argument '$token' ignored"
+				test -z "$arg_used" && warn Additional argument '$token' ignored
 				;;
 		esac
 	done
@@ -314,7 +201,6 @@ function print_summary()
 	print_banner 'Summary'
 	local total_num_dots=40
 	cat << EOF
-
 Verbosity ............................... $option_verbosity
 Dry run ................................. $option_dryrun
 EOF
@@ -327,27 +213,11 @@ EOF
 		awk "BEGIN{for(c=0;c<$num_dots;c++) printf \".\"}"
 		echo " $value"
 	done
-
-	cat << EOF
-
-Build target ............................ $option_build_target
-Modules ................................. $option_modules
-Prefix .................................. $option_prefix
-
-Build examples .......................... $option_build_examples
-Build demos... .......................... $option_build_demos
-Build tests ............................. $option_build_tests
-Build docs .............................. $option_build_docs
-Build tools ............................. $option_build_tools
-EOF
 }
 
 #------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
-
-check_qtmobility_source_dir
-check_pwd_in_qtmobility_build_dir
 
 parse_command_line $*
 
@@ -357,35 +227,21 @@ test "$option_verbosity" != silent && print_summary
 
 print_banner Starting execution
 
-if [ "$METASYSTEM_OS" == "windows" ]
+script=$QT_BUILD_DIR/bin/patch_capabilities.pl
+test ! -f "$script" && error 1 "patch-capabilities.pl not found in QT_BUILD_DIR '$QT_BUILD_DIR'"
+
+target=
+if [ -e .make.cache ]
 then
-	command="winwrapper $METASYSTEM_PROJECT_QTMOBILITY_SOURCE_DIR/configure.bat"
+	target=`cat .make.cache | grep QT_SIS_TARGET | awk '{ print $3 }'`
+	echo "target: $target"
 else
-	command="$METASYSTEM_PROJECT_QTMOBILITY_SOURCE_DIR/configure"
+	error 1 "No .make.cache file found"
 fi
 
-command="$command -$option_build_target"
-
-test "$option_build_examples" == "yes" && command="$command -examples"
-test "$option_build_demos" == "yes" && command="$command -demos"
-test "$option_build_tests" == "yes" && command="$command -tests"
-test "$option_build_docs" == "no" && command="$command -no-docs"
-test "$option_build_tools" == "no" && command="$command -no-tools"
-test -n "$option_modules" && test "$option_modules" != "all" && command="$command -modules $option_modules"
-
-if [ ! -z "$option_prefix" ]
-then
-	build_dir=`pwd`
-	if [ -d "$option_prefix" ]
-	then
-		cd $option_prefix
-		option_prefix=$(metasystem_nativepath `pwd`)
-		cd $build_dir
-	fi
-	command="$command -prefix $option_prefix"
-fi
-
-test "$option_platform" == "harmattan" && command="$command -maemo6"
-
-execute $command
+for pkg in `'ls' *_template.pkg`
+do
+	echo "pkg file: $pkg"
+	execute perl $(metasystem_nativepath $script) $pkg $target
+done
 
