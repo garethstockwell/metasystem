@@ -26,11 +26,8 @@ function metasystem_load_lib()
 {
 	local lib=$1
 	[[ -n $METASYSTEM_DEBUG ]] && echo "[$$] load_lib $lib" >&2
-	eval "source $METASYSTEM_CORE_LIB/bash/$lib"
+	eval "source $METASYSTEM_CORE_LIB/sh/$lib"
 }
-
-export -f metasystem_declare_stub
-export -f metasystem_load_lib
 
 
 #------------------------------------------------------------------------------

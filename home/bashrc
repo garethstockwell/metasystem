@@ -1,4 +1,0 @@
-# Sourced from ~/.bashrc
-
-source $(dirname ${BASH_SOURCE[0]})/../core/shell/shrc.sh
-

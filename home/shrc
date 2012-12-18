@@ -1,0 +1,10 @@
+# Sourced from ~/.bashrc
+
+if [[ -n $BASH_VERSION ]]; then
+	source $(dirname ${BASH_SOURCE[0]})/../core/shell/bashrc.sh
+elif [[ -n $ZSH_VERSION ]]; then
+	source $(dirname $0)/../core/shell/zshrc.sh
+else
+	echo "Error: shell is not bash or zsh" >&2
+fi
+
