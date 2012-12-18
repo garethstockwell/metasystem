@@ -6,8 +6,9 @@
 
 function metasystem_android_prompt()
 {
-	[[ -n $TARGET_PRODUCT && -n $TARGET_BUILD_VARIANT ]] &&\
+	if [[ -n $TARGET_PRODUCT && -n $TARGET_BUILD_VARIANT ]]; then
 		echo "${NAKED_LIGHT_GREEN}android: ${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}${NAKED_NO_COLOR}"
+	fi
 }
 
 
