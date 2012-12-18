@@ -98,8 +98,8 @@ source $METASYSTEM_CORE_LIB/sh/string.sh
 # Autoload
 #------------------------------------------------------------------------------
 
-for dir in $METASYSTEM_CORE_LIB/autosh \
-	       $METASYSTEM_CORE_LIB/autosh/$METASYSTEM_PLATFORM; do
+for dir in $METASYSTEM_CORE_LIB/autoload \
+	       $METASYSTEM_CORE_LIB/autoload/$METASYSTEM_PLATFORM; do
 	export FPATH=$dir:$FPATH
 	for file in $(find $dir -type f); do
 		autoload $(basename $file)

@@ -5,6 +5,8 @@ TODO for metasystem
 Definitely
 ---------------------------------------------------------------------------
 
+* Migrate remaining 'export -f' into autoload
+
 * Replace METASYSTEM_OPT_* with METASYSTEM_CONFIG_*
 	- Set from ~/.profile
 	- Allows per-machine setup tweaks
