@@ -16,3 +16,14 @@ fi
 
 [[ -d /opt/java/x86_64 ]] && export JAVA_HOME=/opt/java/x86_64
 
+
+#------------------------------------------------------------------------------
+# Aliases
+#------------------------------------------------------------------------------
+
+alias pscpu='ps auxf | sort -nr -k 3'
+alias psmem='ps auxf | sort -nr -k 4'
+
+alias meminfo='free -m -l -t'
+alias cpuinfo='lscpu'
+
