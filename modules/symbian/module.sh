@@ -1,5 +1,8 @@
 # modules/symbian/module.sh
 
+autoload metasystem_drivepath
+autoload metasystem_driveletter
+
 function metasystem_symbian_prompt()
 {
 	[[ -n $EPOCROOT ]] &&\
