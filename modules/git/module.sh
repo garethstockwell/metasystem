@@ -68,7 +68,7 @@ function metasystem_git_prompt()
 		local remote_repo=$(git_remote_repo $local_branch)
 		if [[ -n $remote_repo ]]; then
 			local remote_branch=$(git_remote_branch $local_branch)
-			branch="${branch}(${remote_repo}/${remote_branch})"
+			branch="${branch} (${remote_repo}/${remote_branch})"
 		fi
 
 		content="${content} ${start}${branch}${end}"
