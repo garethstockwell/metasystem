@@ -494,15 +494,13 @@ function _metasystem_prompt_update_command()
 	[[ -n $METASYSTEM_PROFILE_HOST ]] && hostname=$METASYSTEM_PROFILE_HOST
 	prompt="${prompt}\[\e]0;\w\a\]${LIGHT_BLUE}\u@${hostname} ${LIGHT_YELLOW}${_metasystem_short_path}${NO_COLOUR}"
 
-	# time
-	prompt="${prompt}\n${LIGHT_YELLOW}\A${NO_COLOUR}"
-
 	prompt="${prompt}${_prompt_tools}${_prompt_ids}"
 
 	local prompt_hooks=$(_metasystem_prompt_hooks)
 	[[ -n $prompt_hooks ]] && prompt="${prompt}\n${prompt_hooks}"
 
-	export PS1="\n${prompt}\n${prompt_rc}\$ "
+	local prompt_time="${LIGHT_YELLOW}\A${NO_COLOUR}"
+	export PS1="\n${prompt}\n${prompt_rc}${prompt_time} \$ "
 }
 
 export PROMPT_COMMAND=_metasystem_prompt_update_command
