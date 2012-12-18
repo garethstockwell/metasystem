@@ -36,6 +36,28 @@ function _metasystem_qt_cd_source()
 	[[ -n $QT_SOURCE_DIR ]] && metasystem_cd $QT_SOURCE_DIR/$*
 }
 
+rename_function _metasystem_set_projectdirs _metasystem_do_set_projectdirs
+
+function _metasystem_set_projectdirs()
+{
+	local project=$1
+	local build_dir=$2
+	local source_dir=$3
+
+	if [[ -n $METASYSTEM_QT_ROOT ]]; then
+		if [[ $project == qt ]]; then
+			_metasystem_set_qtdirs "$build_dir" "$source_dir"
+		else
+			if [[ $project == qtmobility ]]; then
+				_metasystem_export QTMOBILITY_BUILD_DIR=$build_dir
+				_metasystem_export QTMOBILITY_SOURCE_DIR=$source_dir
+			fi
+		fi
+	fi
+
+	_metasystem_do_set_projectdirs $project "$build_dir" "$source_dir"
+}
+
 alias qcdb='_metasystem_qt_cd_build'
 alias qcds='_metasystem_qt_cd_source'
 alias qcd='qcdb'

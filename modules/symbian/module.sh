@@ -1,5 +1,12 @@
 # modules/symbian/module.sh
 
+function metasystem_symbian_prompt()
+{
+	[[ -n $EPOCROOT ]] &&\
+		echo "${NAKED_LIGHT_RED}epoc: $EPOCROOT${NAKED_NO_COLOUR}"
+}
+
+
 #------------------------------------------------------------------------------
 # Cross-platform functions
 #------------------------------------------------------------------------------
@@ -117,4 +124,6 @@ export -f path_remove_epoc
 #------------------------------------------------------------------------------
 
 PATH=$(path_append $METASYSTEM_SYMBIAN_BIN $PATH)
+
+metasystem_register_prompt_hook metasystem_symbian_prompt
 

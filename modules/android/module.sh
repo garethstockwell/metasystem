@@ -1,6 +1,17 @@
 # modules/android/module.sh
 
 #------------------------------------------------------------------------------
+# Prompt
+#------------------------------------------------------------------------------
+
+function metasystem_android_prompt()
+{
+	[[ -n $TARGET_PRODUCT && -n $TARGET_BUILD_VARIANT ]] &&\
+		echo "${NAKED_LIGHT_GREEN}android: ${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}${NAKED_NO_COLOR}"
+}
+
+
+#------------------------------------------------------------------------------
 # Functions
 #------------------------------------------------------------------------------
 
@@ -376,4 +387,6 @@ fi
 if [[ -d $ANDROID_NDK_DIR ]]; then
 	PATH=$(path_prepend $ANDROID_NDK_DIR $PATH)
 fi
+
+metasystem_register_prompt_hook metasystem_android_prompt
 

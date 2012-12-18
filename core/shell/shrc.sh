@@ -99,6 +99,14 @@ source $METASYSTEM_CORE_LIB/bash/string.sh
 
 
 #------------------------------------------------------------------------------
+# Config
+#------------------------------------------------------------------------------
+
+_metasystem_prompt_ids_enabled=no
+_metasystem_prompt_tools_enabled=yes
+
+
+#------------------------------------------------------------------------------
 # Profile
 #------------------------------------------------------------------------------
 
@@ -426,62 +434,129 @@ function _metasystem_dirinfo_install()
 alias dirinfo-init='_metasystem_dirinfo_init'
 
 
-#==============================================================================
-# Modules
-#==============================================================================
+#------------------------------------------------------------------------------
+# Prompt
+#------------------------------------------------------------------------------
 
-source $METASYSTEM_CORE_SHELL/modules.sh
-
-
-#==============================================================================
-# Opt
-#==============================================================================
-
-_metasystem_print_banner "Optional packages"
-source $METASYSTEM_CORE_SHELL/opt/config
-
-
-#==============================================================================
-# Local config
-#==============================================================================
-
-_metasystem_print_banner "Local config"
-
-if [[ -n $METASYSTEM_LOCAL_SHELL ]]; then
-	echo -e "Loading $METASYSTEM_LOCAL_SHELL/shrc.sh ..."
-	source $METASYSTEM_LOCAL_SHELL/shrc.sh
-	PATH=$(path_prepend $METASYSTEM_LOCAL_BIN $PATH)
-else
-	echo -e "${NAKED_LIGHT_RED}$metasystem_local_root not found${NAKED_NO_COLOR}"
-	echo "Using template config files from $METASYSTEM_CORE_CONFIG"
-	echo "To create a metasystem-local repo, run 'metasystem_create_local'"
-fi
-
-function metasystem_create_local()
+function metasystem_short_path()
 {
-	if [[ -e $metasystem_local_root ]]; then
-		echo "Error: $metasystem_local_root already exists"
-		return 1
-	else
-		cp -rv $METASYSTEM_CORE_TEMPLATES/local $metasystem_local_root
-		cp -v $METASYSTEM_CORE_ROOT/.gitignore $metasystem_local_root
-		cd $metasystem_local_root
-		git init
-		git add -A
-		git commit -m "Initial version (created from template)"
-	fi
+	# Shortened path
+	# http://lifehacker.com/5167879/cut-the-bash-prompt-down-to-size
+	local dir=$1
+	dir=`echo $dir | sed -e "s!^$HOME!~!"`
+	[[ ${#dir} -gt 50 ]] && dir="${dir:0:22} ... ${dir:${#dir}-23}"
+	echo $dir
 }
 
+# This is triggered when the directory is changed
+function _metasystem_prompt_update_cd()
+{
+	_metasystem_short_path=$(metasystem_short_path $PWD)
+	_metasystem_short_dirinfo_root=
+	[[ $METASYSTEM_DIRINFO_ROOT != $HOME ]] &&\
+		_metasystem_short_dirinfo_root=$(metasystem_short_path $METASYSTEM_DIRINFO_ROOT)
+}
 
-#==============================================================================
-# Core setup 2/2
-#==============================================================================
+# Called from smartcd scripts
+export _metasystem_prompt_update_cd
+
+function _metasystem_prompt_hooks()
+{
+	echo > /dev/null
+}
+
+function metasystem_register_prompt_hook()
+{
+	local body=$1
+	append_to_function _metasystem_prompt_hooks $body
+}
+
+# This is run before every prompt is displayed
+function _metasystem_prompt_update_command()
+{
+	# Do this first to ensure we get the correct value of $?
+	local rc=$?
+	local prompt_rc=
+	[[ $rc != 0 ]] && local prompt_rc="${LIGHT_CYAN}$rc ${NO_COLOUR}"
+
+	local prompt=
+
+	[[ -n $METASYSTEM_DIRINFO_LABEL ]] &&
+		prompt="${prompt}${LIGHT_PURPLE}${METASYSTEM_DIRINFO_LABEL}${NO_COLOUR} "
+
+	#[[ -n $_metasystem_short_dirinfo_root ]] &&\
+	#	prompt="${prompt}${LIGHT_CYAN}${_metasystem_short_dirinfo_root}${NO_COLOUR} "
+
+	[[ -n $prompt ]] && prompt="${prompt}\n"
+
+	# user@host pwd(short)
+	local hostname=$HOSTNAME
+	[[ -n $METASYSTEM_PROFILE_HOST ]] && hostname=$METASYSTEM_PROFILE_HOST
+	prompt="${prompt}\[\e]0;\w\a\]${LIGHT_BLUE}\u@${hostname} ${LIGHT_YELLOW}${_metasystem_short_path}${NO_COLOUR}"
+
+	# time
+	prompt="${prompt}\n${LIGHT_YELLOW}\A${NO_COLOUR}"
+
+	prompt="${prompt}${_prompt_tools}${_prompt_ids}"
+
+	local prompt_hooks=$(_metasystem_prompt_hooks)
+	[[ -n $prompt_hooks ]] && prompt="${prompt}\n${prompt_hooks}"
+
+	export PS1="\n${prompt}\n${prompt_rc}\$ "
+}
+
+export PROMPT_COMMAND=_metasystem_prompt_update_command
+
 
 #------------------------------------------------------------------------------
-# ssh-agent
+# cd
 #------------------------------------------------------------------------------
 
-[[ -n $SSH_AGENT_ENV ]] && ssh_agent_init
+function _metasystem_cd_hooks()
+{
+	echo > /dev/null
+}
+
+# Allow modules to register a function which will be called when directory changes
+function metasystem_register_cd_hook()
+{
+	local body=$1
+	append_to_function _metasystem_cd_hooks $body
+}
+
+function metasystem_cd()
+{
+	local projects=$METASYSTEM_PROJECTS
+	_metasystem_cd $*
+	_metasystem_cd_hooks
+	[[ $projects != $METASYSTEM_PROJECTS ]] && _metasystem_projects_print
+	_metasystem_prompt_update_cd
+}
+
+function metasystem_rcd()
+{
+	[[ -n $METASYSTEM_DIRINFO_ROOT ]] && metasystem_cd $METASYSTEM_DIRINFO_ROOT
+}
+
+function metasystem_stash_cd()
+{
+	_metasystem_stash_cd=$PWD
+	builtin cd "$@"
+}
+
+function metasystem_unstash_cd()
+{
+	[[ -n $_metasystem_stash_cd ]] && builtin cd $_metasystem_stash_cd
+	_metasystem_stash_cd=
+}
+
+export -f metasystem_cd
+export -f metasystem_rcd
+export -f metasystem_stash_cd
+export -f metasystem_unstash_cd
+
+alias cd=metasystem_cd
+alias rcd=metasystem_rcd
 
 
 #------------------------------------------------------------------------------
@@ -534,13 +609,15 @@ fi
 
 function _metasystem_update_prompt_ids()
 {
-	_prompt_ids=
-	for id_type in $METASYSTEM_ID_TYPES
-	do
-		local id_type_uc=$(uppercase $id_type)
-		eval local id=\$METASYSTEM_ID_${id_type_uc}
-		_prompt_ids="${_prompt_ids} ${LIGHT_CYAN}$id_type:$id${NAKED_NO_COLOUR}"
-	done
+	if [[ $_metasystem_prompt_ids_enabled == yes ]]; then
+		_prompt_ids=
+		for id_type in $METASYSTEM_ID_TYPES
+		do
+			local id_type_uc=$(uppercase $id_type)
+			eval local id=\$METASYSTEM_ID_${id_type_uc}
+			_prompt_ids="${_prompt_ids} ${LIGHT_CYAN}$id_type:$id${NAKED_NO_COLOUR}"
+		done
+	fi
 }
 
 function _metasystem_set_id()
@@ -570,6 +647,7 @@ function _metasystem_reset_ids()
 {
 	metasystem-id.py --quiet generate --reset --script
 	source ~/.metasystem-id
+	_metasystem_update_prompt_ids
 }
 
 function _metasystem_print_ids()
@@ -617,19 +695,23 @@ function _metasystem_reset_tools()
 {
 	metasystem-tools.py generate
 	source ~/.metasystem-tools
+	_metasystem_update_prompt_tools
 }
 
 function _metasystem_update_prompt_tools()
 {
-	_prompt_tools=
-	_metasystem_prompt_tools_enabled=no
-	for tool_type in $METASYSTEM_TOOL_TYPES
-	do
-		local tool_type_uc=$(uppercase $tool_type)
-		eval local tool_name=\$METASYSTEM_TOOL_${tool_type_uc}
-		[[ -n $tool_name ]] && _metasystem_prompt_tools_enabled=yes
-		_prompt_tools="${_prompt_tools} ${LIGHT_RED}$tool_type:$tool_name${NO_COLOUR}"
-	done
+	if [[ $_metasystem_prompt_tools_enabled == yes ]]; then
+		local ok=
+		_prompt_tools=
+		for tool_type in $METASYSTEM_TOOL_TYPES
+		do
+			local tool_type_uc=$(uppercase $tool_type)
+			eval local tool_name=\$METASYSTEM_TOOL_${tool_type_uc}
+			[[ -n $tool_name ]] && ok=yes
+			_prompt_tools="${_prompt_tools} ${LIGHT_RED}$tool_type:$tool_name${NO_COLOUR}"
+		done
+		[[ -z $ok ]] && _prompt_tools=
+	fi
 }
 
 alias tools-get='source ~/.metasystem-tools'
@@ -638,8 +720,6 @@ alias tools=tools-print
 alias t=tools
 alias tool-set='_metasystem_set_tool'
 alias tools-reset='_metasystem_reset_tools'
-
-export -f _metasystem_update_prompt_tools
 
 
 #------------------------------------------------------------------------------
@@ -657,7 +737,7 @@ function metasystem_project_env_prefix()
 	echo METASYSTEM_PROJECT_$(uppercase ${project//-/_})
 }
 
-function _metasystem_do_set_projectdirs()
+function _metasystem_set_projectdirs()
 {
 	local project=$1
 	local project_env_prefix=$(metasystem_project_env_prefix $project)
@@ -687,26 +767,6 @@ function _metasystem_do_set_projectdirs()
 	fi
 }
 
-function _metasystem_set_projectdirs()
-{
-	local project=$1
-	local build_dir=$2
-	local source_dir=$3
-
-	if [[ -n $METASYSTEM_QT_ROOT ]]; then
-		if [[ $project == qt ]]; then
-			_metasystem_set_qtdirs "$build_dir" "$source_dir"
-		else
-			if [[ $project == qtmobility ]]; then
-				_metasystem_export QTMOBILITY_BUILD_DIR=$build_dir
-				_metasystem_export QTMOBILITY_SOURCE_DIR=$source_dir
-			fi
-		fi
-	fi
-
-	_metasystem_do_set_projectdirs $project "$build_dir" "$source_dir"
-}
-
 function _metasystem_update_projects()
 {
 	local projects=${1//,/ }
@@ -722,7 +782,6 @@ function _metasystem_update_projects()
 
 function _metasystem_projects_print()
 {
-	[[ -n $EPOCROOT ]] && echo "epoc: $EPOCROOT"
 	for project in $METASYSTEM_PROJECTS
 	do
 		local prompt_info=
@@ -750,40 +809,6 @@ function _metasystem_projects_print()
 				fi
 			fi
 		fi
-	done
-}
-
-function _metasystem_update_prompt_projects()
-{
-	# Projects
-	_prompt_projects=
-	for project in $METASYSTEM_PROJECTS
-	do
-		local prompt_info=
-		local project_env_prefix=$(metasystem_project_env_prefix $project)
-		eval local source_dir=\$${project_env_prefix}_SOURCE_DIR
-		eval local build_dir=\$${project_env_prefix}_BUILD_DIR
-		if [[ $source_dir == $build_dir ]]; then
-			if [[ -n $build_dir ]]; then
-				prompt_info="${PINK}${project}:${build_dir}${NO_COLOUR}"
-			else
-				if [[ -n $source_dir && -d $source_dir ]]; then
-					prompt_info="${PINK}${project}-source:${source_dir}${NO_COLOUR}"
-				fi
-			fi
-		else
-			if [[ -n $build_dir ]]; then
-				prompt_info="${PINK}${project}-build:${build_dir}${NO_COLOUR}"
-				if [[ -n ${source_dir} && -d ${source_dir} ]]; then
-					prompt_info="$prompt_info\n${PINK}${project}-source:${source_dir}${NO_COLOUR}"
-				fi
-			else
-				if [[ -n $source_dir && -d $source_dir ]]; then
-					prompt_info="${PINK}${project}-source:${source_dir}${NO_COLOUR}"
-				fi
-			fi
-		fi
-	[[ -n $prompt_info ]] && _prompt_projects="$_prompt_projects$prompt_info\n"
 	done
 }
 
@@ -908,178 +933,6 @@ alias eclipse="metasystem_run_bg eclipsec"
 
 
 #------------------------------------------------------------------------------
-# Prompt
-#------------------------------------------------------------------------------
-
-_METASYSTEM_PROMPT_ELEMENTS='ids epocroot git projects tools'
-
-# TODO: make this configurable
-_metasystem_prompt_android_enabled=$METASYSTEM_ANDROID_ROOT
-_metasystem_prompt_ids_enabled=yes
-_metasystem_prompt_epocroot_enabled=$METASYSTEM_SYMBIAN_ROOT
-_metasystem_prompt_git_enabled=yes
-_metasystem_prompt_projects_enabled=no
-_metasystem_prompt_tools_enabled=yes
-
-function _metasystem_prompt_print()
-{
-	echo
-	for element in $_METASYSTEM_PROMPT_ELEMENTS
-	do
-		eval local value=\$_metasystem_prompt_${element}_enabled
-		echo "$element: $value"
-	done
-}
-
-function _metasystem_prompt_set()
-{
-	local element=$1
-	local value=$2
-	[[ -z $value ]] && value=no
-	[[ -n $element ]] && eval _metasystem_prompt_${element}_enabled=$value
-}
-
-function _metasystem_prompt_enable()
-{
-	_metasystem_prompt_set $1 yes
-}
-
-function _metasystem_prompt_disable()
-{
-	_metasystem_prompt_set $1 no
-}
-
-# http://railstips.org/blog/archives/2009/02/02/bedazzle-your-bash-prompt-with-git-info/
-# Alternatively, from http://asemanfar.com/Current-Git-Branch-in-Bash-Prompt
-# git name-rev HEAD 2> /dev/null | awk "{ print \\$2 }"
-function _metasystem_git_branch_prompt()
-{
-    local ref=$(git symbolic-ref HEAD 2> /dev/null) || return
-    [[ -n $ref ]] && echo "${PINK}git:${ref#refs/heads/}${NO_COLOUR}"
-}
-
-function metasystem_short_path()
-{
-	# Shortened path
-	# http://lifehacker.com/5167879/cut-the-bash-prompt-down-to-size
-	local dir=$1
-	dir=`echo $dir | sed -e "s!^$HOME!~!"`
-	[[ ${#dir} -gt 50 ]] && dir="${dir:0:22} ... ${dir:${#dir}-23}"
-	echo $dir
-}
-
-# This is triggered when the directory is changed
-function _metasystem_update_prompt()
-{
-	_metasystem_short_path=$(metasystem_short_path $PWD)
-	_metasystem_short_dirinfo_root=
-	[[ $METASYSTEM_DIRINFO_ROOT != $HOME ]] &&\
-		_metasystem_short_dirinfo_root=$(metasystem_short_path $METASYSTEM_DIRINFO_ROOT)
-	_metasystem_update_prompt_projects
-	_metasystem_update_prompt_ids
-	_metasystem_update_prompt_tools
-}
-
-export -f _metasystem_update_prompt
-
-# This is run before every prompt is displayed
-function _metasystem_prompt_command()
-{
-	# Do this first to ensure we get the correct value of $?
-	local rc=$?
-	local prompt_rc=
-	[[ $rc != 0 ]] && local prompt_rc="${LIGHT_CYAN}$rc ${NO_COLOUR}"
-
-	local prompt=
-
-	[[ -n $METASYSTEM_DIRINFO_LABEL ]] &&
-		prompt="${prompt}${LIGHT_PURPLE}${METASYSTEM_DIRINFO_LABEL}${NO_COLOUR} "
-
-	[[ -n $_metasystem_short_dirinfo_root ]] &&\
-		prompt="${prompt}${LIGHT_CYAN}${_metasystem_short_dirinfo_root}${NO_COLOUR} "
-
-	[[ -n $prompt ]] && prompt="${prompt}\n"
-
-	[[ $_metasystem_prompt_projects_enabled == yes ]] &&\
-		prompt="${_prompt_projects}${prompt}"
-
-	[[ $_metasystem_prompt_epocroot_enabled == yes && -n $EPOCROOT ]] &&\
-		prompt="${LIGHT_RED}epoc: $EPOCROOT${NAKED_NO_COLOUR}\n${prompt}"
-
-	# user@host pwd(short)
-	local hostname=$HOSTNAME
-	[[ -n $METASYSTEM_PROFILE_HOST ]] && hostname=$METASYSTEM_PROFILE_HOST
-	prompt="${prompt}\[\e]0;\w\a\]${LIGHT_BLUE}\u@${hostname} ${LIGHT_YELLOW}${_metasystem_short_path}${NO_COLOUR}"
-	[[ $_metasystem_prompt_git_enabled == yes ]] &&\
-		prompt="${prompt} $(_metasystem_git_branch_prompt)"
-
-	# Android
-	local android=
-	if [[ -n $_metasystem_prompt_android_enabled ]]; then
-		[[ -n $TARGET_PRODUCT && -n $TARGET_BUILD_VARIANT ]] &&\
-			android="\n${LIGHT_GREEN}android: ${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}${NO_COLOR}"
-	fi
-	prompt="${prompt}${android}"
-
-	# time
-	prompt="${prompt}\n${LIGHT_YELLOW}\A${NO_COLOUR}"
-
-	[[ $_metasystem_prompt_tools_enabled == yes ]] &&\
-		prompt="${prompt}${_prompt_tools}"
-
-	[[ $_metasystem_prompt_ids_enabled == yes ]] &&\
-		prompt="${prompt}${_prompt_ids}"
-
-	export PS1="\n${prompt}\n${prompt_rc}\$ "
-}
-
-export PROMPT_COMMAND=_metasystem_prompt_command
-
-alias prompt-print='_metasystem_prompt_print'
-alias prompt=prompt-print
-alias prompt-enable='_metasystem_prompt_enable'
-alias prompt-disable='_metasystem_prompt_disable'
-
-
-#------------------------------------------------------------------------------
-# 'cd' trigger
-#------------------------------------------------------------------------------
-
-function metasystem_cd()
-{
-	local projects=$METASYSTEM_PROJECTS
-	_metasystem_cd $*
-	[[ $projects != $METASYSTEM_PROJECTS ]] && _metasystem_projects_print
-	_metasystem_update_prompt
-}
-
-function metasystem_rcd()
-{
-	[[ -n $METASYSTEM_DIRINFO_ROOT ]] && metasystem_cd $METASYSTEM_DIRINFO_ROOT
-}
-
-function metasystem_stash_cd()
-{
-	_metasystem_stash_cd=$PWD
-	builtin cd "$@"
-}
-
-function metasystem_unstash_cd()
-{
-	[[ -n $_metasystem_stash_cd ]] && builtin cd $_metasystem_stash_cd
-	_metasystem_stash_cd=
-}
-
-export -f metasystem_cd
-export -f metasystem_rcd
-export -f metasystem_stash_cd
-export -f metasystem_unstash_cd
-
-alias cd=metasystem_cd
-alias rcd=metasystem_rcd
-
-
-#------------------------------------------------------------------------------
 # Config files
 #------------------------------------------------------------------------------
 
@@ -1110,6 +963,64 @@ function rc_update()
 }
 
 alias rc-update=rc_update
+
+
+#==============================================================================
+# Modules
+#==============================================================================
+
+source $METASYSTEM_CORE_SHELL/modules.sh
+
+
+#==============================================================================
+# Opt
+#==============================================================================
+
+_metasystem_print_banner "Optional packages"
+source $METASYSTEM_CORE_SHELL/opt/config
+
+
+#==============================================================================
+# Local config
+#==============================================================================
+
+_metasystem_print_banner "Local config"
+
+if [[ -n $METASYSTEM_LOCAL_SHELL ]]; then
+	echo -e "Loading $METASYSTEM_LOCAL_SHELL/shrc.sh ..."
+	source $METASYSTEM_LOCAL_SHELL/shrc.sh
+	PATH=$(path_prepend $METASYSTEM_LOCAL_BIN $PATH)
+else
+	echo -e "${NAKED_LIGHT_RED}$metasystem_local_root not found${NAKED_NO_COLOR}"
+	echo "Using template config files from $METASYSTEM_CORE_CONFIG"
+	echo "To create a metasystem-local repo, run 'metasystem_create_local'"
+fi
+
+function metasystem_create_local()
+{
+	if [[ -e $metasystem_local_root ]]; then
+		echo "Error: $metasystem_local_root already exists"
+		return 1
+	else
+		cp -rv $METASYSTEM_CORE_TEMPLATES/local $metasystem_local_root
+		cp -v $METASYSTEM_CORE_ROOT/.gitignore $metasystem_local_root
+		cd $metasystem_local_root
+		git init
+		git add -A
+		git commit -m "Initial version (created from template)"
+	fi
+}
+
+
+#==============================================================================
+# Core setup 2/2
+#==============================================================================
+
+#------------------------------------------------------------------------------
+# ssh-agent
+#------------------------------------------------------------------------------
+
+[[ -n $SSH_AGENT_ENV ]] && ssh_agent_init
 
 
 #------------------------------------------------------------------------------
@@ -1181,11 +1092,8 @@ echo -e "$_METASYSTEM_RULE"
 echo
 
 metasystem_cd -metasystem-init
-_metasystem_update_prompt_ids
 
 [[ -n $have_python ]] && tools-reset
-_metasystem_update_prompt_tools
-
 [[ -n $have_python ]] && ids-reset
 
 # Export final PATH
