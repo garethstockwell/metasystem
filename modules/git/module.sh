@@ -118,7 +118,7 @@ function metasystem_git_prompt()
 # Exported variables
 #------------------------------------------------------------------------------
 
-export METASYSTEM_GIT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export METASYSTEM_GIT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
 export METASYSTEM_GIT_BIN=$METASYSTEM_GIT_ROOT/bin
 
 

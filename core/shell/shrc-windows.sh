@@ -73,8 +73,6 @@ function killall()
 	done
 }
 
-export -f killall
-
 
 #------------------------------------------------------------------------------
 # Aliases
@@ -92,8 +90,6 @@ function metasystem_windows_explorer()
 	fi
 	explorer.exe $path &
 }
-
-export -f metasystem_windows_explorer
 
 alias explorer=metasystem_windows_explorer
 

@@ -123,7 +123,7 @@ fi
 # Exported variables
 #------------------------------------------------------------------------------
 
-export METASYSTEM_QT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export METASYSTEM_QT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
 export METASYSTEM_QT_BIN=$METASYSTEM_QT_ROOT/bin
 export METASYSTEM_QT_LIB=$METASYSTEM_QT_ROOT/lib
 

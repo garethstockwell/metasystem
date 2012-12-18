@@ -1,0 +1,11 @@
+# Prevent sbs from bombing out...
+local x=Error
+if [[ -n $1 && $METASYSTEM_PLATFORM != $1 ]]; then
+	if [[ -z $2 ]]; then
+		echo "$x: this program can only be run on platform '$1'"
+	else
+		echo "$x: program '$2' can only be run on platform '$1'"
+	fi
+	exit 1
+fi
+

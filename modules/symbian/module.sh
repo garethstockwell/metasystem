@@ -105,7 +105,7 @@ fi
 # Exported variables
 #------------------------------------------------------------------------------
 
-export METASYSTEM_SYMBIAN_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export METASYSTEM_SYMBIAN_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
 export METASYSTEM_SYMBIAN_BIN=$METASYSTEM_SYMBIAN_ROOT/bin
 
 export SF_TOOLS_DIR=~/work/sync/hg/sf/oss/MCL/sftools/fbf/utilities

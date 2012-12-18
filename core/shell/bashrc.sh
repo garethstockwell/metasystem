@@ -1,8 +1,6 @@
 # bashrc.sh
 
-# Find location of this script
-export METASYSTEM_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )"/../.. && pwd )
-
+source $(dirname ${BASH_SOURCE[0]})/autoload.sh
 source $(dirname ${BASH_SOURCE[0]})/shrc.sh
 
 #==============================================================================
@@ -39,44 +37,6 @@ source $METASYSTEM_CORE_SHELL/shrc-$METASYSTEM_PLATFORM.sh
 os_rc=$METASYSTEM_CORE_SHELL/shrc-$METASYSTEM_OS.sh
 [[ -e $os_rc ]] && source $os_rc
 unset os_rc
-
-function metasystem_assert_os()
-{
-	# Prevent sbs from bombing out...
-	local x=Error
-	if [[ -n $1 && $METASYSTEM_OS != $1 ]]; then
-		if [[ -z $2 ]]; then
-			echo "$x: this program can only be run on OS '$1'"
-		else
-			echo "$x: program '$2' can only be run on OS '$1'"
-		fi
-		exit 1
-	fi
-}
-
-function metasystem_assert_platform()
-{
-	# Prevent sbs from bombing out...
-	local x=Error
-	if [[ -n $1 && $METASYSTEM_PLATFORM != $1 ]]; then
-		if [[ -z $2 ]]; then
-			echo "$x: this program can only be run on platform '$1'"
-		else
-			echo "$x: program '$2' can only be run on platform '$1'"
-		fi
-		exit 1
-	fi
-}
-
-export -f metasystem_nativepath
-export -f metasystem_unixpath
-export -f metasystem_assert_os
-export -f metasystem_assert_platform
-
-if [[ $METASYSTEM_OS == windows ]]; then
-	export -f metasystem_driveletter
-	export -f metasystem_drivepath
-fi
 
 
 #------------------------------------------------------------------------------

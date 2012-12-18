@@ -1,0 +1,4 @@
+if [[ -n $1 ]]; then
+	cygpath -w $1
+fi
+

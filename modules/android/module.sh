@@ -323,7 +323,7 @@ function metasystem_android_devices()
 # Exported variables
 #------------------------------------------------------------------------------
 
-export METASYSTEM_ANDROID_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export METASYSTEM_ANDROID_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
 export METASYSTEM_ANDROID_BIN=$METASYSTEM_ANDROID_ROOT/bin
 
 export ANDROID_HOST_SSH_PORT=9999

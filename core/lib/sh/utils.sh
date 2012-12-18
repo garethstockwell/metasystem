@@ -42,6 +42,7 @@ metasystem_declare_stub build.sh number_of_processors
 metasystem_declare_stub func.sh rename_function
 metasystem_declare_stub func.sh prepend_to_function
 metasystem_declare_stub func.sh append_to_function
+metasystem_declare_stub func.sh source_function
 
 # list.sh
 metasystem_declare_stub list.sh list_append

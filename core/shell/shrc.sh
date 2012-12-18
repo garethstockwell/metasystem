@@ -62,6 +62,9 @@ export METASYSTEM_HOSTNAME=$HOSTNAME
 # Ensure that we start in the home directory
 cd $HOME
 
+# Find location of this script
+export METASYSTEM_ROOT=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/../.. && pwd )
+
 export METASYSTEM_CORE_ROOT=$METASYSTEM_ROOT/core
 export METASYSTEM_CORE_BIN=$METASYSTEM_CORE_ROOT/bin
 export METASYSTEM_CORE_LIB=$METASYSTEM_CORE_ROOT/lib
@@ -90,7 +93,18 @@ source $METASYSTEM_CORE_LIB/sh/utils.sh
 source $METASYSTEM_CORE_LIB/sh/path.sh
 source $METASYSTEM_CORE_LIB/sh/string.sh
 
-export FPATH=$FPATH:$METASYSTEM_CORE_LIB/autosh
+
+#------------------------------------------------------------------------------
+# Autoload
+#------------------------------------------------------------------------------
+
+for dir in $METASYSTEM_CORE_LIB/autosh \
+	       $METASYSTEM_CORE_LIB/autosh/$METASYSTEM_PLATFORM; do
+	export FPATH=$dir:$FPATH
+	for file in $(find $dir -type f); do
+		autoload $(basename $file)
+	done
+done
 
 
 #------------------------------------------------------------------------------

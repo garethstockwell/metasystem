@@ -32,3 +32,10 @@ function append_to_function()
 	eval "$(declare -f ${name} | head -n -1; echo ${body}; echo '}')"
 }
 
+function source_function()
+{
+	local name=$1
+	local file=$2
+	eval "$(echo "${name}() {"; cat ${file}; echo '}' )"
+}
+
