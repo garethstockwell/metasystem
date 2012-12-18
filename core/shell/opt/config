@@ -45,13 +45,6 @@ function autostash()
 # Exported functions
 #------------------------------------------------------------------------------
 
-# Called by smartcd/templates/metasystem
-export -f metasystem_parse_dirinfo
-
-# Called from scripts written by metasystem-*.py
-export -f _metasystem_export
-export -f _metasystem_unset
-
 
 #------------------------------------------------------------------------------
 # Source

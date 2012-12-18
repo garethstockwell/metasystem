@@ -174,8 +174,6 @@ function _metasystem_print_banner()
 	echo -e "$_METASYSTEM_RULE\n"
 }
 
-export -f _metasystem_print_banner
-
 
 #------------------------------------------------------------------------------
 # System information
@@ -337,11 +335,6 @@ function metasystem_unstash_cd()
 	[[ -n $_metasystem_stash_cd ]] && builtin cd $_metasystem_stash_cd
 	_metasystem_stash_cd=
 }
-
-export -f metasystem_cd
-export -f metasystem_rcd
-export -f metasystem_stash_cd
-export -f metasystem_unstash_cd
 
 alias cd=metasystem_cd
 alias rcd=metasystem_rcd
@@ -633,8 +626,6 @@ function metasystem_project_cd_source()
 }
 
 export -f metasystem_project_env_prefix
-export -f metasystem_project_cd_build
-export -f metasystem_project_cd_source
 
 alias pcdb='metasystem_project_cd_build'
 alias pcds='metasystem_project_cd_source'
@@ -707,8 +698,6 @@ function metasystem_install_git_hooks()
 		return 1
 	fi
 }
-
-export -f metasystem_install_git_hooks
 
 export HGEXT_DIR=$(metasystem_nativepath ~/work/sync/hg/hgext)
 

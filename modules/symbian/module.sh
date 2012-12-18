@@ -118,9 +118,6 @@ export SF_TOOLS_DIR=~/work/sync/hg/sf/oss/MCL/sftools/fbf/utilities
 # Exported functions
 #------------------------------------------------------------------------------
 
-export -f path_prepend_epoc
-export -f path_remove_epoc
-
 
 #------------------------------------------------------------------------------
 # Main

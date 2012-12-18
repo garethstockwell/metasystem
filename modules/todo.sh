@@ -11,7 +11,6 @@ function _todo()
 	todo.sh $*
 }
 
-export -f _todo
 alias todo=_todo
 
 function _todo_complete()

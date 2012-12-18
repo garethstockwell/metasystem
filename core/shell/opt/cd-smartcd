@@ -28,10 +28,6 @@ function _metasystem_dirinfo_init()
 	_metasystem_smartcd_install $*
 }
 
-export -f _metasystem_dirinfo_init
-export -f _metasystem_dirinfo_install
-export -f _metasystem_smartcd_install
-
 function metasystem_parse_dirinfo()
 {
 	local dir=$1
@@ -109,6 +105,4 @@ export METASYSTEM_DIRINFO_SHELL_DEPRECATE=yes
 #------------------------------------------------------------------------------
 # Exported functions
 #------------------------------------------------------------------------------
-
-export -f smartcd_install_templates
 

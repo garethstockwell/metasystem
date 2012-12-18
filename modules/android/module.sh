@@ -343,18 +343,10 @@ export ANDROID_SET_KERNEL_COMPILATION_VARS=1
 # Exported functions
 #------------------------------------------------------------------------------
 
-export -f metasystem_android_emulator
-export -f metasystem_android_observe
-export -f metasystem_android_ndk_build
-export -f metasystem_android_cd_src
-export -f metasystem_android_cd_build
-export -f metasystem_android_cd_product_out
-export -f metasystem_android_shell
+export -f metasystem_android_devices
 export -f metasystem_android_ssh_adb_forward
 export -f metasystem_android_ssh_adb
 export -f metasystem_android_sync
-export -f metasystem_android_pull_kconfig
-export -f metasystem_android_devices
 
 alias acds=metasystem_android_cd_src
 alias acdb=metasystem_android_cd_build
