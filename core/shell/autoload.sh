@@ -10,13 +10,16 @@ function _metasystem_autoload()
 {
 	local name=$1
 	shift
-	for path in $(path_split '\n' $FPATH); do
+	for path in $(echo $FPATH | sed -e 's/:/\n/g'); do
 		local file=$path/$name
 		if [[ -e $file ]]; then
-			source_function $name $file
+			eval "$(echo "${name}() {"; cat ${file}; echo '}' )"
 			break
 		fi
 	done
 	eval "$(echo ${name} $@)"
 }
+
+export -f autoload
+export -f _metasystem_autoload
 
