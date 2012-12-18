@@ -5,16 +5,31 @@ TODO for metasystem
 Definitely
 ---------------------------------------------------------------------------
 
-* Migrate remaining 'export -f' into autoload
+* Move stuff back out of autoload, into lib/sh/utils.sh
+
+* Migrate rest of bashrc.sh into shrc.sh
 
 * Replace METASYSTEM_OPT_* with METASYSTEM_CONFIG_*
 	- Set from ~/.profile
 	- Allows per-machine setup tweaks
 
+* Convert the following functions into scripts
+	- metasystem_android_devices ()
+	- metasystem_android_ssh_adb ()
+	- metasystem_android_ssh_adb_forward ()
+	- metasystem_android_sync ()
+
+* Do something with metasystem_project_env_prefix()
+	- Used by qt-reset.sh
+
+* Write a function for
+	grep something $(find . -type f | grep -v .git)
 
 ---------------------------------------------------------------------------
 Maybe
 ---------------------------------------------------------------------------
+
+* Move function bodies from lib/bash into lib/autoload
 
 * Tidy up python scripts
 	- Comply with PEP008 naming conventions (member_functions,
