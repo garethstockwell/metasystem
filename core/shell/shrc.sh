@@ -477,7 +477,7 @@ function _metasystem_prompt_update_command()
 	# Do this first to ensure we get the correct value of $?
 	local rc=$?
 	local prompt_rc=
-	[[ $rc != 0 ]] && local prompt_rc="${LIGHT_CYAN}$rc ${NO_COLOUR}"
+	[[ $rc != 0 ]] && local prompt_rc="${LIGHT_PURPLE}$rc ${NO_COLOUR}"
 
 	local prompt=
 
