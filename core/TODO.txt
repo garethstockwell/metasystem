@@ -17,9 +17,6 @@ Definitely
 	- metasystem_android_ssh_adb_forward ()
 	- metasystem_android_sync ()
 
-* Do something with metasystem_project_env_prefix()
-	- Used by qt-reset.sh
-
 * Use [include] in gitconfig
 	- Supported since git 1.7.10
 

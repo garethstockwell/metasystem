@@ -507,16 +507,12 @@ alias tools-reset='_metasystem_reset_tools'
 # Projects
 #------------------------------------------------------------------------------
 
+source $METASYSTEM_CORE_LIB_BASH/project.sh
+
 export METASYSTEM_PROJECTS=
 
 # Global variables
 _metasystem_projectdirs_updated=
-
-function metasystem_project_env_prefix()
-{
-	local project=$1
-	echo METASYSTEM_PROJECT_$(uppercase ${project//-/_})
-}
 
 function _metasystem_set_projectdirs()
 {
@@ -624,8 +620,6 @@ function metasystem_project_cd_source()
 		return 1
 	fi
 }
-
-export -f metasystem_project_env_prefix
 
 alias pcdb='metasystem_project_cd_build'
 alias pcds='metasystem_project_cd_source'
