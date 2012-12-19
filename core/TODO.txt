@@ -7,10 +7,6 @@ Definitely
 
 * Migrate rest of bashrc.sh into shrc.sh
 
-* Replace METASYSTEM_OPT_* with METASYSTEM_CONFIG_*
-	- Set from ~/.profile
-	- Allows per-machine setup tweaks
-
 * Use [include] in gitconfig
 	- Supported since git 1.7.10
 
