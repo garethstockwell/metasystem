@@ -25,6 +25,9 @@ Definitely
 * Write a function for
 	grep something $(find . -type f | grep -v .git)
 
+* Use [include] in gitconfig
+	- Supported since git 1.7.10
+
 ---------------------------------------------------------------------------
 Maybe
 ---------------------------------------------------------------------------
