@@ -162,12 +162,6 @@ function xterm_set_title()
 	esac
 }
 
-# Set screen window title
-function screen_set_title()
-{
-	echo -e '\033k'$*'\033\\'
-}
-
 
 #------------------------------------------------------------------------------
 # Utility functions: misc
