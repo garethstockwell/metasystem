@@ -4,37 +4,44 @@
 # Settings
 #------------------------------------------------------------------------------
 
-# Detach on HUP instead of kill
-autodetach on
+autodetach				on
+startup_message			off
+vbell					off
+nethack					off
+defscrollback			10000
 
-# Don't display the copyright page
-startup_message off
+msgminwait				1
+msgwait					3
 
-# Tab-completion flash in heading bar
-vbell off
 
-# More history
-defscrollback 10000
+#------------------------------------------------------------------------------
+# Messages
+#------------------------------------------------------------------------------
 
-# Show messages for n seconds unless interrupted
-msgwait 5
+activity				"activity in %n (%t)"
+bell_msg				"bell in %n (%t)"
+defhstatus				"screen: ^En (^Et)"
+
+windowlist title		" Num%+3=| Fl%+3=| Name"
+windowlist string		" %3n%+3=| %f%+3=| %t"
 
 
 #------------------------------------------------------------------------------
 # Key bindings
 #------------------------------------------------------------------------------
 
+escape ^Ee
+
+bindkey ^[ prev
+bindkey ^] next
+
 # Enable SHIFT-PGUP / SHIFT-PGDOWN scroll
-termcapinfo xterm* ti@:te@
+#termcapinfo xterm*		ti@:te@
 
 
 #------------------------------------------------------------------------------
 # Status
 #------------------------------------------------------------------------------
-
-# Have screen update terminal emulators titlebar
-termcapinfo xterm* 'hs:ts=\E]0;:fs=\007:ds=\E]0;\007'
-defhstatus "screen ^E (^Et) | $USER@^EH"
 
 hardstatus alwayslastline
 

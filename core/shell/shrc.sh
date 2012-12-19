@@ -153,6 +153,12 @@ function xtitle()
 	esac
 }
 
+# Set screen window title
+function screen_title()
+{
+	echo -e '\033k'$*'\033\\'
+}
+
 # Empty function
 function empty_function()
 {
