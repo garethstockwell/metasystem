@@ -298,6 +298,8 @@ export PROMPT_COMMAND=_metasystem_prompt_update_command
 # cd
 #------------------------------------------------------------------------------
 
+source $METASYSTEM_CORE_SHELL/cd.sh
+
 function _metasystem_cd_hooks()
 {
 	echo > /dev/null
@@ -390,7 +392,7 @@ fi
 
 function _metasystem_update_prompt_ids()
 {
-	if [[ $_metasystem_prompt_ids_enabled == yes ]]; then
+	if [[ $(metasystem_get_config PROMPT_IDS_ENABLED) == yes ]]; then
 		_prompt_ids=
 		for id_type in $METASYSTEM_ID_TYPES
 		do
@@ -481,7 +483,7 @@ function _metasystem_reset_tools()
 
 function _metasystem_update_prompt_tools()
 {
-	if [[ $_metasystem_prompt_tools_enabled == yes ]]; then
+	if [[ $(metasystem_get_config PROMPT_TOOLS_ENABLED) == yes ]]; then
 		local ok=
 		_prompt_tools=
 		for tool_type in $METASYSTEM_TOOL_TYPES
@@ -741,14 +743,6 @@ alias rc-update=rc_update
 #==============================================================================
 
 source $METASYSTEM_CORE_SHELL/modules.sh
-
-
-#==============================================================================
-# Opt
-#==============================================================================
-
-_metasystem_print_banner "Optional packages"
-source $METASYSTEM_CORE_SHELL/opt/config
 
 
 #==============================================================================

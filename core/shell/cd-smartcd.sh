@@ -1,8 +1,6 @@
-# opt/cd-smartcd
+# cd-smartcd.sh
 #
 # Integration layer for smartcd (https://github.com/cxreg/smartcd)
-
-echo "cd-smartcd"
 
 #------------------------------------------------------------------------------
 # Main

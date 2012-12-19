@@ -92,6 +92,19 @@ else
 	export METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config
 fi
 
+
+#------------------------------------------------------------------------------
+# Config
+#------------------------------------------------------------------------------
+
+# Import config
+source $METASYSTEM_CORE_SHELL/config.sh
+
+
+#------------------------------------------------------------------------------
+# Imports
+#------------------------------------------------------------------------------
+
 # Import utility functions
 source $METASYSTEM_CORE_LIB_BASH/utils.sh
 source $METASYSTEM_CORE_LIB_BASH/path.sh
@@ -109,14 +122,6 @@ for dir in $METASYSTEM_CORE_LIB/autoload \
 		autoload $(basename $file)
 	done
 done
-
-
-#------------------------------------------------------------------------------
-# Config
-#------------------------------------------------------------------------------
-
-_metasystem_prompt_ids_enabled=no
-_metasystem_prompt_tools_enabled=yes
 
 
 #------------------------------------------------------------------------------
@@ -144,11 +149,11 @@ export PAGER='less -R'
 
 
 #------------------------------------------------------------------------------
-# Utility functions: misc
+# Utility functions: window titles
 #------------------------------------------------------------------------------
 
 # Function to set window title
-function xtitle()
+function xterm_set_title()
 {
 	case $TERM in
 		*term | rxvt)
@@ -158,10 +163,15 @@ function xtitle()
 }
 
 # Set screen window title
-function screen_title()
+function screen_set_title()
 {
 	echo -e '\033k'$*'\033\\'
 }
+
+
+#------------------------------------------------------------------------------
+# Utility functions: misc
+#------------------------------------------------------------------------------
 
 # Empty function
 function empty_function()
