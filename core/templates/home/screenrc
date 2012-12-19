@@ -30,7 +30,7 @@ windowlist string		" %3n%+3=| %f%+3=| %t"
 # Key bindings
 #------------------------------------------------------------------------------
 
-escape ^Ee
+escape ^\\
 
 bindkey ^[ prev
 bindkey ^] next
