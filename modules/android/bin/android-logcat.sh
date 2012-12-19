@@ -47,7 +47,7 @@ echo -en "Waiting for device ... " >&2
 adb wait-for-device
 echo -e "OK" >&2
 
-devices=$(metasystem_android_devices)
+devices=$(android-devices.sh)
 [[ -z $devices ]] && error "No ADB device found"
 [[ $(echo $devices | wc -w) != 1 ]] && error "Multiple ADB devices found: $devices"
 

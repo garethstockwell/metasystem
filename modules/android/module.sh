@@ -207,31 +207,6 @@ function metasystem_android_shell()
 	adb wait-for-device && adb shell "$@"
 }
 
-function metasystem_android_ssh_adb_forward()
-{
-	local cmd="adb forward tcp:$ANDROID_HOST_SSH_PORT tcp:$ANDROID_TARGET_SSH_PORT $@"
-	echo $cmd &&\
-	$cmd
-}
-
-function metasystem_android_ssh_adb()
-{
-	# Use alias defined in ~/.ssh/config
-	local cmd="ssh android-adb"
-	metasystem_android_ssh_adb_forward "$@" &&\
-	echo $cmd &&\
-	$cmd
-}
-
-function metasystem_android_sync()
-{
-	device-sync.sh \
-	  --host android-adb \
-	  --shell /system/bin/sh \
-	  --script-dir /sdcard \
-	  "$@"
-}
-
 # Pull kernel config from running device
 function metasystem_android_pull_kconfig()
 {
@@ -307,17 +282,6 @@ function metasystem_android_push_binary()
 	return $ret
 }
 
-function metasystem_android_devices()
-{
-	adb devices 2>/dev/null | while read line; do
-		if [[ -n $line ]] && [[ $(echo $line | awk '{print $2}') == device ]]; then
-			device=$(echo $line | awk '{print $1}')
-			echo -n "$device "
-		fi
-	done
-}
-
-
 
 #------------------------------------------------------------------------------
 # Exported variables
@@ -343,11 +307,6 @@ export ANDROID_SET_KERNEL_COMPILATION_VARS=1
 # Exported functions
 #------------------------------------------------------------------------------
 
-export -f metasystem_android_devices
-export -f metasystem_android_ssh_adb_forward
-export -f metasystem_android_ssh_adb
-export -f metasystem_android_sync
-
 alias acds=metasystem_android_cd_src
 alias acdb=metasystem_android_cd_build
 alias acdp=metasystem_android_cd_product_out
@@ -356,12 +315,9 @@ alias android-emulator=metasystem_android_emulator
 alias android-observe=metasystem_android_observe
 alias ndk-build=metasystem_android_ndk_build
 alias android-shell=metasystem_android_shell
-alias android-ssh-adb=metasystem_android_ssh_adb
 alias adb=android-adb.sh
-alias android-sync=metasystem_android_sync
 alias android-pull-kconfig=metasystem_android_pull_kconfig
 alias android-push-binary=metasystem_android_push_binary
-alias android-devices=metasystem_android_devices
 
 
 #------------------------------------------------------------------------------

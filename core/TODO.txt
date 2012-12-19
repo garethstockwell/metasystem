@@ -11,12 +11,6 @@ Definitely
 	- Set from ~/.profile
 	- Allows per-machine setup tweaks
 
-* Convert the following functions into scripts
-	- metasystem_android_devices ()
-	- metasystem_android_ssh_adb ()
-	- metasystem_android_ssh_adb_forward ()
-	- metasystem_android_sync ()
-
 * Use [include] in gitconfig
 	- Supported since git 1.7.10
 
