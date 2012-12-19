@@ -40,7 +40,20 @@ function git_head()
 
 function git_root()
 {
-	$GIT_EXE rev-parse --show-toplevel || echo "."
+	$GIT_EXE rev-parse --show-toplevel
+}
+
+function git_grep()
+{
+	local path=$1
+	shift
+	grep "$@" $(find $path -type f | grep -v .git)
+}
+
+function gcd()
+{
+	local root=$(git_root)
+	[[ -n $root ]] && cd $root
 }
 
 

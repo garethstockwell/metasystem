@@ -1,2 +1,0 @@
-echo $1 | sed -e 's/\/cygdrive\/\([a-z]\).*/\1/'
-

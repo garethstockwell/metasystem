@@ -1,7 +1,6 @@
 # modules/symbian/module.sh
 
-autoload metasystem_drivepath
-autoload metasystem_driveletter
+source $METASYSTEM_CORE_LIB_BASH/path.sh
 
 function metasystem_symbian_prompt()
 {

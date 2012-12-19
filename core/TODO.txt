@@ -5,8 +5,6 @@ TODO for metasystem
 Definitely
 ---------------------------------------------------------------------------
 
-* Move stuff back out of autoload, into lib/sh/utils.sh
-
 * Migrate rest of bashrc.sh into shrc.sh
 
 * Replace METASYSTEM_OPT_* with METASYSTEM_CONFIG_*
@@ -22,17 +20,12 @@ Definitely
 * Do something with metasystem_project_env_prefix()
 	- Used by qt-reset.sh
 
-* Write a function for
-	grep something $(find . -type f | grep -v .git)
-
 * Use [include] in gitconfig
 	- Supported since git 1.7.10
 
 ---------------------------------------------------------------------------
 Maybe
 ---------------------------------------------------------------------------
-
-* Move function bodies from lib/bash into lib/autoload
 
 * Tidy up python scripts
 	- Comply with PEP008 naming conventions (member_functions,

@@ -9,8 +9,7 @@
 #------------------------------------------------------------------------------
 
 source $METASYSTEM_QT_LIB/functions.sh
-
-autoload metasystem_assert_os
+source $METASYSTEM_CORE_LIB_BASH/misc.sh
 
 #------------------------------------------------------------------------------
 # Constants

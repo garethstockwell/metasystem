@@ -4,8 +4,7 @@
 # Imports
 #------------------------------------------------------------------------------
 
-autoload metasystem_nativepath
-autoload metasystem_unixpath
+source $METASYSTEM_CORE_LIB_BASH/path.sh
 
 
 #------------------------------------------------------------------------------

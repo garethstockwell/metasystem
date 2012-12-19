@@ -9,9 +9,7 @@
 #------------------------------------------------------------------------------
 
 source $METASYSTEM_QT_LIB/functions.sh
-
-autoload metasystem_nativepath
-autoload metasystem_nativepathlist
+source $METASYSTEM_CORE_LIB_BASH/path.sh
 
 #------------------------------------------------------------------------------
 # Constants

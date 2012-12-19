@@ -71,6 +71,8 @@ export METASYSTEM_CORE_LIB=$METASYSTEM_CORE_ROOT/lib
 export METASYSTEM_CORE_SHELL=$METASYSTEM_CORE_ROOT/shell
 export METASYSTEM_CORE_TEMPLATES=$METASYSTEM_CORE_ROOT/templates
 
+export METASYSTEM_CORE_LIB_BASH=$METASYSTEM_CORE_LIB/bash
+
 if [[ -n $METASYSTEM_LOCAL_ROOT ]]; then
 	metasystem_local_root=$METASYSTEM_LOCAL_ROOT
 else
@@ -84,14 +86,16 @@ if [[ -d $metasystem_local_root ]]; then
 	export METASYSTEM_LOCAL_SHELL=$METASYSTEM_LOCAL_ROOT/shell
 	export METASYSTEM_LOCAL_TEMPLATES=$METASYSTEM_LOCAL_ROOT/templates
 	export METASYSTEM_CORE_CONFIG=$METASYSTEM_LOCAL_ROOT/config
+
+	export METASYSTEM_LOCAL_LIB_BASH=$METASYSTEM_LOCAL_LIB/bash
 else
 	export METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config
 fi
 
 # Import utility functions
-source $METASYSTEM_CORE_LIB/sh/utils.sh
-source $METASYSTEM_CORE_LIB/sh/path.sh
-source $METASYSTEM_CORE_LIB/sh/string.sh
+source $METASYSTEM_CORE_LIB_BASH/utils.sh
+source $METASYSTEM_CORE_LIB_BASH/path.sh
+source $METASYSTEM_CORE_LIB_BASH/string.sh
 
 
 #------------------------------------------------------------------------------
@@ -101,7 +105,7 @@ source $METASYSTEM_CORE_LIB/sh/string.sh
 for dir in $METASYSTEM_CORE_LIB/autoload \
 	       $METASYSTEM_CORE_LIB/autoload/$METASYSTEM_PLATFORM; do
 	export FPATH=$dir:$FPATH
-	for file in $(find $dir -type f); do
+	for file in $(find $dir -type f 2>/dev/null); do
 		autoload $(basename $file)
 	done
 done

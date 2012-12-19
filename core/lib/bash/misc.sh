@@ -94,3 +94,57 @@ function log_file()
 	echo $filename
 }
 
+function metasystem_assert_os()
+{
+	# Prevent sbs from bombing out...
+	local x=Error
+	if [[ -n $1 && $METASYSTEM_OS != $1 ]]; then
+		if [[ -z $2 ]]; then
+			echo "$x: this program can only be run on OS '$1'"
+		else
+			echo "$x: program '$2' can only be run on OS '$1'"
+		fi
+		exit 1
+	fi
+}
+
+function metasystem_assert_platform()
+{
+	# Prevent sbs from bombing out...
+	local x=Error
+	if [[ -n $1 && $METASYSTEM_PLATFORM != $1 ]]; then
+			if [[ -z $2 ]]; then
+					echo "$x: this program can only be run on platform '$1'"
+			else
+					echo "$x: program '$2' can only be run on platform '$1'"
+			fi
+			exit 1
+	fi
+}
+
+function metasystem_run_bg()
+{
+	local args=
+	local background=1
+	for token in "$@"; do
+			case $token in
+					-fg | --fg | -foreground | --foreground)
+							background=
+							;;
+					-bg | --bg | -background | --background)
+							background=1
+							;;
+					*)
+							[[ -n $args ]] && args="$args "
+							args="$args$token"
+							;;
+			esac
+	done
+	if [[ -n $background ]]; then
+			echo "Launching '$args' in background ..."
+			nohup $args 1>/dev/null 2>/dev/null &
+	else
+			$args
+	fi
+}
+

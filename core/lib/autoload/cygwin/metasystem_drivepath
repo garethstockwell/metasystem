@@ -1,3 +1,0 @@
-local letter=$(metasystem_driveletter $1)
-[[ -n $letter ]] && echo /cygdrive/$letter
-
