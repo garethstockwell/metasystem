@@ -1,14 +1,17 @@
 # zshrc.sh
 
-# Find location of this script
-export METASYSTEM_ROOT=$( builtin cd "$( dirname $0 )"/../.. && pwd )
+# bash/zsh compatibility
+# Used as e.g. "local ${OVERRIDE_SPECIAL} path=something"
+OVERRIDE_SPECIAL=-h
 
 source $(dirname $0)/shrc.sh
 
-function test_export()
-{
-	echo test_export
-}
+#------------------------------------------------------------------------------
+# Prompt
+#------------------------------------------------------------------------------
 
-export test_export
+function precmd()
+{
+	PROMPT=$(_metasystem_prompt)
+}
 

@@ -91,36 +91,36 @@ function metasystem_git_prompt()
 			content="${content} ${start}$head${end}"
 		fi
 
-		local status=
-		local status_out=$($GIT_EXE status -unormal 2>/dev/null)
+		local lstatus=
+		local status_out="$($GIT_EXE status -unormal 2>/dev/null)"
 
 		if [[ $status_out =~ Your\ branch\ is\ ahead ]]; then
-			status="${status} ${NAKED_LIGHT_YELLOW}ahead${end}"
+			lstatus="${lstatus} ${NAKED_LIGHT_YELLOW}ahead${end}"
 		elif [[ $status_out =~ Your\ branch\ is\ behind ]]; then
-			status="${status} ${NAKED_LIGHT_YELLOW}behind${end}"
+			lstatus="${lstatus} ${NAKED_LIGHT_YELLOW}behind${end}"
 		fi
 
 		if [[ $status_out =~ nothing\ to\ commit ]]; then
-			status="${status} ${NAKED_LIGHT_GREEN}clean${end}"
+			lstatus="${lstatus} ${NAKED_LIGHT_GREEN}clean${end}"
 		else
-			status="${status}${NAKED_LIGHT_RED}"
+			lstatus="${lstatus}${NAKED_LIGHT_RED}"
 			if [[ $status_out =~ Changes\ to\ be\ committed ]]; then
-				status="${status} staged"
+				lstatus="${lstatus} staged"
 			fi
 			if [[ $status_out =~ Changes\ not\ staged\ for\ commit ]]; then
-				status="${status} unstaged"
+				lstatus="${lstatus} unstaged"
 			fi
 			if [[ $status_out =~ Untracked\ files ]]; then
-				status="${status} untracked"
+				lstatus="${lstatus} untracked"
 			fi
-			status="${status}${end}"
+			lstatus="${lstatus}${end}"
 		fi
 
-		if [[ -n $status ]]; then
-			content="${content}${status}"
+		if [[ -n "$lstatus" ]]; then
+			content="${content}${lstatus}"
 		fi
 
-		if [[ -n $content ]]; then
+		if [[ -n "$content" ]]; then
 			echo "${start}git:${content}${end}"
 		fi
 	fi

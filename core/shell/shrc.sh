@@ -225,3 +225,203 @@ PATH=$(path_remove '^\.$' $PATH)
 
 [[ -d $VIM_HOME ]] && export METASYSTEM_EDITOR=$(metasystem_nativepath $VIM_HOME/vim.exe)
 
+
+#------------------------------------------------------------------------------
+# Aliases
+#------------------------------------------------------------------------------
+
+# Enable trusted X forwarding
+alias ssh='ssh -Y'
+alias scp='scp -2'
+alias com='history | grep $1'
+alias findproc='ps -ax -o %p%u%c%t | grep -v grep | grep $1'
+alias du='du -h'
+alias df='df -kh'
+
+alias del='cmd /c del'
+
+alias less='less -x4 -R'	# R is for cgrep
+
+alias ls='ls -hF'
+if [[ $METASYSTEM_PLATFORM == mac ]]; then
+	alias ls='ls -hFG'		# add colors for filetype recognition
+else
+	[[ $METASYSTEM_OS != sunos ]] &&\
+		alias ls='ls -hF --color'	# add colors for filetype recognition
+fi
+
+alias ll='ls -l'			# long listing
+alias lx='ls -lXB'			# sort by extension
+alias lk='ls -lSr'			# sort by size
+alias la='ls -Al'			# show hidden files
+alias lr='ls -lR'			# recursive ls
+alias lt='ls -ltr'			# sort by date
+alias lm='ls -al |more'		# pipe through 'more'
+alias tree='tree -Cs'		# nice alternative to 'ls'
+
+alias vi='vim'
+
+alias sync='sync.py'
+alias p4='p4.pl'
+alias todo='todo.sh'
+
+alias nativepath=metasystem_nativepath
+alias npath=metasystem_nativepath
+alias unixpath=metasystem_unixpath
+alias upath=metasystem_unixpath
+
+alias beep="echo $'\a'"
+
+# Colorising grep
+# Reads GREP_COLOR environment variable
+# Note: requires 'less -R' to correctly interpret escapes
+alias cgrep='grep --color=always'
+
+alias path='path_split \\n $PATH'
+
+# Avoid using the DOS ftp client
+[[ $METASYSTEM_PLATFORM == mingw ]] && alias ftp='/bin/ftp.exe'
+
+[[ $METASYSTEM_OS == linux ]] &&\
+	alias rdp='metasystem_run_bg xfreerdp -d dir -u $USER -g 1920x1080 -a 32 -x l -o'
+
+
+#------------------------------------------------------------------------------
+# Banner
+#------------------------------------------------------------------------------
+
+export _METASYSTEM_RULE='-------------------------------------------------------------------------------'
+
+function _metasystem_print_banner()
+{
+	echo -e "\n$_METASYSTEM_RULE"
+	echo $1
+	echo -e "$_METASYSTEM_RULE\n"
+}
+
+
+#------------------------------------------------------------------------------
+# System information
+#------------------------------------------------------------------------------
+
+echo -e "$_METASYSTEM_RULE\n"
+echo "Hostname:   $METASYSTEM_HOSTNAME"
+[[ -n $have_python ]] && echo "Domain:     $($METASYSTEM_CORE_BIN/network-info.py domain)"
+if [[ $METASYSTEM_OS == linux ]]; then
+	echo "IP address: "`ifconfig | grep 'inet addr' | head -n1 | awk ' { print $2 } ' | sed -e 's/addr://'`
+else
+	echo "IP address: $($METASYSTEM_CORE_BIN/network-info.py ip)"
+fi
+echo "OS:         $METASYSTEM_OS"
+echo "OS vendor:  $METASYSTEM_OS_VENDOR"
+echo "OS version: $METASYSTEM_OS_VERSION"
+echo "Platform:   $METASYSTEM_PLATFORM"
+
+
+#------------------------------------------------------------------------------
+# dirinfo
+#------------------------------------------------------------------------------
+
+function _metasystem_dirinfo_init()
+{
+	_metasystem_dirinfo_install $*
+}
+
+function _metasystem_dirinfo_install()
+{
+	local force=
+	[[ "$1" == "-force" ]] && force=1
+	[[ "$1" == "--force" ]] && force=1
+	local src=$METASYSTEM_CORE_ROOT/templates/metasystem-dirinfo
+	local dst=$PWD/.metasystem-dirinfo
+	if [[ -e $dst && -z $force ]]; then
+		echo "$PWD/.metasystem-dirinfo already exists"
+		echo "Use --force to overwrite it"
+	else
+		echo "Creating $dst ..."
+		rm -f $dst
+		subst-vars.sh $src $dst
+	fi
+}
+
+alias dirinfo-init='_metasystem_dirinfo_init'
+
+
+#------------------------------------------------------------------------------
+# Prompt
+#------------------------------------------------------------------------------
+
+function metasystem_short_path()
+{
+	# Shortened path
+	# http://lifehacker.com/5167879/cut-the-bash-prompt-down-to-size
+	local dir=$1
+	dir=`echo $dir | sed -e "s!^$HOME!~!"`
+	[[ ${#dir} -gt 50 ]] && dir="${dir:0:22} ... ${dir:${#dir}-23}"
+	echo $dir
+}
+
+# This is triggered when the directory is changed
+function _metasystem_prompt_update_cd()
+{
+	_metasystem_short_path=$(metasystem_short_path $PWD)
+	_metasystem_short_dirinfo_root=
+	[[ $METASYSTEM_DIRINFO_ROOT != $HOME ]] &&\
+		_metasystem_short_dirinfo_root=$(metasystem_short_path $METASYSTEM_DIRINFO_ROOT)
+}
+
+# Called from smartcd scripts
+export _metasystem_prompt_update_cd
+
+function _metasystem_prompt_hooks()
+{
+	echo > /dev/null
+}
+
+function metasystem_register_prompt_hook()
+{
+	local body=$1
+	append_to_function _metasystem_prompt_hooks $body
+}
+
+function _metasystem_prompt()
+{
+	# Do this first to ensure we get the correct value of $?
+	local rc=$?
+	local prompt_rc=
+	[[ $rc != 0 ]] && local prompt_rc="${NAKED_LIGHT_PURPLE}$rc ${NAKED_NO_COLOUR}"
+
+	local prompt=
+
+	[[ -n $METASYSTEM_DIRINFO_LABEL ]] &&
+		prompt="${prompt}${NAKED_LIGHT_PURPLE}${METASYSTEM_DIRINFO_LABEL}${NAKED_NO_COLOUR} "
+
+	#[[ -n $_metasystem_short_dirinfo_root ]] &&\
+	#	prompt="${prompt}${NAKED_LIGHT_CYAN}${_metasystem_short_dirinfo_root}${NAKED_NO_COLOUR} "
+
+	[[ -n $prompt ]] && prompt="${prompt}\n"
+
+	if [[ -n $ZSH_VERSION ]]; then
+		local user='%n'
+		local time='%D{%H:%M}'
+	else
+		local user='\u'
+		local time='\A'
+	fi
+
+	local hostname=$HOSTNAME
+	[[ -z $hostname ]] && hostname=$HOST
+	[[ -n $METASYSTEM_PROFILE_HOST ]] && hostname=$METASYSTEM_PROFILE_HOST
+	prompt="${prompt}${NAKED_LIGHT_BLUE}${user}@${hostname} ${NAKED_LIGHT_YELLOW}${_metasystem_short_path}${NAKED_NO_COLOUR}"
+
+	prompt="${prompt}${_prompt_tools}${_prompt_ids}"
+
+	local prompt_hooks="$(_metasystem_prompt_hooks)"
+	[[ -n $prompt_hooks ]] && prompt="${prompt}\n${prompt_hooks}"
+
+	local prompt_time="${NAKED_LIGHT_YELLOW}${time}${NAKED_NO_COLOUR}"
+	echo "\n${prompt}\n${prompt_rc}${prompt_time} \$ "
+}
+
+
+
