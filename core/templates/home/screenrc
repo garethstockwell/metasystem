@@ -14,7 +14,6 @@ nonblock						on
 msgminwait						1
 msgwait							3
 startup_message					off
-term							screen-256color
 vbell							off
 
 
@@ -23,7 +22,7 @@ vbell							off
 #------------------------------------------------------------------------------
 
 # Enable scrollbar
-termcapinfo	xterm*|ansi			ti@:te@
+termcapinfo	xterm*				ti@:te@
 
 
 #------------------------------------------------------------------------------
