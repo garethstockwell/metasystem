@@ -20,60 +20,6 @@ export METASYSTEM_BASH_ASSOC_ARRAY
 export METASYSTEM_BASH_PARAM_SUBST_CASE_MODIFIERS
 
 
-#------------------------------------------------------------------------------
-# METASYSTEM_APPS
-#------------------------------------------------------------------------------
-
-[[ $METASYSTEM_PLATFORM == cygwin ]] && _METASYSTEM_APPS=/cygdrive/c/apps
-[[ $METASYSTEM_PLATFORM == mingw ]] && _METASYSTEM_APPS=/c/apps
-[[ -z $_METASYSTEM_APPS ]] && _METASYSTEM_APPS=~/apps
-
-
-#------------------------------------------------------------------------------
-# Platform
-#------------------------------------------------------------------------------
-
-source $METASYSTEM_CORE_SHELL/shrc-$METASYSTEM_PLATFORM.sh
-os_rc=$METASYSTEM_CORE_SHELL/shrc-$METASYSTEM_OS.sh
-[[ -e $os_rc ]] && source $os_rc
-unset os_rc
-
-
-#------------------------------------------------------------------------------
-# Python check
-#------------------------------------------------------------------------------
-
-have_python=`which python`
-
-
-#------------------------------------------------------------------------------
-# PATH
-#------------------------------------------------------------------------------
-
-PATH=$HOME/bin:$PATH
-
-# Editor
-METASYSTEM_EDITOR=vi
-
-# Misc apps
-PATH=$(path_prepend_if_exists $_METASYSTEM_APPS/bin $PATH)
-
-# Misc tools
-PATH=$METASYSTEM_CORE_BIN:${PATH}
-
-# Templater
-PATH=$(path_append_if_exists ~/work/sync/git/templater/bin $PATH)
-
-# stuff
-[[ -d $METASYSTEM_CORE_ROOT/../stuff ]] && source $METASYSTEM_CORE_ROOT/../stuff/bashrc-stuff
-
-PATH=$(path_remove '^\.$' $PATH)
-
-[[ -d $VIM_HOME ]] && export METASYSTEM_EDITOR=$(metasystem_nativepath $VIM_HOME/vim.exe)
-
-# Raptor
-[[ -n $SBS_HOME ]] && PATH=$PATH:$(metasystem_unixpath $SBS_HOME)/bin
-
 
 #------------------------------------------------------------------------------
 # Shell options
@@ -360,10 +306,10 @@ function profile_update()
 	local cmd="metasystem-profile.py --verbose set $args"
 	echo $cmd
 
-	local path=$PATH
-	[[ -n $METASYSTEM_SYMBIAN_ROOT ]] && path=$(path_remove_epoc $path)
+	local lpath=$PATH
+	[[ -n $METASYSTEM_SYMBIAN_ROOT ]] && lpath=$(path_remove_epoc $path)
 
-	PATH=$path $cmd
+	PATH=$lpath $cmd
 
 	[[ $global != 1 ]] && source ~/.metasystem-profile
 
@@ -595,12 +541,12 @@ function metasystem_project_cd_build()
 {
 	local arg=$1
 	local project=`echo $arg | sed -e 's/\/.*//'`
-	local path=`echo $arg | sed -e 's/[a-zA-Z]*\///'`
+	local lpath=`echo $arg | sed -e 's/[a-zA-Z]*\///'`
 	local project_env_prefix=$(metasystem_project_env_prefix $project)
 	eval local build_dir=\$${project_env_prefix}_BUILD_DIR
-	[[ $path == $project ]] && path=
+	[[ $lpath == $project ]] && lpath=
 	if [[ -n $build_dir ]]; then
-		metasystem_cd $build_dir/$path
+		metasystem_cd $build_dir/$lpath
 	else
 		echo "pcd: '$arg' not recognized"
 		return 1
@@ -611,12 +557,12 @@ function metasystem_project_cd_source()
 {
 	local arg=$1
 	local project=`echo $arg | sed -e 's/\/.*//'`
-	local path=`echo $arg | sed -e 's/[a-zA-Z]*\///'`
+	local lpath=`echo $arg | sed -e 's/[a-zA-Z]*\///'`
 	local project_env_prefix=$(metasystem_project_env_prefix $project)
 	eval local source_dir=\$${project_env_prefix}_SOURCE_DIR
-	[[ $path == $project ]] && path=
+	[[ $lpath == $project ]] && lpath=
 	if [[ -n $source_dir ]]; then
-		metasystem_cd $source_dir/$path
+		metasystem_cd $source_dir/$lpath
 	else
 		echo "pcd: '$arg' not recognized"
 		return 1
@@ -631,17 +577,17 @@ function _metasystem_complete_pcd()
 {
 	local suffix=$1
 	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local path=`echo $cur | sed -e 's/[a-zA-Z]*\///'`
+	local lpath=`echo $cur | sed -e 's/[a-zA-Z]*\///'`
 	if [[ $path == $cur ]]; then
 		COMPREPLY=( $(compgen -W "${METASYSTEM_PROJECTS}" -- ${cur}) )
 	else
 		local project=`echo $cur | sed -e 's/\/.*//'`
 		local project_uc=$(uppercase $project)
 		eval local dir=\$${project_uc}${suffix}
-		local path_part=`echo $path | sed -e 's/\/[a-zA-Z]*$/\//'`
+		local path_part=`echo $lpath | sed -e 's/\/[a-zA-Z]*$/\//'`
 		local path_rest=
 		if [[ -d $dir/$path_part ]]; then
-			path_rest=`echo $path | tail -c+\`echo $path_part | wc -c\``
+			path_rest=`echo $lpath | tail -c+\`echo $path_part | wc -c\``
 		else
 			path_rest=$path_part
 			path_part=

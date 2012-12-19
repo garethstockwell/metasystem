@@ -173,3 +173,55 @@ function empty_function()
 	echo > /dev/null
 }
 
+
+#------------------------------------------------------------------------------
+# Apps
+#------------------------------------------------------------------------------
+
+[[ $METASYSTEM_PLATFORM == cygwin ]] && _METASYSTEM_APPS=/cygdrive/c/apps
+[[ $METASYSTEM_PLATFORM == mingw ]] && _METASYSTEM_APPS=/c/apps
+[[ -z $_METASYSTEM_APPS ]] && _METASYSTEM_APPS=~/apps
+
+
+#------------------------------------------------------------------------------
+# Platform
+#------------------------------------------------------------------------------
+
+source $METASYSTEM_CORE_SHELL/shrc-$METASYSTEM_PLATFORM.sh
+os_rc=$METASYSTEM_CORE_SHELL/shrc-$METASYSTEM_OS.sh
+[[ -e $os_rc ]] && source $os_rc
+unset os_rc
+
+
+#------------------------------------------------------------------------------
+# Python check
+#------------------------------------------------------------------------------
+
+have_python=`which python`
+
+
+#------------------------------------------------------------------------------
+# PATH
+#------------------------------------------------------------------------------
+
+PATH=$HOME/bin:$PATH
+
+# Editor
+METASYSTEM_EDITOR=vi
+
+# Misc apps
+PATH=$(path_prepend_if_exists $_METASYSTEM_APPS/bin $PATH)
+
+# Misc tools
+PATH=$METASYSTEM_CORE_BIN:${PATH}
+
+# Templater
+PATH=$(path_append_if_exists ~/work/sync/git/templater/bin $PATH)
+
+# stuff
+[[ -d $METASYSTEM_CORE_ROOT/../stuff ]] && source $METASYSTEM_CORE_ROOT/../stuff/bashrc-stuff
+
+PATH=$(path_remove '^\.$' $PATH)
+
+[[ -d $VIM_HOME ]] && export METASYSTEM_EDITOR=$(metasystem_nativepath $VIM_HOME/vim.exe)
+

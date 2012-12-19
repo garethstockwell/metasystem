@@ -83,12 +83,12 @@ alias subst-drives='subst-drives.sh'
 
 function metasystem_windows_explorer()
 {
-	local path=.
+	local lpath=.
 	if [[ -n $1 ]]; then
-		path=$(metasystem_nativepath $1)
-		path=${path//\//\\}
+		lpath=$(metasystem_nativepath $1)
+		lpath=${path//\//\\}
 	fi
-	explorer.exe $path &
+	explorer.exe $lpath &
 }
 
 alias explorer=metasystem_windows_explorer

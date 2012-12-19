@@ -30,18 +30,18 @@ function path_append()
 	local element=$1
 	shift
 	local src="$*"
-	local path=$(path_remove $element $src)
-	test -n "$path" && element=:$element
-	echo $path$element
+	local list=$(path_remove $element $src)
+	test -n "$list" && element=:$element
+	echo $list$element
 }
 
 function path_append_if_exists()
 {
 	local element=$1
 	shift
-	local path="$*"
-	test -d "$element" && path=$(path_append $element $path)
-	echo $path
+	local list="$*"
+	test -d "$element" && list=$(path_append $element $list)
+	echo $list
 }
 
 function path_prepend()
@@ -49,18 +49,18 @@ function path_prepend()
 	local element=$1
 	shift
 	local src="$*"
-	local path=$(path_remove "$element" $src)
-	test -n "$path" && element=$element:
-	echo $element$path
+	local list=$(path_remove "$element" $src)
+	test -n "$list" && element=$element:
+	echo $element$list
 }
 
 function path_prepend_if_exists()
 {
 	local element=$1
 	shift
-	local path="$*"
-	test -d "$element" && path=$(path_prepend $element $path)
-	echo $path
+	local list="$*"
+	test -d "$element" && list=$(path_prepend $element $list)
+	echo $list
 }
 
 
