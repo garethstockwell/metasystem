@@ -1,0 +1,44 @@
+# screenrc
+
+#------------------------------------------------------------------------------
+# Settings
+#------------------------------------------------------------------------------
+
+# Detach on HUP instead of kill
+autodetach on
+
+# Don't display the copyright page
+startup_message off
+
+# Tab-completion flash in heading bar
+vbell off
+
+# More history
+defscrollback 10000
+
+# Show messages for n seconds unless interrupted
+msgwait 5
+
+
+#------------------------------------------------------------------------------
+# Key bindings
+#------------------------------------------------------------------------------
+
+# Enable SHIFT-PGUP / SHIFT-PGDOWN scroll
+termcapinfo xterm* ti@:te@
+
+
+#------------------------------------------------------------------------------
+# Status
+#------------------------------------------------------------------------------
+
+# Have screen update terminal emulators titlebar
+termcapinfo xterm* 'hs:ts=\E]0;:fs=\007:ds=\E]0;\007'
+defhstatus "screen ^E (^Et) | $USER@^EH"
+
+hardstatus alwayslastline
+
+# Left: window list
+# Right: host and load
+hardstatus string "%{-b gk}%-w%{+b yg}%50>%n %t%{-b gk}%+w%<%-30= [ %H ]"
+

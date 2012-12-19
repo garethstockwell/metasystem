@@ -727,7 +727,7 @@ function do_rc_update()
 function rc_update()
 {
 	if [[ -z $1 ]]; then
-		local rcs='astylerc inputrc vimrc ssh/config'
+		local rcs='astylerc inputrc vimrc screenrc ssh/config'
 		for rc in $rcs; do
 			do_rc_update $rc
 		done
