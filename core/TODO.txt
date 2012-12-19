@@ -5,10 +5,21 @@ TODO for metasystem
 Definitely
 ---------------------------------------------------------------------------
 
-* Migrate rest of bashrc.sh into shrc.sh
-
 * Use [include] in gitconfig
 	- Supported since git 1.7.10
+
+* Add stuff (setopts, etc) to zshrc.sh
+
+* zsh support
+	- replace
+		foo=$(some_func)
+	  with
+		foo="$(some_func)"
+	
+	- replace
+		test "$x" == "$y" && do_stuff
+	  with
+		[[ $x == $y ]] && do_stuff
 
 ---------------------------------------------------------------------------
 Maybe

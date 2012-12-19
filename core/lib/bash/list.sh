@@ -32,7 +32,7 @@ function list_contains()
     local result=
     for x in $list
     do
-        test "$x" == "$element" && result=1
+        [[ "$x" == "$element" ]] && result=1
     done
     echo $result
 }
