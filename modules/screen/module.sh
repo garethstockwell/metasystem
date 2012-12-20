@@ -18,7 +18,7 @@ function screen_set_title()
 }
 
 
-function _metasystem_screen_cd_hook()
+function _metasystem_screen_cd_post_hook()
 {
 	local title=$METASYSTEM_DIRINFO_LABEL
 	[[ -z $title ]] && title=shell
@@ -32,5 +32,5 @@ function _metasystem_screen_cd_hook()
 # Main
 #------------------------------------------------------------------------------
 
-metasystem_register_cd_hook _metasystem_screen_cd_hook
+metasystem_register_cd_post_hook _metasystem_screen_cd_post_hook
 

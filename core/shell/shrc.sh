@@ -382,23 +382,36 @@ function _metasystem_prompt()
 
 source $METASYSTEM_CORE_SHELL/cd.sh
 
-function _metasystem_cd_hooks()
+function _metasystem_cd_pre_hooks()
 {
 	echo > /dev/null
 }
 
-# Allow modules to register a function which will be called when directory changes
-function metasystem_register_cd_hook()
+function _metasystem_cd_post_hooks()
+{
+	echo > /dev/null
+}
+
+# Register a function which will be called before cd
+function metasystem_register_cd_pre_hook()
 {
 	local body=$1
-	append_to_function _metasystem_cd_hooks $body
+	append_to_function _metasystem_cd_pre_hooks $body
+}
+
+# Register a function which will be called after cd
+function metasystem_register_cd_post_hook()
+{
+	local body=$1
+	append_to_function _metasystem_cd_post_hooks $body
 }
 
 function metasystem_cd()
 {
 	local projects=$METASYSTEM_PROJECTS
+	_metasystem_cd_pre_hooks
 	_metasystem_cd $*
-	_metasystem_cd_hooks
+	_metasystem_cd_post_hooks
 	[[ $projects != $METASYSTEM_PROJECTS ]] && _metasystem_projects_print
 	_metasystem_prompt_update_cd
 }
@@ -444,7 +457,7 @@ function _metasystem_dirinfo_install()
 	fi
 }
 
-function _metasystem_dirinfo_cd_hook()
+function _metasystem_dirinfo_cd_post_hook()
 {
 	_metasystem_short_dirinfo_root=
 	[[ $METASYSTEM_DIRINFO_ROOT != $HOME ]] &&\
@@ -469,7 +482,7 @@ function metasystem_rcd()
 alias dirinfo-init='_metasystem_dirinfo_init'
 alias rcd=metasystem_rcd
 
-metasystem_register_cd_hook _metasystem_dirinfo_cd_hook
+metasystem_register_cd_post_hook _metasystem_dirinfo_cd_post_hook
 metasystem_register_prompt_hook _metasystem_dirinfo_prompt_hook
 
 
