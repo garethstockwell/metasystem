@@ -58,14 +58,28 @@ function gcd()
 
 
 #------------------------------------------------------------------------------
-# Prompt
+# Exported variables
 #------------------------------------------------------------------------------
 
+export METASYSTEM_GIT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
+export METASYSTEM_GIT_BIN=$METASYSTEM_GIT_ROOT/bin
+
+
+#------------------------------------------------------------------------------
+# Aliases
+#------------------------------------------------------------------------------
+
+alias gcd='cd $(git_root)'
+
+
+#------------------------------------------------------------------------------
+# Hooks
+#------------------------------------------------------------------------------
 
 # http://railstips.org/blog/archives/2009/02/02/bedazzle-your-bash-prompt-with-git-info/
 # Alternatively, from http://asemanfar.com/Current-Git-Branch-in-Bash-Prompt
 # git name-rev HEAD 2> /dev/null | awk "{ print \\$2 }"
-function metasystem_git_prompt()
+function _metasystem_git_prompt_hook()
 {
 	local local_branch="$(git_current_branch)" || return
 	if [[ -n $local_branch ]]; then
@@ -128,30 +142,12 @@ function metasystem_git_prompt()
 
 
 #------------------------------------------------------------------------------
-# Exported variables
-#------------------------------------------------------------------------------
-
-export METASYSTEM_GIT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
-export METASYSTEM_GIT_BIN=$METASYSTEM_GIT_ROOT/bin
-
-
-#------------------------------------------------------------------------------
-# Exported functions
-#------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
-# Aliases
-#------------------------------------------------------------------------------
-
-alias gcd='cd $(git_root)'
-
-
-#------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
 
 PATH=$(path_append $METASYSTEM_GIT_BIN $PATH)
 
-metasystem_register_prompt_hook metasystem_git_prompt
+# First load only
+$(metasystem_module_loaded git) ||\
+	metasystem_register_prompt_hook _metasystem_git_prompt_hook
 

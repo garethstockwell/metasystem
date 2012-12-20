@@ -18,6 +18,10 @@ function screen_set_title()
 }
 
 
+#------------------------------------------------------------------------------
+# Hooks
+#------------------------------------------------------------------------------
+
 function _metasystem_screen_cd_post_hook()
 {
 	local title=$METASYSTEM_DIRINFO_LABEL
@@ -32,5 +36,7 @@ function _metasystem_screen_cd_post_hook()
 # Main
 #------------------------------------------------------------------------------
 
-metasystem_register_cd_post_hook _metasystem_screen_cd_post_hook
+# First load only
+$(metasystem_module_loaded screen) ||\
+	metasystem_register_cd_post_hook _metasystem_screen_cd_post_hook
 

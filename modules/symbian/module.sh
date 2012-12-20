@@ -1,14 +1,5 @@
 # modules/symbian/module.sh
 
-source $METASYSTEM_CORE_LIB_BASH/path.sh
-
-function metasystem_symbian_prompt()
-{
-	[[ -n $EPOCROOT ]] &&\
-		echo "${NAKED_LIGHT_RED}epoc: $EPOCROOT${NAKED_NO_COLOUR}"
-}
-
-
 #------------------------------------------------------------------------------
 # Cross-platform functions
 #------------------------------------------------------------------------------
@@ -114,8 +105,14 @@ export SF_TOOLS_DIR=~/work/sync/hg/sf/oss/MCL/sftools/fbf/utilities
 
 
 #------------------------------------------------------------------------------
-# Exported functions
+# Hooks
 #------------------------------------------------------------------------------
+
+function _metasystem_symbian_prompt_hook()
+{
+	[[ -n $EPOCROOT ]] &&\
+		echo "${NAKED_LIGHT_RED}epoc: $EPOCROOT${NAKED_NO_COLOUR}"
+}
 
 
 #------------------------------------------------------------------------------
@@ -124,5 +121,6 @@ export SF_TOOLS_DIR=~/work/sync/hg/sf/oss/MCL/sftools/fbf/utilities
 
 PATH=$(path_append $METASYSTEM_SYMBIAN_BIN $PATH)
 
-metasystem_register_prompt_hook metasystem_symbian_prompt
+$(metasystem_module_loaded symbian) || \
+	metasystem_register_prompt_hook _metasystem_symbian_prompt_hook
 

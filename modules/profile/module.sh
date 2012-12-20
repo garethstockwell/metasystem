@@ -28,17 +28,6 @@ function metasystem_profile_update()
 	metasystem-id.py generate --script
 }
 
-function metasystem_profile_init()
-{
-	_metasystem_print_banner "Profile"
-	if [[ -e ~/.metasystem-profile ]]; then
-		echo "Sourcing existing .metasystem-profile"
-		source ~/.metasystem-profile
-	else
-		metasystem_profile_update
-	fi
-}
-
 alias profile-get='source ~/.metasystem-profile'
 alias profile-print='metasystem-profile.py print'
 alias profile='profile-print'
@@ -54,10 +43,27 @@ export METASYSTEM_PROFILE_BIN=$METASYSTEM_PROFILE_ROOT/bin
 
 
 #------------------------------------------------------------------------------
+# Hooks
+#------------------------------------------------------------------------------
+
+function _metasystem_profile_init_hook()
+{
+	_metasystem_print_banner "Profile"
+	if [[ -e ~/.metasystem-profile ]]; then
+		echo "Sourcing existing .metasystem-profile"
+		source ~/.metasystem-profile
+	else
+		metasystem_profile_update
+	fi
+}
+
+
+#------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
 
 PATH=$(path_append $METASYSTEM_PROFILE_BIN $PATH)
 
-metasystem_register_init_hook metasystem_profile_init
+$(metasystem_module_loaded profile) ||\
+	metasystem_register_init_hook _metasystem_profile_init_hook
 

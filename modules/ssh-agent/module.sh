@@ -43,7 +43,12 @@ function ssh_agent_stop()
 	rm -f ${SSH_AGENT_ENV}
 }
 
-function metasystem_ssh_agent_init()
+
+#------------------------------------------------------------------------------
+# Hooks
+#------------------------------------------------------------------------------
+
+function _metasystem_ssh_agent_init_hook()
 {
 	_metasystem_print_banner "ssh-agent"
 	[[ -f ${SSH_AGENT_ENV} ]] && source ${SSH_AGENT_ENV} > /dev/null
@@ -55,6 +60,7 @@ function metasystem_ssh_agent_init()
 # Main
 #------------------------------------------------------------------------------
 
-metasystem_register_init_hook metasystem_ssh_agent_init
+$(metasystem_module_loaded ssh-agent) ||\
+	metasystem_register_init_hook _metasystem_ssh_agent_init_hook
 
 
