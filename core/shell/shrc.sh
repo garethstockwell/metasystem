@@ -773,7 +773,7 @@ function _metasystem_complete_pcd()
 	local suffix=$1
 	local cur="${COMP_WORDS[COMP_CWORD]}"
 	local lpath=`echo $cur | sed -e 's/[a-zA-Z]*\///'`
-	if [[ $path == $cur ]]; then
+	if [[ $lpath == $cur ]]; then
 		COMPREPLY=( $(compgen -W "${METASYSTEM_PROJECTS}" -- ${cur}) )
 	else
 		local project=`echo $cur | sed -e 's/\/.*//'`
