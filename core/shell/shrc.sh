@@ -670,9 +670,11 @@ function _metasystem_projects_cd_post_hook()
 	[[ $_metasystem_projects != $METASYSTEM_PROJECTS ]] && _metasystem_projects_print
 }
 
-complete -F _metasystem_complete_pcdb pcd
-complete -F _metasystem_complete_pcdb pcdb
-complete -F _metasystem_complete_pcds pcds
+if [[ -n $BASH_VERSION ]]; then
+	complete -F _metasystem_complete_pcdb pcd
+	complete -F _metasystem_complete_pcdb pcdb
+	complete -F _metasystem_complete_pcds pcds
+fi
 
 alias pcdb='metasystem_project_cd_build'
 alias pcds='metasystem_project_cd_source'
