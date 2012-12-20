@@ -408,11 +408,9 @@ function metasystem_register_cd_post_hook()
 
 function metasystem_cd()
 {
-	local projects=$METASYSTEM_PROJECTS
 	_metasystem_cd_pre_hooks
 	_metasystem_cd $*
 	_metasystem_cd_post_hooks
-	[[ $projects != $METASYSTEM_PROJECTS ]] && _metasystem_projects_print
 	_metasystem_prompt_update_cd
 }
 
@@ -659,6 +657,7 @@ export METASYSTEM_PROJECTS=
 
 # Global variables
 _metasystem_projectdirs_updated=
+_metasystem_projects=
 
 function _metasystem_set_projectdirs()
 {
@@ -754,10 +753,6 @@ function metasystem_project_cd_source()
 	fi
 }
 
-alias pcdb='metasystem_project_cd_build'
-alias pcds='metasystem_project_cd_source'
-alias pcd='pcdb'
-
 function _metasystem_complete_pcd()
 {
 	local suffix=$1
@@ -793,13 +788,30 @@ function _metasystem_complete_pcds()
 	_metasystem_complete_pcd _SOURCE_DIR
 }
 
+function _metasystem_projects_cd_pre_hook()
+{
+	_metasystem_projects=$METASYSTEM_PROJECTS
+}
+
+function _metasystem_projects_cd_post_hook()
+{
+	[[ $_metasystem_projects != $METASYSTEM_PROJECTS ]] && _metasystem_projects_print
+}
+
 complete -F _metasystem_complete_pcdb pcd
 complete -F _metasystem_complete_pcdb pcdb
 complete -F _metasystem_complete_pcds pcds
 
+alias pcdb='metasystem_project_cd_build'
+alias pcds='metasystem_project_cd_source'
+alias pcd='pcdb'
+
 alias projects-print=_metasystem_projects_print
 alias projects=projects-print
 alias p=projects
+
+metasystem_register_cd_pre_hook _metasystem_projects_cd_pre_hook
+metasystem_register_cd_post_hook _metasystem_projects_cd_post_hook
 
 
 #------------------------------------------------------------------------------
