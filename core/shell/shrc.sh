@@ -322,20 +322,10 @@ echo "Platform:   $METASYSTEM_PLATFORM"
 # Prompt
 #------------------------------------------------------------------------------
 
-function metasystem_short_path()
-{
-	# Shortened path
-	# http://lifehacker.com/5167879/cut-the-bash-prompt-down-to-size
-	local dir=$1
-	dir=`echo $dir | sed -e "s!^$HOME!~!"`
-	[[ ${#dir} -gt 50 ]] && dir="${dir:0:22} ... ${dir:${#dir}-23}"
-	echo $dir
-}
-
 # This is triggered when the directory is changed
 function _metasystem_prompt_update_cd()
 {
-	_metasystem_short_path=$(metasystem_short_path $PWD)
+	_path_shorten=$(path_shorten $PWD)
 }
 
 # Called from smartcd scripts
@@ -374,7 +364,7 @@ function _metasystem_prompt()
 	local hostname=$HOSTNAME
 	[[ -z $hostname ]] && hostname=$HOST
 	[[ -n $METASYSTEM_PROFILE_HOST ]] && hostname=$METASYSTEM_PROFILE_HOST
-	prompt="${prompt}${NAKED_LIGHT_BLUE}${user}@${hostname} ${NAKED_LIGHT_YELLOW}${_metasystem_short_path}${NAKED_NO_COLOUR}"
+	prompt="${prompt}${NAKED_LIGHT_BLUE}${user}@${hostname} ${NAKED_LIGHT_YELLOW}${_path_shorten}${NAKED_NO_COLOUR}"
 
 	prompt="${prompt}${_prompt_tools}${_prompt_ids}"
 
@@ -458,7 +448,7 @@ function _metasystem_dirinfo_cd_hook()
 {
 	_metasystem_short_dirinfo_root=
 	[[ $METASYSTEM_DIRINFO_ROOT != $HOME ]] &&\
-		_metasystem_short_dirinfo_root=$(metasystem_short_path $METASYSTEM_DIRINFO_ROOT)
+		_metasystem_short_dirinfo_root=$(path_shorten $METASYSTEM_DIRINFO_ROOT)
 }
 
 function _metasystem_dirinfo_prompt_hook()

@@ -70,6 +70,7 @@ metasystem_declare_stub path.sh path_append_if_exists
 metasystem_declare_stub path.sh path_prepend
 metasystem_declare_stub path.sh path_prepend_if_exists
 metasystem_declare_stub path.sh path_remove
+metasystem_declare_stub path.sh path_shorten
 
 # string.sh
 metasystem_declare_stub string.sh lowercase

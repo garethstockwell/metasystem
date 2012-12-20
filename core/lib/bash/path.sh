@@ -63,6 +63,16 @@ function path_prepend_if_exists()
 	echo $list
 }
 
+function path_shorten()
+{
+	# Shortened path
+	# http://lifehacker.com/5167879/cut-the-bash-prompt-down-to-size
+	local dir=$1
+	dir=`echo $dir | sed -e "s!^$HOME!~!"`
+	[[ ${#dir} -gt 50 ]] && dir="${dir:0:22} ... ${dir:${#dir}-23}"
+	echo $dir
+}
+
 
 #------------------------------------------------------------------------------
 # unix functions
