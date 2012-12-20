@@ -108,7 +108,7 @@ export SF_TOOLS_DIR=~/work/sync/hg/sf/oss/MCL/sftools/fbf/utilities
 # Hooks
 #------------------------------------------------------------------------------
 
-function _metasystem_symbian_prompt_hook()
+function _metasystem_hook_symbian_prompt()
 {
 	[[ -n $EPOCROOT ]] &&\
 		echo "${NAKED_LIGHT_RED}epoc: $EPOCROOT${NAKED_NO_COLOUR}"
@@ -120,7 +120,4 @@ function _metasystem_symbian_prompt_hook()
 #------------------------------------------------------------------------------
 
 PATH=$(path_append $METASYSTEM_SYMBIAN_BIN $PATH)
-
-$(metasystem_module_loaded symbian) || \
-	metasystem_register_prompt_hook _metasystem_symbian_prompt_hook
 

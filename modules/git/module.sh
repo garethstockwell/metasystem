@@ -79,7 +79,7 @@ alias gcd='cd $(git_root)'
 # http://railstips.org/blog/archives/2009/02/02/bedazzle-your-bash-prompt-with-git-info/
 # Alternatively, from http://asemanfar.com/Current-Git-Branch-in-Bash-Prompt
 # git name-rev HEAD 2> /dev/null | awk "{ print \\$2 }"
-function _metasystem_git_prompt_hook()
+function _metasystem_hook_git_prompt()
 {
 	local local_branch="$(git_current_branch)" || return
 	if [[ -n $local_branch ]]; then
@@ -146,8 +146,4 @@ function _metasystem_git_prompt_hook()
 #------------------------------------------------------------------------------
 
 PATH=$(path_append $METASYSTEM_GIT_BIN $PATH)
-
-# First load only
-$(metasystem_module_loaded git) ||\
-	metasystem_register_prompt_hook _metasystem_git_prompt_hook
 

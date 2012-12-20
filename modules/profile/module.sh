@@ -46,7 +46,7 @@ export METASYSTEM_PROFILE_BIN=$METASYSTEM_PROFILE_ROOT/bin
 # Hooks
 #------------------------------------------------------------------------------
 
-function _metasystem_profile_init_hook()
+function _metasystem_hook_profile_init()
 {
 	_metasystem_print_banner "Profile"
 	if [[ -e ~/.metasystem-profile ]]; then
@@ -63,7 +63,4 @@ function _metasystem_profile_init_hook()
 #------------------------------------------------------------------------------
 
 PATH=$(path_append $METASYSTEM_PROFILE_BIN $PATH)
-
-$(metasystem_module_loaded profile) ||\
-	metasystem_register_init_hook _metasystem_profile_init_hook
 

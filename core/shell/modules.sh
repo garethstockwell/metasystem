@@ -11,6 +11,19 @@ METASYSTEM_MODULES_LOADED=
 # Functions
 #------------------------------------------------------------------------------
 
+function _metasystem_module_register_hooks()
+{
+	local module=$1
+	for hook in prompt cd_pre cd_post init; do
+		local func=_metasystem_hook_${module}_${hook}
+		local register=metasystem_register_${hook}_hook
+		$(declare -f $func) && eval "$(echo $register) $(echo $func)"
+	done
+
+	local func=_metasystem_hook_${module}_help
+	$(declare -f $func) && metasystem_register_help_hook $module $func
+}
+
 function metasystem_module_load()
 {
 	local module=$1
@@ -28,7 +41,10 @@ function metasystem_module_load()
 		esac
 	done
 
-	$(metasystem_module_loaded $module) && if [[ $opt_force != yes ]]; then
+	local first_load=yes
+	$(metasystem_module_loaded $module) && first_load=
+
+	if [[ -z $first_load && $opt_force != yes ]]; then
 		echo "Module $module already loaded - skipping"
 		return 1
 	fi
@@ -38,6 +54,7 @@ function metasystem_module_load()
 		[[ $opt_quiet != yes ]] && echo "Loading module $module ..."
 		source $script
 		METASYSTEM_MODULES_LOADED="$(list_append $module $METASYSTEM_MODULES_LOADED)"
+		[[ -n $first_load ]] && _metasystem_module_register_hooks $module
 	else
 		echo "Error: $module not found" >&2
 		return 1

@@ -312,7 +312,7 @@ alias android-push-binary=metasystem_android_push_binary
 # Hooks
 #------------------------------------------------------------------------------
 
-function _metasystem_android_prompt_hook()
+function _metasystem_hook_android_prompt()
 {
 	if [[ -n $TARGET_PRODUCT && -n $TARGET_BUILD_VARIANT ]]; then
 		echo "${NAKED_LIGHT_GREEN}android: ${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}${NAKED_NO_COLOR}"
@@ -336,8 +336,4 @@ fi
 if [[ -d $ANDROID_NDK_DIR ]]; then
 	PATH=$(path_prepend $ANDROID_NDK_DIR $PATH)
 fi
-
-# First load only
-$(metasystem_module_loaded android) || \
-	metasystem_register_prompt_hook _metasystem_android_prompt_hook
 

@@ -94,21 +94,16 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Config
-#------------------------------------------------------------------------------
-
-# Import config
-source $METASYSTEM_CORE_SHELL/config.sh
-
-
-#------------------------------------------------------------------------------
 # Imports
 #------------------------------------------------------------------------------
 
-# Import utility functions
+# Utility functions
 source $METASYSTEM_CORE_LIB_BASH/utils.sh
 source $METASYSTEM_CORE_LIB_BASH/path.sh
 source $METASYSTEM_CORE_LIB_BASH/string.sh
+
+source $METASYSTEM_CORE_SHELL/config.sh
+source $METASYSTEM_CORE_SHELL/help.sh
 
 
 #------------------------------------------------------------------------------
@@ -880,68 +875,6 @@ function metasystem_create_local()
 		git commit -m "Initial version (created from template)"
 	fi
 }
-
-
-#==============================================================================
-# Core setup 2/2
-#==============================================================================
-
-
-#------------------------------------------------------------------------------
-# Help
-#------------------------------------------------------------------------------
-
-function _metasystem_help()
-{
-	cat << EOF
-
--------------------------------------------------------------------------------
-Metasystem help
--------------------------------------------------------------------------------
-
-Dirinfo
-    dirinfo-init             Install dirinfo scripts in current directory
-
-Profile
-    profile-get              Source ~/.metasystem-profile
-    profile                  Print current profile
-    profile-update           Regenerate profile
-                                 location=[name] Location
-                                 rvct=[name]     RVCT license server
-
-IDs
-    ids-get                  Source ~/.metasystem-ids
-    ids                      Print current IDs
-    id-set [type] [name]     Set specified ID
-    ids-reset                Reset IDs to default
-
-Tools
-    tools-get                Source ~/.metasystem-tools
-    tools                    Print current tools
-    tool-set [type] [name]   Set specified tool
-    tools-reset              Reset tools to default
-
-Projects
-    projects                 Print current project directories
-
-Directories
-    pcdb [project]           Change to build directory for project
-    pcds [project]           Change to source directory for project
-    ecd                      Change directory to EPOCROOT
-    rcd                      Change directory to METASYSTEM_DIRINFO_ROOT
-    nativepath [path]        Translate path to native format
-    unixpath [path]          Translate path to UNIX format
-
-Miscellaneous
-    rc-update                Regenerate dot files in home directory
-
--------------------------------------------------------------------------------
-
-EOF
-}
-
-alias help='_metasystem_help'
-alias h=help
 
 
 #==============================================================================
