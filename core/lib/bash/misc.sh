@@ -4,6 +4,11 @@
 # Functions
 #------------------------------------------------------------------------------
 
+function empty_function()
+{
+	echo > /dev/null
+}
+
 function assert_superuser()
 {
 	test `whoami` == "root" || error "Must be run as superuser"
