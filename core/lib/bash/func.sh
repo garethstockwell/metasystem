@@ -4,6 +4,13 @@
 # Functions
 #------------------------------------------------------------------------------
 
+function function_exists()
+{
+	local name=$1
+	[[ -z $(declare -f $name) ]] && return 1
+	return 0
+}
+
 # Syntax: rename_function <old_name> <new_name>
 # http://stackoverflow.com/questions/1203583/how-do-i-rename-a-bash-function
 function rename_function()

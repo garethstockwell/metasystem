@@ -16,7 +16,6 @@ function metasystem_register_help_hook()
 	local key=$1
 	local var=METASYSTEM_HELP_$(echo $key)
 	local value=$2
-	echo "REG [$key] [$value]"
 	eval "$(echo $var)=$value"
 	[[ -z $(list_contains $key $METASYSTEM_HELP_HOOKS) ]] &&\
 		METASYSTEM_HELP_HOOKS="$(list_append $key $METASYSTEM_HELP_HOOKS)"

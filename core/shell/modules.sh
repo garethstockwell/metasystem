@@ -15,13 +15,13 @@ function _metasystem_module_register_hooks()
 {
 	local module=$1
 	for hook in prompt cd_pre cd_post init; do
-		local func=_metasystem_hook_${module}_${hook}
+		local func=_metasystem_hook_${module//-/_}_${hook}
 		local register=metasystem_register_${hook}_hook
-		$(declare -f $func) && eval "$(echo $register) $(echo $func)"
+		$(function_exists $func) && eval "$(echo $register) $(echo $func)"
 	done
 
-	local func=_metasystem_hook_${module}_help
-	$(declare -f $func) && metasystem_register_help_hook $module $func
+	local func=_metasystem_hook_${module//-/_}_help
+	$(function_exists $func) && metasystem_register_help_hook $module $func
 }
 
 function metasystem_module_load()
