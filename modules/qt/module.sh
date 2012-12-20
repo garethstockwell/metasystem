@@ -36,7 +36,7 @@ function _metasystem_qt_cd_source()
 	[[ -n $QT_SOURCE_DIR ]] && metasystem_cd $QT_SOURCE_DIR/$*
 }
 
-rename_function _metasystem_set_projectdirs _metasystem_do_set_projectdirs
+func_rename _metasystem_set_projectdirs _metasystem_do_set_projectdirs
 
 function _metasystem_set_projectdirs()
 {

@@ -275,7 +275,7 @@ function _metasystem_prompt_hooks()
 function metasystem_register_prompt_hook()
 {
 	local body=$1
-	append_to_function _metasystem_prompt_hooks $body
+	func_append_to _metasystem_prompt_hooks $body
 }
 
 function _metasystem_prompt()
@@ -336,14 +336,14 @@ function _metasystem_cd()
 function metasystem_register_cd_pre_hook()
 {
 	local body=$1
-	append_to_function _metasystem_cd_pre_hooks $body
+	func_append_to _metasystem_cd_pre_hooks $body
 }
 
 # Register a function which will be called after cd
 function metasystem_register_cd_post_hook()
 {
 	local body=$1
-	append_to_function _metasystem_cd_post_hooks $body
+	func_append_to _metasystem_cd_post_hooks $body
 }
 
 function metasystem_cd()
@@ -382,7 +382,7 @@ function _metasystem_init_hooks()
 function metasystem_register_init_hook()
 {
 	local body=$1
-	append_to_function _metasystem_init_hooks $body
+	func_append_to _metasystem_init_hooks $body
 }
 
 
