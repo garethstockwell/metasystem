@@ -690,19 +690,6 @@ function _metasystem_set_projectdirs()
 	fi
 }
 
-function _metasystem_update_projects()
-{
-	local projects=${1//,/ }
-	for x in $METASYSTEM_PROJECTS; do
-		still_exists=
-		for y in $projects; do
-			[[ $x == $y ]] && still_exists=1
-		done
-		[[ -z $still_exists ]] && _metasystem_set_projectdirs $x '' ''
-	done
-	_metasystem_export METASYSTEM_PROJECTS=$projects
-}
-
 function _metasystem_projects_print()
 {
 	for project in $METASYSTEM_PROJECTS
