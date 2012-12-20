@@ -47,7 +47,15 @@ function git_grep()
 {
 	local path=$1
 	shift
-	grep "$@" $(find $path -type f | grep -v .git)
+	grep "$@" $(find $path ! -path "*/.git/*" -type f)
+}
+
+function metasystem_grep()
+{
+	git_grep $METASYSTEM_ROOT "$@"
+	if [[ -n $METASYSTEM_LOCAL_ROOT && -d $METASYSTEM_LOCAL_ROOT ]]; then
+		git_grep $METASYSTEM_LOCAL_ROOT "$@"
+	fi
 }
 
 function gcd()
