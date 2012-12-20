@@ -364,8 +364,6 @@ function _metasystem_prompt()
 # cd
 #------------------------------------------------------------------------------
 
-source $METASYSTEM_CORE_SHELL/cd.sh
-
 function _metasystem_cd_pre_hooks()
 {
 	echo > /dev/null
@@ -374,6 +372,12 @@ function _metasystem_cd_pre_hooks()
 function _metasystem_cd_post_hooks()
 {
 	echo > /dev/null
+}
+
+# Stub function which is overridden by dirinfo module
+function _metasystem_cd()
+{
+	empty_function
 }
 
 # Register a function which will be called before cd
@@ -428,61 +432,6 @@ function metasystem_register_init_hook()
 	local body=$1
 	append_to_function _metasystem_init_hooks $body
 }
-
-
-#------------------------------------------------------------------------------
-# dirinfo
-#------------------------------------------------------------------------------
-
-function _metasystem_dirinfo_init()
-{
-	_metasystem_dirinfo_install $*
-}
-
-function _metasystem_dirinfo_install()
-{
-	local force=
-	[[ "$1" == "-force" ]] && force=1
-	[[ "$1" == "--force" ]] && force=1
-	local src=$METASYSTEM_CORE_ROOT/templates/metasystem-dirinfo
-	local dst=$PWD/.metasystem-dirinfo
-	if [[ -e $dst && -z $force ]]; then
-		echo "$PWD/.metasystem-dirinfo already exists"
-		echo "Use --force to overwrite it"
-	else
-		echo "Creating $dst ..."
-		rm -f $dst
-		subst-vars.sh $src $dst
-	fi
-}
-
-function _metasystem_dirinfo_cd_post_hook()
-{
-	_metasystem_short_dirinfo_root=
-	[[ $METASYSTEM_DIRINFO_ROOT != $HOME ]] &&\
-		_metasystem_short_dirinfo_root=$(path_shorten $METASYSTEM_DIRINFO_ROOT)
-}
-
-function _metasystem_dirinfo_prompt_hook()
-{
-	local ret=
-	[[ -n $METASYSTEM_DIRINFO_LABEL ]] &&
-		ret="${NAKED_LIGHT_PURPLE}${METASYSTEM_DIRINFO_LABEL}${NAKED_NO_COLOUR} "
-	[[ -n $_metasystem_short_dirinfo_root ]] &&\
-		ret="${ret}${NAKED_LIGHT_PURPLE}(${_metasystem_short_dirinfo_root})${NAKED_NO_COLOUR}"
-	echo $ret
-}
-
-function metasystem_rcd()
-{
-	[[ -n $METASYSTEM_DIRINFO_ROOT ]] && metasystem_cd $METASYSTEM_DIRINFO_ROOT
-}
-
-alias dirinfo-init='_metasystem_dirinfo_init'
-alias rcd=metasystem_rcd
-
-metasystem_register_cd_post_hook _metasystem_dirinfo_cd_post_hook
-metasystem_register_prompt_hook _metasystem_dirinfo_prompt_hook
 
 
 #------------------------------------------------------------------------------

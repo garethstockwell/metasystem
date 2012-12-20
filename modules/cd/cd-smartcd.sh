@@ -78,7 +78,7 @@ function do_smartcd_install_templates()
 
 function smartcd_install_templates()
 {
-	do_smartcd_install_templates $METASYSTEM_CORE_ROOT/templates/smartcd
+	do_smartcd_install_templates $METASYSTEM_CD_ROOT/templates/smartcd
 	do_smartcd_install_templates $METASYSTEM_LOCAL_ROOT/templates/smartcd
 }
 

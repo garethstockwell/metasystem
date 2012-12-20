@@ -33,7 +33,6 @@ function metasystem_set_config_default()
 # Main
 #------------------------------------------------------------------------------
 
-metasystem_set_config_default CD smartcd
 metasystem_set_config_default PROMPT_IDS_ENABLED no
 metasystem_set_config_default PROMPT_TOOLS_ENABLED yes
 
