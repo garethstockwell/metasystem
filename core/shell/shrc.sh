@@ -62,9 +62,6 @@ export METASYSTEM_HOSTNAME=$HOSTNAME
 # Ensure that we start in the home directory
 cd $HOME
 
-# Find location of this script
-export METASYSTEM_ROOT=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/../.. && pwd )
-
 export METASYSTEM_CORE_ROOT=$METASYSTEM_ROOT/core
 export METASYSTEM_CORE_BIN=$METASYSTEM_CORE_ROOT/bin
 export METASYSTEM_CORE_LIB=$METASYSTEM_CORE_ROOT/lib
@@ -97,50 +94,15 @@ fi
 # Imports
 #------------------------------------------------------------------------------
 
-# Utility functions
 source $METASYSTEM_CORE_LIB_BASH/utils.sh
+
+source $METASYSTEM_CORE_LIB_BASH/color.sh
 source $METASYSTEM_CORE_LIB_BASH/path.sh
 source $METASYSTEM_CORE_LIB_BASH/string.sh
 
+source $METASYSTEM_CORE_SHELL/autoload.sh
 source $METASYSTEM_CORE_SHELL/config.sh
 source $METASYSTEM_CORE_SHELL/help.sh
-
-
-#------------------------------------------------------------------------------
-# Autoload
-#------------------------------------------------------------------------------
-
-for dir in $METASYSTEM_CORE_LIB/autoload \
-	       $METASYSTEM_CORE_LIB/autoload/$METASYSTEM_PLATFORM; do
-	export FPATH=$dir:$FPATH
-	for file in $(find $dir -type f 2>/dev/null); do
-		autoload $(basename $file)
-	done
-done
-
-
-#------------------------------------------------------------------------------
-# Profile
-#------------------------------------------------------------------------------
-
-source $METASYSTEM_CORE_SHELL/profile.sh
-
-
-#------------------------------------------------------------------------------
-# Misc setup
-#------------------------------------------------------------------------------
-
-# cgrep
-# 1;32 = bright green
-# See	http://www.termsys.demon.co.uk/vtansi.htm#colors
-#		http://www.debian-administration.org/articles/460
-export GREP_COLOR='1;32'
-
-# X server forwarding
-[[ $METASYSTEM_PLATFORM == cygwin ]] && export DISPLAY=127.0.0.1:0.0
-
-# Git colorizer
-export PAGER='less -R'
 
 
 #------------------------------------------------------------------------------
@@ -178,13 +140,6 @@ unset os_rc
 
 
 #------------------------------------------------------------------------------
-# Python check
-#------------------------------------------------------------------------------
-
-have_python=`which python`
-
-
-#------------------------------------------------------------------------------
 # PATH
 #------------------------------------------------------------------------------
 
@@ -217,12 +172,11 @@ PATH=$(path_remove '^\.$' $PATH)
 # Enable trusted X forwarding
 alias ssh='ssh -Y'
 alias scp='scp -2'
+
 alias com='history | grep $1'
 alias findproc='ps -ax -o %p%u%c%t | grep -v grep | grep $1'
 alias du='du -h'
 alias df='df -kh'
-
-alias del='cmd /c del'
 
 alias less='less -x4 -R'	# R is for cgrep
 
@@ -246,8 +200,6 @@ alias tree='tree -Cs'		# nice alternative to 'ls'
 alias vi='vim'
 
 alias sync='sync.py'
-alias p4='p4.pl'
-alias todo='todo.sh'
 
 alias nativepath=metasystem_nativepath
 alias npath=metasystem_nativepath
@@ -290,7 +242,7 @@ function _metasystem_print_banner()
 
 echo -e "$_METASYSTEM_RULE\n"
 echo "Hostname:   $METASYSTEM_HOSTNAME"
-[[ -n $have_python ]] && echo "Domain:     $($METASYSTEM_CORE_BIN/network-info.py domain)"
+[[ -n $(which python) ]] && echo "Domain:     $($METASYSTEM_CORE_BIN/network-info.py domain)"
 if [[ $METASYSTEM_OS == linux ]]; then
 	echo "IP address: "`ifconfig | grep 'inet addr' | head -n1 | awk ' { print $2 } ' | sed -e 's/addr://'`
 else
@@ -491,12 +443,19 @@ function _metasystem_print_ids()
 	done
 }
 
+function _metasystem_hook_ids_init()
+{
+	[[ -n $(which python) ]] && _metasystem_reset_ids
+}
+
 alias ids-get='source ~/.metasystem-id'
 alias ids-print='_metasystem_print_ids'
 alias ids=ids-print
 alias i=ids
 alias id-set='_metasystem_set_id'
 alias ids-reset='_metasystem_reset_ids'
+
+metasystem_register_init_hook _metasystem_hook_ids_init
 
 
 #------------------------------------------------------------------------------
@@ -545,12 +504,19 @@ function _metasystem_update_prompt_tools()
 	fi
 }
 
+function _metasystem_hook_tools_init()
+{
+	[[ -n $(which python) ]] && _metasystem_reset_tools
+}
+
 alias tools-get='source ~/.metasystem-tools'
 alias tools-print='_metasystem_print_tools'
 alias tools=tools-print
 alias t=tools
 alias tool-set='_metasystem_set_tool'
 alias tools-reset='_metasystem_reset_tools'
+
+metasystem_register_init_hook _metasystem_hook_tools_init
 
 
 #------------------------------------------------------------------------------
@@ -721,33 +687,6 @@ metasystem_register_cd_post_hook _metasystem_projects_cd_post_hook
 
 
 #------------------------------------------------------------------------------
-# SCM
-#------------------------------------------------------------------------------
-
-alias git='scm-wrapper.sh git'
-alias hg='scm-wrapper.sh hg'
-
-function metasystem_install_git_hooks()
-{
-	local hook_dir=.git/hooks
-	if [[ -d $hook_dir ]]; then
-		builtin cd $hook_dir
-		for sample in $('ls' *.sample); do
-			dst=${sample//.sample/}
-			src=$METASYSTEM_CORE_LIB/git-hooks/$dst
-			[[ -e $src ]] && rm -f $dst && ln -s $src $dst
-		done
-		builtin cd ../..
-	else
-		echo "Error: .git/hooks not found" >&2
-		return 1
-	fi
-}
-
-export HGEXT_DIR=$(metasystem_nativepath ~/work/sync/hg/hgext)
-
-
-#------------------------------------------------------------------------------
 # IDEs
 #------------------------------------------------------------------------------
 
@@ -833,9 +772,6 @@ function metasystem_create_local()
 metasystem_cd -metasystem-init
 
 _metasystem_init_hooks
-
-[[ -n $have_python ]] && tools-reset
-[[ -n $have_python ]] && ids-reset
 
 # Export final PATH
 export PATH

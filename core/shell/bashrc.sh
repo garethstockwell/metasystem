@@ -4,7 +4,6 @@
 # Used as e.g. "local ${OVERRIDE_SPECIAL} path=something"
 OVERRIDE_SPECIAL=
 
-source $(dirname ${BASH_SOURCE[0]})/autoload.sh
 source $(dirname ${BASH_SOURCE[0]})/shrc.sh
 
 #==============================================================================

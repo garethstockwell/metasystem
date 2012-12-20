@@ -1,4 +1,7 @@
 # Sourced from ~/.profile
 
-source $(dirname ${BASH_SOURCE[0]})/../core/shell/profile.sh
+# Find location of this script
+export METASYSTEM_ROOT=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/.. && pwd )
+
+source $METASYSTEM_ROOT/core/shell/profile.sh
 

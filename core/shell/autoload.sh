@@ -1,5 +1,11 @@
 # autoload.sh
 
+#------------------------------------------------------------------------------
+# BASH compatibility layer
+#------------------------------------------------------------------------------
+
+if [[ -n $BASH_VERSION ]]; then
+
 function autoload()
 {
 	local name=$1
@@ -22,4 +28,22 @@ function _metasystem_autoload()
 
 export -f autoload
 export -f _metasystem_autoload
+
+fi
+
+
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+function metasystem_autoload_all()
+{
+	for dir in $METASYSTEM_CORE_LIB/autoload \
+			   $METASYSTEM_CORE_LIB/autoload/$METASYSTEM_PLATFORM; do
+		export FPATH=$dir:$FPATH
+		for file in $(find $dir -type f 2>/dev/null); do
+			autoload $(basename $file)
+		done
+	done
+}
 

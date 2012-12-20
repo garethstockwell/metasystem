@@ -56,6 +56,23 @@ function gcd()
 	[[ -n $root ]] && cd $root
 }
 
+function metasystem_install_git_hooks()
+{
+	local hook_dir=.git/hooks
+	if [[ -d $hook_dir ]]; then
+		builtin cd $hook_dir
+		for sample in $('ls' *.sample); do
+			dst=${sample//.sample/}
+			src=$METASYSTEM_GIT_ROOT/hooks/$dst
+			[[ -e $src ]] && rm -f $dst && ln -s $src $dst
+		done
+		builtin cd ../..
+	else
+		echo "Error: .git/hooks not found" >&2
+		return 1
+	fi
+}
+
 
 #------------------------------------------------------------------------------
 # Exported variables
@@ -64,11 +81,14 @@ function gcd()
 export METASYSTEM_GIT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
 export METASYSTEM_GIT_BIN=$METASYSTEM_GIT_ROOT/bin
 
+export PAGER='less -R'
+
 
 #------------------------------------------------------------------------------
 # Aliases
 #------------------------------------------------------------------------------
 
+alias git='scm-wrapper.sh git'
 alias gcd='cd $(git_root)'
 
 

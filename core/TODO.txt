@@ -5,8 +5,9 @@ TODO for metasystem
 Definitely
 ---------------------------------------------------------------------------
 
-* Move dirinfo, projects, id, tools into modules
-	- metasystem_register_help (?)
+* Move projects, id, tools into modules
+
+* Move gitconfig, hgrc, screenrc into modules
 
 * Use [include] in gitconfig
 	- Supported since git 1.7.10
