@@ -14,7 +14,7 @@ _metasystem_screen_title=
 function screen_set_title()
 {
 	_metasystem_screen_title="$@"
-    echo -e '\033k'$_metasystem_screen_title'\033\\'
+    echo -en '\033k'$_metasystem_screen_title'\033\\'
 }
 
 

@@ -43,11 +43,18 @@ function ssh_agent_stop()
 	rm -f ${SSH_AGENT_ENV}
 }
 
-# To be called from login script
-function ssh_agent_init()
+function metasystem_ssh_agent_init()
 {
 	_metasystem_print_banner "ssh-agent"
 	[[ -f ${SSH_AGENT_ENV} ]] && source ${SSH_AGENT_ENV} > /dev/null
 	ssh_agent_start
 }
+
+
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
+metasystem_register_init_hook metasystem_ssh_agent_init
+
 

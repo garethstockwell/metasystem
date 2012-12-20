@@ -430,6 +430,23 @@ alias cd=metasystem_cd
 
 
 #------------------------------------------------------------------------------
+# Init
+#------------------------------------------------------------------------------
+
+function _metasystem_init_hooks()
+{
+	echo > /dev/null
+}
+
+# Register a function which will be called at the end of this script
+function metasystem_register_init_hook()
+{
+	local body=$1
+	append_to_function _metasystem_init_hooks $body
+}
+
+
+#------------------------------------------------------------------------------
 # dirinfo
 #------------------------------------------------------------------------------
 
@@ -482,50 +499,6 @@ alias rcd=metasystem_rcd
 
 metasystem_register_cd_post_hook _metasystem_dirinfo_cd_post_hook
 metasystem_register_prompt_hook _metasystem_dirinfo_prompt_hook
-
-
-#------------------------------------------------------------------------------
-# Profile
-#------------------------------------------------------------------------------
-
-function profile_update()
-{
-	local args="--reset --auto all"
-	local global=
-	for arg in $*
-	do
-		args="$args --user $arg"
-	done
-
-	echo "Setting profile for this shell session"
-
-	local cmd="metasystem-profile.py --verbose set $args"
-	echo $cmd
-
-	local lpath=$PATH
-	[[ -n $METASYSTEM_SYMBIAN_ROOT ]] && lpath=$(path_remove_epoc $path)
-
-	PATH=$lpath $cmd
-
-	[[ $global != 1 ]] && source ~/.metasystem-profile
-
-	metasystem-id.py generate --script
-}
-
-alias profile-get='source ~/.metasystem-profile'
-alias profile-print='metasystem-profile.py print'
-alias profile='profile-print'
-alias profile-update=profile_update
-
-if [[ -z $METASYSTEM_DISABLE_PROFILE ]]; then
-	_metasystem_print_banner "Profile"
-	if [[ -e ~/.metasystem-profile ]]; then
-		echo "Sourcing existing .metasystem-profile"
-		profile-get
-	else
-		profile-update
-	fi
-fi
 
 
 #------------------------------------------------------------------------------
@@ -924,12 +897,6 @@ function metasystem_create_local()
 # Core setup 2/2
 #==============================================================================
 
-#------------------------------------------------------------------------------
-# ssh-agent
-#------------------------------------------------------------------------------
-
-[[ -n $SSH_AGENT_ENV ]] && ssh_agent_init
-
 
 #------------------------------------------------------------------------------
 # Help
@@ -987,19 +954,14 @@ EOF
 alias help='_metasystem_help'
 alias h=help
 
-echo -e "\n$_METASYSTEM_RULE"
-echo -e "Type 'help' for a list of metasystem functions and aliases"
-echo -e "$_METASYSTEM_RULE"
-
 
 #==============================================================================
 # Finalizing
 #==============================================================================
 
-# Ensure environment and prompt are correctly initialized
-echo
-
 metasystem_cd -metasystem-init
+
+_metasystem_init_hooks
 
 [[ -n $have_python ]] && tools-reset
 [[ -n $have_python ]] && ids-reset
@@ -1010,4 +972,7 @@ export PATH
 # Don't know where these get set...
 unset f
 
+echo -e "\n$_METASYSTEM_RULE"
+echo -e "Type 'help' for a list of metasystem functions and aliases"
+echo -e "$_METASYSTEM_RULE"
 
