@@ -63,6 +63,7 @@ metasystem_declare_stub misc.sh check_os
 metasystem_declare_stub misc.sh assert_is_linux
 metasystem_declare_stub misc.sh assert_is_ubuntu
 metasystem_declare_stub misc.sh log_file
+metasystem_declare_stub misc.sh command_exists
 
 # path.sh
 metasystem_declare_stub path.sh path_split

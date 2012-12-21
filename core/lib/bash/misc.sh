@@ -153,3 +153,10 @@ function metasystem_run_bg()
 	fi
 }
 
+function command_exists()
+{
+	local command=$1
+	[[ -n $(which $command 2>/dev/null) ]] || return 1
+	return 0
+}
+

@@ -27,6 +27,7 @@ function _metasystem_module_register_hooks()
 function metasystem_module_load()
 {
 	local module=$1
+	local ret=0
 	shift
 	local opt_quiet=
 	local opt_force=
@@ -46,19 +47,24 @@ function metasystem_module_load()
 
 	if [[ -z $first_load && $opt_force != yes ]]; then
 		echo "Module $module already loaded - skipping"
-		return 1
+		ret=1
+	else
+		local script=$METASYSTEM_ROOT/modules/$module/module.sh
+		if [[ -e $script ]]; then
+			[[ $opt_quiet != yes ]] && echo "Loading module $module ..."
+			source $script
+			ret=$?
+			if [[ $ret == 0 ]]; then
+				METASYSTEM_MODULES_LOADED="$(list_append $module $METASYSTEM_MODULES_LOADED)"
+				[[ -n $first_load ]] && _metasystem_module_register_hooks $module
+			fi
+		else
+			echo "Error: $module not found" >&2
+			ret=1
+		fi
 	fi
 
-	local script=$METASYSTEM_ROOT/modules/$module/module.sh
-	if [[ -e $script ]]; then
-		[[ $opt_quiet != yes ]] && echo "Loading module $module ..."
-		source $script
-		METASYSTEM_MODULES_LOADED="$(list_append $module $METASYSTEM_MODULES_LOADED)"
-		[[ -n $first_load ]] && _metasystem_module_register_hooks $module
-	else
-		echo "Error: $module not found" >&2
-		return 1
-	fi
+	return $ret
 }
 
 function metasystem_module_list()
@@ -92,8 +98,14 @@ function metasystem_module_load_all()
 	for module in $list; do
 		[[ -n $first ]] && _metasystem_print_banner Modules
 		unset first
-		echo $module
+		echo -n "$module "
 		metasystem_module_load $module -quiet
+		local ret=$?
+		if [[ $ret == 0 ]]; then
+			echo
+		else
+			echo "(failed)"
+		fi
 	done
 
 	if [[ -n $METASYSTEM_MODULES_DISABLE ]]; then
