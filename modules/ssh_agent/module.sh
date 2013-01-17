@@ -48,6 +48,8 @@ function ssh_agent_stop()
 	local pid=$(ssh_agent_pid)
 	[[ -n $pid ]] && kill -9 $pid
 	rm -f ${SSH_AGENT_ENV}
+    export SSH_AGENT_PID=
+    export SSH_AUTH_SOCK=
 }
 
 
