@@ -96,6 +96,7 @@ function ssh_agent_stop()
 
 export METASYSTEM_SSH_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
 export METASYSTEM_SSH_BIN=$METASYSTEM_SSH_ROOT/bin
+export METASYSTEM_SSH_LIB=$METASYSTEM_SSH_ROOT/lib
 
 
 #------------------------------------------------------------------------------
@@ -115,4 +116,6 @@ function _metasystem_hook_ssh_init()
 #------------------------------------------------------------------------------
 
 PATH=$(path_append $METASYSTEM_SSH_BIN $PATH)
+source $METASYSTEM_SSH_LIB/port-fwd-config.sh
+source $METASYSTEM_SSH_LIB/port-fwd.sh
 

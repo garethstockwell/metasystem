@@ -272,6 +272,43 @@ function metasystem_android_push_binary()
 
 
 #------------------------------------------------------------------------------
+# Functions which require the ssh module
+#------------------------------------------------------------------------------
+
+function metasystem_android_ssh_port_fwd_config()
+{
+	export SSH_PORT_FWD_SERVICES='adb gdb'
+
+	export SSH_PORT_FWD_SERVICE_adb_local_base=5037
+	export SSH_PORT_FWD_SERVICE_adb_remote_offset=0
+	export SSH_PORT_FWD_SERVICE_adb_count=1
+
+	export SSH_PORT_FWD_SERVICE_gdb_local_base=
+	export SSH_PORT_FWD_SERVICE_gdb_local_offset=1
+	export SSH_PORT_FWD_SERVICE_gdb_remote_offset=1
+	export SSH_PORT_FWD_SERVICE_gdb_count=10
+}
+
+function metasystem_android_ssh_port_fwd_client()
+{
+	metasystem_android_ssh_port_fwd_config
+	ssh-port-fwd.sh "$@"
+}
+
+function metasystem_android_ssh_port_fwd_server()
+{
+	metasystem_android_ssh_port_fwd_config
+	local base=$(eval $SSH_PORT_FWD_REMOTE_BASE_CMD)
+	export ANDROID_ADB_SERVER_PORT=$( __ssh_port_fwd_remote_port $base adb 1)
+	export CODEEXPLORER_GDB_SERVER_PORT=$( __ssh_port_fwd_remote_port $base gdb 1)
+}
+
+# Sometimes ADB port forwarding stops working; creating a telnet connection
+# to the local port seems to wake it up...
+alias adb-poke="adb kill-server; telnet localhost $ANDROID_ADB_SERVER_PORT"
+
+
+#------------------------------------------------------------------------------
 # Exported variables
 #------------------------------------------------------------------------------
 
