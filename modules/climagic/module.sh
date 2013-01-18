@@ -19,16 +19,6 @@ function delayed_popup()
 	popup "@"
 }
 
-function scp()
-{
-	if [[ "$@" =~ : ]]; then
-		$(which scp) $@
-	else
-		echo "Error: missing colon" >&2
-		return 1
-	fi
-}
-
 
 #------------------------------------------------------------------------------
 # Exported variables

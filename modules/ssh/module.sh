@@ -1,9 +1,11 @@
-# modules/ssh-agent.sh
+# modules/ssh.sh
 
 #------------------------------------------------------------------------------
 # Dependency check
 #------------------------------------------------------------------------------
 
+command_exists ssh || return 1
+command_exists scp || return 1
 command_exists ssh-agent || return 1
 
 
@@ -54,10 +56,29 @@ function ssh_agent_stop()
 
 
 #------------------------------------------------------------------------------
+# Aliases
+#------------------------------------------------------------------------------
+
+# Forward X connection
+alias ssh='ssh -Y'
+
+# From climagic (with protocol 2 added)
+function scp()
+{
+	if [[ "$@" =~ : ]]; then
+		$(which scp) -2 $@
+	else
+		echo "Error: missing colon" >&2
+		return 1
+	fi
+}
+
+
+#------------------------------------------------------------------------------
 # Hooks
 #------------------------------------------------------------------------------
 
-function _metasystem_hook_ssh_agent_init()
+function _metasystem_hook_ssh_init()
 {
 	_metasystem_print_banner "ssh-agent"
 	[[ -f ${SSH_AGENT_ENV} ]] && source ${SSH_AGENT_ENV} > /dev/null

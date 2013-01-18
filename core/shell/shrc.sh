@@ -169,10 +169,6 @@ PATH=$(path_remove '^\.$' $PATH)
 # Aliases
 #------------------------------------------------------------------------------
 
-# Enable trusted X forwarding
-alias ssh='ssh -Y'
-alias scp='scp -2'
-
 alias com='history | grep $1'
 alias findproc='ps -ax -o %p%u%c%t | grep -v grep | grep $1'
 alias du='du -h'
