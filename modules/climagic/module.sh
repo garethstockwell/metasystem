@@ -8,7 +8,11 @@
 
 function popup()
 {
-	xmessage -nearmouse "$@"
+	if [[ $METASYSTEM_OS == windows ]]; then
+		msg $(whoami) "$@"
+	else
+		xmessage -nearmouse "$@"
+	fi
 }
 
 function delayed_popup()
@@ -16,7 +20,7 @@ function delayed_popup()
 	local delay=$1
 	shift
 	sleep $delay
-	popup "@"
+	popup "$@"
 }
 
 # List disk usage for specified directory
