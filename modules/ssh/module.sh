@@ -10,7 +10,42 @@ command_exists ssh-agent || return 1
 
 
 #------------------------------------------------------------------------------
-# Functions
+# ssh
+#------------------------------------------------------------------------------
+
+function ssh()
+{
+	# Forward X connection
+	$(which ssh) -Y $@
+}
+
+function ssh_screen()
+{
+	# Remote screen (detaches if already connected)
+	ssh-wrapper.sh -Y -t "$@" "screen -RR"
+}
+
+alias ssh-screen=ssh_screen
+
+
+#------------------------------------------------------------------------------
+# scp
+#------------------------------------------------------------------------------
+
+# From climagic (with protocol 2 added)
+function scp()
+{
+	if [[ "$@" =~ : ]]; then
+		$(which scp) -2 $@
+	else
+		echo "Error: missing colon" >&2
+		return 1
+	fi
+}
+
+
+#------------------------------------------------------------------------------
+# ssh-agent
 #------------------------------------------------------------------------------
 
 SSH_AGENT_ENV="$HOME/.ssh/agent-env-${HOSTNAME}-${METASYSTEM_OS}-${METASYSTEM_PLATFORM}"
@@ -56,22 +91,11 @@ function ssh_agent_stop()
 
 
 #------------------------------------------------------------------------------
-# Aliases
+# Exported variables
 #------------------------------------------------------------------------------
 
-# Forward X connection
-alias ssh='ssh -Y'
-
-# From climagic (with protocol 2 added)
-function scp()
-{
-	if [[ "$@" =~ : ]]; then
-		$(which scp) -2 $@
-	else
-		echo "Error: missing colon" >&2
-		return 1
-	fi
-}
+export METASYSTEM_SSH_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
+export METASYSTEM_SSH_BIN=$METASYSTEM_SSH_ROOT/bin
 
 
 #------------------------------------------------------------------------------
@@ -90,4 +114,5 @@ function _metasystem_hook_ssh_init()
 # Main
 #------------------------------------------------------------------------------
 
+PATH=$(path_append $METASYSTEM_SSH_BIN $PATH)
 
