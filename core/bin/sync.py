@@ -115,8 +115,8 @@ from datetime import timedelta
 from optparse import OptionParser
 import os.path
 import os
-from socket import gethostname
-from subprocess import call
+import socket
+import subprocess
 import sys
 from time import time
 
@@ -176,7 +176,7 @@ def Execute(command, options, flag = True):
     success = True
     if flag:
         try:
-            r = call(command.split())
+            r = subprocess.call(command.split())
             if 0 != r:
                 PrintError("'" + command + "' failed with error " + str(r))
                 success = False
@@ -718,12 +718,30 @@ class UnisonProject(Project):
                 for subdir in subdirList:
                     command += '-path ' + subdir + ' '
         command += profile
-        execute = True
-        if options.dry_run == 0:
-            command += " -batch"
-        if options.dry_run > 1:
-            execute = False
-        success = Execute(command, options, execute)
+        if options.dry_run == 1:
+            # Unison has no -dry-run option, so we resort to nastiness...
+            # Run without -batch, and send 'q' when asked whether to
+            # proceed
+            print '\n' + command
+            process = subprocess.Popen(command.split(),
+                                       shell=True,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT,
+                                       stdin=subprocess.PIPE)
+            output = ''
+            while (True):
+                buf = process.stdout.read(1)
+                if len(buf) == 0:
+                    break
+                output += buf
+                sys.stdout.write(buf)
+                if 'Proceed with propagating updates? [] ' in output:
+                    process.stdin.write('q\n')
+                    break
+        else:
+            if options.dry_run == 0:
+                command += " -batch"
+            success = Execute(command, options)
         return success
 
     def status(self, options):
@@ -893,7 +911,7 @@ def ParseIniFile(fileName):
 
 
 def ParseLocal(parser, config):
-    config['hostname'] = gethostname()
+    config['hostname'] = socket.gethostname()
     for section in parser.sections():
         if section.startswith('local:'):
             name = section[6:]
