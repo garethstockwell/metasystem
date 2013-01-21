@@ -588,11 +588,10 @@ class GitProject(ScmProject):
         if Verbosity.Loud == options.verbosity:
             verbosity = ' --verbose'
         command = 'git ' + operation + ' origin' + branch + verbosity
-        if 'push' == operation:
-            if options.dry_run:
-                command += ' --dry-run'
         execute = True
-        if 'pull' == operation and options.dry_run:
+        if options.dry_run == 1:
+            command += ' --dry-run'
+        if options.dry_run > 1:
             execute = False
         return Execute(command, options, execute)
 
@@ -709,7 +708,7 @@ class UnisonProject(Project):
             return False
 
         success = True
-        command = 'unison -auto -batch -ui text '
+        command = 'unison -auto -ui text '
         command += self.VerbosityMap[options.verbosity]
         if '' != subdir:
             command += '-path ' + subdir + ' '
@@ -720,7 +719,9 @@ class UnisonProject(Project):
                     command += '-path ' + subdir + ' '
         command += profile
         execute = True
-        if options.dry_run:
+        if options.dry_run == 0:
+            command += " -batch"
+        if options.dry_run > 1:
             execute = False
         success = Execute(command, options, execute)
         return success
@@ -777,7 +778,12 @@ class RsyncProject(Project):
         command = command + ' -e ssh ' +\
                   remote.root + ':' + self.remote_path +\
                   " " + self.local_path
-        return Execute(command, options, (not options.dry_run))
+        execute = True
+        if options.dry_run == 1:
+            command += " --dry-run"
+        if options.dry_run > 1:
+            execute = False
+        return Execute(command, options, execute)
 
     def _push(self, remote, options, subdir):
         print "\nChanging directory to " + self.fullLocalPath() + " ..."
@@ -786,7 +792,12 @@ class RsyncProject(Project):
         if self.rsync_options:
             command = command + self.rsync_options
         command = command + ' -e ssh . ' + remote.root + ':' + self.remote_path
-        return Execute(command, options, (not options.dry_run))
+        execute = True
+        if options.dry_run == 1:
+            command += " --dry-run"
+        if options.dry_run > 1:
+            execute = False
+        return Execute(command, options, execute)
 
     def _sync(self, remote, options, subdir = ''):
         result = True
@@ -1052,8 +1063,8 @@ def CreateCommandLineParser():
                       default=False, help='Verbose output')
     parser.add_option('-q', '--quiet', dest='quiet', action='store_true',
                       default=False, help='No output')
-    parser.add_option('-n', '--dry-run', dest='dry_run', action='store_true',
-                      default=False, help='Do not actually execute any actions')
+    parser.add_option('-n', '--dry-run', dest='dry_run', action='count',
+                      default=0, help='Do not actually execute any actions')
     parser.add_option('-a', '--all', dest='all', action='store_true',
               default=False, help='Sync all projects, including those with auto=false')
     parser.add_option('-r', '--remote', dest='remote',
