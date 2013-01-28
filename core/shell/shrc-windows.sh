@@ -73,6 +73,30 @@ function killall()
 	done
 }
 
+function dos2unix_forall()
+{
+	local dir=$1
+	shift
+	[[ -z $dir ]] && return 1
+	for f in $(find $dir -type f); do
+		local cmd="dos2unix --force $f $@"
+		echo $cmd
+		$cmd
+	done
+}
+
+function unix2dos_forall()
+{
+	local dir=$1
+	shift
+	[[ -z $dir ]] && return 1
+	for f in $(find $dir -type f); do
+		local cmd="unix2dos --force $f $@"
+		echo $cmd
+		$cmd
+	done
+}
+
 
 #------------------------------------------------------------------------------
 # Aliases
