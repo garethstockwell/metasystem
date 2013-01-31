@@ -21,7 +21,7 @@ import serial
 import sys
 import threading
 
-sys.path.append(os.path.join(sys.path[0], '../lib/python'))
+sys.path.append(os.path.join(os.environ.get('METASYSTEM_CORE_LIB'), 'python'))
 import Console
 import CommandSocket
 import Threading
