@@ -576,10 +576,14 @@ class GitProject(ScmProject):
         repr = ScmProject.getFormat(self, remote)
         return repr
 
-    def _init(self, remote, options):
+    def _remote_path(self, remote, options):
         remote_path = remote.root + '/' + self.remote_path
         if (remote.scm_bare):
             remote_path += '.git'
+        return remote_path
+
+    def _init(self, remote, options):
+        remote_path = self._remote_path(remote, options)
         command = 'git clone ' + remote_path + ' ' + self.fullLocalPath()
         return Execute(command, options, (not options.dry_run))
 
@@ -587,7 +591,11 @@ class GitProject(ScmProject):
         verbosity = ''
         if Verbosity.Loud == options.verbosity:
             verbosity = ' --verbose'
-        command = 'git ' + operation + ' origin' + branch + verbosity
+        remote_path = ''
+        if operation == 'push' and branch != '':
+            remote = self.getRemote(options, config)
+            remote_path = self._remote_path(remote, options)
+        command = 'git ' + operation + ' ' + remote_path + ' ' + branch + verbosity
         execute = True
         if options.dry_run == 1:
             command += ' --dry-run'
