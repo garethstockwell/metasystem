@@ -77,7 +77,7 @@ function dos2unix_forall()
 {
 	local dir=$1
 	shift
-	[[ -z $dir ]] && return 1
+	[[ -z $dir ]] && dir=.
 	for f in $(find $dir -type f); do
 		local cmd="dos2unix --force $f $@"
 		echo $cmd
@@ -89,7 +89,7 @@ function unix2dos_forall()
 {
 	local dir=$1
 	shift
-	[[ -z $dir ]] && return 1
+	[[ -z $dir ]] && dir=.
 	for f in $(find $dir -type f); do
 		local cmd="unix2dos --force $f $@"
 		echo $cmd
