@@ -31,6 +31,13 @@ function usage()
 	ls -1A $dir | tr '\n' '\0' | xargs -0 du -sk | sort -n
 }
 
+# Repeat character specified number of times
+# Usage: repeatchar <character> <number>
+function repeatchar()
+{
+	printf "%0$2d" | tr 0 $1;
+}
+
 #------------------------------------------------------------------------------
 # Exported variables
 #------------------------------------------------------------------------------
