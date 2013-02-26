@@ -11,5 +11,5 @@ source $METASYSTEM_CORE_LIB/bash/script.sh
 echo "About to restore $HARMATTAN_BACKUP_ARCHIVE"
 ask "Proceed?" || exit 1
 
-tar -xvpzf $HARMATTAN_BACKUP_ARCHIVE | ssh developer@192.168.2.15 "cat > /"
+time tar -xvpzf $HARMATTAN_BACKUP_ARCHIVE | ssh developer@192.168.2.15 "cat > /"
 

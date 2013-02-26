@@ -8,5 +8,15 @@ source $METASYSTEM_CORE_LIB/bash/script.sh
 
 rm -fv $HARMATTAN_BACKUP_ARCHIVE
 
-ssh developer@192.168.2.15 "tar cvzp - --exclude='/proc' --exclude='/lost+found' --exclude='/sys' --exclude='/mnt' --exclude='/media' --exclude='/dev' /" | cat > $HARMATTAN_BACKUP_ARCHIVE
+EXCLUDES='proc lost+found sys mnt media dev'
+
+cmd="tar cvzp -"
+for e in $EXCLUDES; do
+	cmd="$cmd --exclude='$e'"
+done
+cmd="$cmd /"
+
+echo $cmd
+
+time ssh developer@192.168.2.15 "$cmd" | cat > $HARMATTAN_BACKUP_ARCHIVE
 
