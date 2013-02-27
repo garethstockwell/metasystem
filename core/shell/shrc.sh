@@ -73,7 +73,7 @@ export METASYSTEM_CORE_LIB_BASH=$METASYSTEM_CORE_LIB/bash
 if [[ -n $METASYSTEM_LOCAL_ROOT ]]; then
 	metasystem_local_root=$METASYSTEM_LOCAL_ROOT
 else
-	metasystem_local_root=$METASYSTEM_CORE_ROOT/../metasystem-local
+	metasystem_local_root=$METASYSTEM_ROOT/../metasystem-local
 fi
 
 if [[ -d $metasystem_local_root ]]; then
@@ -754,11 +754,12 @@ function metasystem_create_local()
 		return 1
 	else
 		cp -rv $METASYSTEM_CORE_TEMPLATES/local $metasystem_local_root
-		cp -v $METASYSTEM_CORE_ROOT/.gitignore $metasystem_local_root
-		cd $metasystem_local_root
+		cp -v $METASYSTEM_ROOT/.gitignore $metasystem_local_root
+		pushd $metasystem_local_root
 		git init
 		git add -A
 		git commit -m "Initial version (created from template)"
+		popd
 	fi
 }
 

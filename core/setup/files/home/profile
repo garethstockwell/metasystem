@@ -1,2 +1,2 @@
-. ${METASYSTEM_CORE_SHELL}/profile
+. ${METASYSTEM_ROOT}/shell/profile
 

@@ -1,6 +1,6 @@
 if [[ -n $PS1 ]]; then
 	#export METASYSTEM_LOCAL_ROOT=...
-	. ${METASYSTEM_CORE_SHELL}/shrc
+	. ${METASYSTEM_ROOT}/home/shrc
 	metasystem_cd ~
 fi
 
