@@ -195,7 +195,7 @@ alias tree='tree -Cs'		# nice alternative to 'ls'
 
 alias vi='vim'
 
-alias sync='sync.py'
+alias sync='metasystem-sync.py'
 
 alias nativepath=metasystem_nativepath
 alias npath=metasystem_nativepath

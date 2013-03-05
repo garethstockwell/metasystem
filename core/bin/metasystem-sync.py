@@ -14,9 +14,9 @@
 #
 #         auto = true | false
 #             Determines whether the project is synchronised automatically.
-#             If true, the project is synchronised when 'sync.py' is run
+#             If true, the project is synchronised when 'metasystem-sync.py' is run
 #             without any arguments.  If false, the project name must be
-#             explicitly stated, e.g. 'sync.py foo'.
+#             explicitly stated, e.g. 'metasystem-sync.py foo'.
 #
 #    Optional attributes:
 #
@@ -32,7 +32,7 @@
 #             Subdirectories which are synchronised.  If not specified, all
 #             subdirectories are synchronised by default.  This can be
 #             overridden on the command line - for example, to synchronise only
-#             subdirectory x from project foo, run 'sync.py foo/x'.
+#             subdirectory x from project foo, run 'metasystem-sync.py foo/x'.
 #             Only valid for 'type = rsync | unison' projects.
 #
 # Example project definitions:
