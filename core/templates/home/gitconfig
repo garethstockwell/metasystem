@@ -61,17 +61,3 @@
 	name = ${NAME}
 	email = ${EMAIL}
 
-
-#------------------------------------------------------------------------------
-# Qt
-#------------------------------------------------------------------------------
-
-[url "git@scm.dev.troll.no"]
-	insteadOf = git@scm.dev.nokia.troll.no
-
-[url "git@scm.dev.troll.no:"]
-	insteadOf = troll://
-
-[url "git@scm.dev.troll.no:personal/gstockwells-"]
-	insteadOf = troll-personal://
-
