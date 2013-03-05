@@ -67,6 +67,7 @@ function metasystem_module_load()
 	return $ret
 }
 
+# TODO: support modules in metasystem-local
 function metasystem_module_list()
 {
 	local list=
@@ -86,14 +87,39 @@ function metasystem_module_loaded()
 	return 0
 }
 
+# Returns a list of modules which should be loaded
+# By default, metasystem attempts to load all available modules
+# This behaviour can be overridden by specifying one of the following
+# environment variables:
+# METASYSTEM_MODULES_EXPLICIT
+#     Specify a list of modules to load
+# METASYSTEM_MODULES_DISABLE
+#     Specify modules to be excluded from the list
+function metasystem_module_select()
+{
+	local result="$(metasystem_module_list)"
+	if [[ -n $METASYSTEM_MODULES_EXPLICIT ]]; then
+		local list=$result
+		result=
+		for module in $METASYSTEM_MODULES_EXPLICIT; do
+			[[ -n $(list_contains $module $list) ]] &&\
+				result=$(list_append $module $result)
+		done
+	else
+		if [[ -n $METASYSTEM_MODULES_DISABLE ]]; then
+			for module in $METASYSTEM_MODULES_DISABLE; do
+				result=$(list_remove $module $result)
+			done
+		fi
+	fi
+	echo $result
+}
+
 function metasystem_module_load_all()
 {
-	local list="$(metasystem_module_list)"
-	local module=
-	for module in $METASYSTEM_MODULES_DISABLE; do
-		list=$(list_remove $module $list)
-	done
+	local list="$(metasystem_module_select)"
 
+	local module=
 	local first=1
 	for module in $list; do
 		[[ -n $first ]] && _metasystem_print_banner Modules
