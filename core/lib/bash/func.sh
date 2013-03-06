@@ -36,7 +36,10 @@ function func_append_to()
 	local name=$1
 	shift
 	local body="$@"
-	eval "$(declare -f ${name} | head -n -1; echo ${body}; echo '}')"
+	# Jump through some hoops here because "head -n -1" is invalid on non-GNU
+	# versions of head ...
+	local num_lines=$(( $(declare -f ${name} | wc -l | awk '{print $1}') - 1 ))
+	eval "$(declare -f ${name} | head -n ${num_lines}; echo ${body}; echo '}')"
 }
 
 function func_source()

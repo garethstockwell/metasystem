@@ -280,6 +280,8 @@ function install_files()
 	local cmd="$METASYSTEM_CORE_BIN/subst-vars.sh \
 		$METASYSTEM_SETUP/files/home/$login_file $HOME/.$login_file"
 	execute $cmd
+	execute rm -f $HOME/.metasystem-config
+	execute cp $METASYSTEM_SETUP/files/home/metasystem-config $HOME/.metasystem-config
 	if [ "$METASYSTEM_OS" == "linux" ]
 	then
 		execute mkdir -p ~/.config/autostart

@@ -41,11 +41,6 @@ function _metasystem_cd()
 	[[ $1 != -metasystem-init ]] && builtin cd $*
 }
 
-function _metasystem_export()
-{
-	export "$@"
-}
-
 function _metasystem_unset()
 {
 	unset "$@"

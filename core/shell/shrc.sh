@@ -41,10 +41,24 @@ if [[ -n `uname | grep -i ^sunos` ]]; then
 	METASYSTEM_PLATFORM=unix
 fi
 
+if [[ -n `uname | grep -i ^linux` ]]; then
+	METASYSTEM_OS=linux
+	METASYSTEM_OS_VENDOR=
+	METASYSTEM_OS_VERSION=
+	METASYSTEM_PLATFORM=unix
+fi
+
 if [[ $METASYSTEM_OS == unknown && -e /etc/issue ]]; then
 	METASYSTEM_OS=linux
 	METASYSTEM_OS_VENDOR=`cat /etc/issue | awk '{ print $1 }' | tr 'A-Z' 'a-z'`
 	METASYSTEM_OS_VERSION=`cat /etc/issue | awk '{ print $2 }' | tr 'A-Z' 'a-z'`
+	METASYSTEM_PLATFORM=unix
+fi
+
+if [[ -z $METASYSTEM_OS && -n `uname | grep -i ^linux` ]]; then
+	METASYSTEM_OS=linux
+        METASYSTEM_OS_VENDOR=
+	METASYSTEM_OS_VERSION=
 	METASYSTEM_PLATFORM=unix
 fi
 
@@ -311,6 +325,11 @@ function _metasystem_prompt()
 #------------------------------------------------------------------------------
 # cd
 #------------------------------------------------------------------------------
+
+function _metasystem_export()
+{
+	export "$@"
+}
 
 function _metasystem_cd_pre_hooks()
 {

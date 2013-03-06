@@ -208,9 +208,9 @@ def cmd_list(args, config):
         print "ids:", str.join(' ', config['ids'].keys())
 
 def do_write_config_file(args, template_dir, config_file, suffix, id):
+    destFileName = os.path.join(HOME_PATH, '.' + config_file)
     if template_dir:
         sourceFileName = os.path.join(template_dir, 'home', config_file)
-        destFileName = os.path.join(HOME_PATH, '.' + config_file)
         if suffix:
             destFileName = destFileName + '-' + suffix
             config_file = config_file + '-' + suffix
