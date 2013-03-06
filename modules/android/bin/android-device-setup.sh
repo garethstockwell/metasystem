@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ANDROID_DEVICE_HOME=$METASYSTEM_ANDROID_ROOT/device
 

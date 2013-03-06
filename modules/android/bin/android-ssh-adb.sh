@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Use alias defined in ~/.ssh/config
 cmd="ssh android-adb"

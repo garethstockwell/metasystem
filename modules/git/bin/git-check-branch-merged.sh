@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Lists all commits which are in a target branch, but not in the current
 # branch.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Wrapper for adb which redirects logcat to a colorizer
 
