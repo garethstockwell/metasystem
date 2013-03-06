@@ -207,7 +207,7 @@ alias lt='ls -ltr'			# sort by date
 alias lm='ls -al |more'		# pipe through 'more'
 alias tree='tree -Cs'		# nice alternative to 'ls'
 
-alias vi='vim'
+command_exists vim && alias vi='vim'
 
 alias sync='metasystem-sync.py'
 
