@@ -208,29 +208,30 @@ def cmd_list(args, config):
         print "ids:", str.join(' ', config['ids'].keys())
 
 def do_write_config_file(args, template_dir, config_file, suffix, id):
-    sourceFileName = os.path.join(template_dir, 'home', config_file)
-    destFileName = os.path.join(HOME_PATH, '.' + config_file)
-    if suffix:
-        destFileName = destFileName + '-' + suffix
-        config_file = config_file + '-' + suffix
-    if os.path.isfile(sourceFileName):
-        if not args.quiet:
-            print "Generating file ~/." + config_file
-        sourceFile = open(sourceFileName, 'r')
-        destFile = open(destFileName, 'wb')
-        subst = os.environ
-        subst.update(id.subst)
-        regexp = re.compile('\$\{(.*)\}')
-        for line in sourceFile:
-            matches = regexp.findall(line)
-            for m in matches:
-                line = line.replace('${' + m + '}', subst.get(m, ''))
-            destFile.write(line)
-    else:
-        if os.path.isfile(destFileName):
+    if template_dir:
+        sourceFileName = os.path.join(template_dir, 'home', config_file)
+        destFileName = os.path.join(HOME_PATH, '.' + config_file)
+        if suffix:
+            destFileName = destFileName + '-' + suffix
+            config_file = config_file + '-' + suffix
+        if os.path.isfile(sourceFileName):
             if not args.quiet:
-                print "Removing file ~/." + config_file
-            os.remove(destFileName)
+                print "Generating file ~/." + config_file
+            sourceFile = open(sourceFileName, 'r')
+            destFile = open(destFileName, 'wb')
+            subst = os.environ
+            subst.update(id.subst)
+            regexp = re.compile('\$\{(.*)\}')
+            for line in sourceFile:
+                matches = regexp.findall(line)
+                for m in matches:
+                    line = line.replace('${' + m + '}', subst.get(m, ''))
+                destFile.write(line)
+            return
+    if os.path.isfile(destFileName):
+        if not args.quiet:
+            print "Removing file ~/." + config_file
+        os.remove(destFileName)
 
 def write_config_file(args, type, id):
     do_write_config_file(args, os.environ.get('METASYSTEM_CORE_TEMPLATES'),
