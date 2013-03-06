@@ -1,0 +1,7 @@
+# Sourced by ~/.bashrc
+
+export METASYSTEM_LOCAL_ROOT=
+
+export METASYSTEM_MODULES_EXPLICIT=
+export METASYSTEM_MODULES_DISABLE=
+
