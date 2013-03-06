@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ $METASYSTEM_PLATFORM == mingw ]]; then
 	agent_env=${HOME}/.ssh/agent-env-${HOSTNAME}-windows-cygwin

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check for existence of blacklisted words in the repository
 # Note that lib/git-hooks/post-commit.py performs the same check prior

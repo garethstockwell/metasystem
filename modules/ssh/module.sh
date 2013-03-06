@@ -50,6 +50,11 @@ function scp()
 
 SSH_AGENT_ENV="$HOME/.ssh/agent-env-${HOSTNAME}-${METASYSTEM_OS}-${METASYSTEM_PLATFORM}"
 
+function ssh_agent_add_all()
+{
+	ssh-add $HOME/.ssh/*id_rsa
+}
+
 function ssh_agent_pid()
 {
 	if [[ -n ${SSH_AGENT_PID} ]]; then
@@ -72,11 +77,13 @@ function ssh_agent_start()
 		source ${SSH_AGENT_ENV} > /dev/null
 		if [[ -n $SSH_AGENT_PID ]]; then
 			echo "PID $SSH_AGENT_PID"
-			ssh-add
+			ssh_agent_add_all
 		else
 			echo "failed"
 		fi
 	fi
+	echo -e "\nKeys added to ssh-agent:"
+	ssh-add -l
 }
 
 function ssh_agent_stop()

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # start_commit=1234abcd
 # git log --reverse --pretty=oneline $start_commit.. -- my_filename.* | awk '{ print $1 }'

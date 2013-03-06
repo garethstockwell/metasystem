@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Script for building (parts I care about from) the Qt5 alpha release
 #

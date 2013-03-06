@@ -1,4 +1,4 @@
-#!/bin/bash -f
+#!/usr/bin/env bash
 
 # Wrapper script for SCM tools
 # For actions which write to a local repo, the script first dynamically

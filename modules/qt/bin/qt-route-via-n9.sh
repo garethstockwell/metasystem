@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Route SSH port 29418 via the N9, to work around corporate firewall
 

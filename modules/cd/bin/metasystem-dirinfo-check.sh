@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # metasystem-dirinfo-check
 # Script for checking whether smartcd and .metasystem-dirinfo files are in sync

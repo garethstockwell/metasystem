@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 device-sync.sh \
 	  --host android-adb \

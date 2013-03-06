@@ -1,5 +1,5 @@
 if [[ -n $PS1 ]]; then
-	#export METASYSTEM_LOCAL_ROOT=...
+	source ~/.metasystem-config
 	. ${METASYSTEM_ROOT}/home/shrc
 	metasystem_cd ~
 fi
