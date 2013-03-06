@@ -82,6 +82,8 @@ function ssh_agent_start()
 			echo "failed"
 		fi
 	fi
+	echo -e "\nKeys added to ssh-agent:"
+	ssh-add -l
 }
 
 function ssh_agent_stop()
