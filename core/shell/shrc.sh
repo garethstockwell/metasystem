@@ -12,55 +12,55 @@ METASYSTEM_OS_VENDOR=unknown
 METASYSTEM_OS_VERSION=unknown
 METASYSTEM_PLATFORM=unknown
 
-if [[ -n `uname | grep -i ^cygwin` ]]; then
-	METASYSTEM_OS=windows
-	METASYSTEM_OS_VENDOR=microsoft
-	METASYSTEM_PLATFORM=cygwin
-	export CYGWIN_HOME=/cygdrive/c/cygwin
-fi
+uname_out=$(uname)
 
-if [[ -n `uname | grep -i ^mingw` ]]; then
-	METASYSTEM_OS=windows
-	METASYSTEM_OS_VENDOR=microsoft
-	METASYSTEM_PLATFORM=mingw
-	export MSYS_HOME=/c/MinGW/msys/1.0
-	export TERM=msys
-fi
+case $uname_out in
+	[Mm][Ii][Nn][Gg][Ww]*)
+		METASYSTEM_OS=windows
+		METASYSTEM_OS_VENDOR=microsoft
+		METASYSTEM_PLATFORM=mingw
+		export MSYS_HOME=/c/MinGW/msys/1.0
+		export TERM=msys
+		;;
 
-if [[ -n `uname | grep -i ^darwin` ]]; then
-	METASYSTEM_OS=mac
-	METASYSTEM_OS_VENDOR=apple
-	METASYSTEM_OS_VERSION=`sw_vers -productVersion`
-	METASYSTEM_PLATFORM=unix
-fi
+	[Cc][Yy][Gg][Ww][Ii][Nn]*)
+		METASYSTEM_OS=windows
+		METASYSTEM_OS_VENDOR=microsoft
+		METASYSTEM_PLATFORM=cygwin
+		export CYGWIN_HOME=/cygdrive/c/cygwin
+		;;
 
-if [[ -n `uname | grep -i ^sunos` ]]; then
-	METASYSTEM_OS=sunos
-	METASYSTEM_OS_VENDOR=sun
-	METASYSTEM_OS_VERSION=
-	METASYSTEM_PLATFORM=unix
-fi
+	[Ll][Ii][Nn][Uu][Xx]*)
+		METASYSTEM_OS=linux
+		METASYSTEM_OS_VENDOR=
+		METASYSTEM_OS_VERSION=
+		METASYSTEM_PLATFORM=unix
+		;;
 
-if [[ -n `uname | grep -i ^linux` ]]; then
-	METASYSTEM_OS=linux
-	METASYSTEM_OS_VENDOR=
-	METASYSTEM_OS_VERSION=
-	METASYSTEM_PLATFORM=unix
-fi
+	[Dd][Aa][Rr][Ww][Ii][Nn]*)
+		METASYSTEM_OS=mac
+		METASYSTEM_OS_VENDOR=apple
+		METASYSTEM_OS_VERSION=`sw_vers -productVersion`
+		METASYSTEM_PLATFORM=unix
+		;;
 
-if [[ $METASYSTEM_OS == unknown && -e /etc/issue ]]; then
-	METASYSTEM_OS=linux
-	METASYSTEM_OS_VENDOR=`cat /etc/issue | awk '{ print $1 }' | tr 'A-Z' 'a-z'`
-	METASYSTEM_OS_VERSION=`cat /etc/issue | awk '{ print $2 }' | tr 'A-Z' 'a-z'`
-	METASYSTEM_PLATFORM=unix
-fi
+	[Ss][Uu][Nn][Oo][Ss]*)
+		METASYSTEM_OS=sunos
+		METASYSTEM_OS_VENDOR=sun
+		METASYSTEM_OS_VERSION=
+		METASYSTEM_PLATFORM=unix
+		;;
 
-if [[ -z $METASYSTEM_OS && -n `uname | grep -i ^linux` ]]; then
-	METASYSTEM_OS=linux
-        METASYSTEM_OS_VENDOR=
-	METASYSTEM_OS_VERSION=
-	METASYSTEM_PLATFORM=unix
-fi
+	*)
+		if [[ -e /etc/issue ]]; then
+			METASYSTEM_OS=linux
+			METASYSTEM_OS_VENDOR=`cat /etc/issue | awk '{ print $1 }' | tr 'A-Z' 'a-z'`
+			METASYSTEM_OS_VERSION=`cat /etc/issue | awk '{ print $2 }' | tr 'A-Z' 'a-z'`
+			METASYSTEM_PLATFORM=unix
+		fi
+esac
+
+unset uname_out
 
 export METASYSTEM_OS
 export METASYSTEM_OS_VENDOR
