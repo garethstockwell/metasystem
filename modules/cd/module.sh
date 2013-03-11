@@ -36,11 +36,6 @@ function metasystem_parse_dirinfo()
 	empty_function
 }
 
-function _metasystem_cd()
-{
-	[[ $1 != -metasystem-init ]] && builtin cd $*
-}
-
 function _metasystem_unset()
 {
 	unset "$@"
