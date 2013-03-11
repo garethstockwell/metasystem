@@ -3,5 +3,5 @@
 *.orig
 *.pyc
 nohup.out
-.metasystem-dirinfo.sh
+.metasystem-dirinfo*
 
