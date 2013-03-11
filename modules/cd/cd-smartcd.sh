@@ -6,6 +6,10 @@
 # Dependency check
 #------------------------------------------------------------------------------
 
+smartcd_lib=$HOME/.smartcd/lib/core/smartcd
+[[ -e $smartcd_lib ]] && source $smartcd_lib
+unset smartcd_lib
+
 func_exists smartcd || return 1
 
 
@@ -53,6 +57,7 @@ if [[ -e $smartcd_config ]]; then
 else
 	echo "Error: $smartcd_config not found"
 fi
+unset smartcd_config
 
 function _metasystem_cd()
 {

@@ -348,10 +348,11 @@ function _metasystem_cd_post_hooks()
 	echo > /dev/null
 }
 
-# Stub function which is overridden by dirinfo module
 function _metasystem_cd()
 {
-	empty_function
+	if [[ "$1" != "-metasystem-init" ]]; then
+        builtin cd $*
+    fi
 }
 
 # Register a function which will be called before cd

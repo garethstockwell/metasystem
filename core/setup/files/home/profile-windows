@@ -1,3 +1,6 @@
+# Required to successfully load smartcd
+export SHELL=bash
+
 _profile=${HOME}/work/sync/git/github/metasystem/home/profile
 [[ -z $MSYSTEM ]] && _profile=/cygdrive/${_profile}
 . ${_profile}
