@@ -22,9 +22,9 @@ import sys
 import threading
 
 sys.path.append(os.path.join(os.environ.get('METASYSTEM_CORE_LIB'), 'python'))
-import Console
-import CommandSocket
-import Threading
+from metasystem import console
+from metasystem import commandsocket
+from metasystem import threading
 
 
 #------------------------------------------------------------------------------
@@ -252,7 +252,7 @@ class AnsiFilter(Filter):
         if self.csi_buf == '0':
             self.console_state.reset()
         else:
-            rs = Console.Ansi.ansi_to_renderstate(self.csi_buf)
+            rs = console.Ansi.ansi_to_renderstate(self.csi_buf)
             self.console_state.set(rs)
 
 
@@ -299,7 +299,7 @@ class UbootFastbootFilter(SimpleMatchFilter):
     def match(self):
         log_debug("UbootFastbootFilter.match")
         self.disable()
-        write_stdout('\n[UbootFastbootFilter] Sending fastboot ...\n\n', Console.Color.RED)
+        write_stdout('\n[UbootFastbootFilter] Sending fastboot ...\n\n', console.Color.RED)
         self.miniterm.serial.write('fastboot')
         self.miniterm.serial.write(self.miniterm.newline)
 
@@ -319,12 +319,12 @@ class UbootFastbootFilter(SimpleMatchFilter):
 
     def send_newline(self):
         log_debug("UbootFastbootFilter.send_newline")
-        write_stdout('\n[UbootFastbootFilter] Sending newline ...\n\n', Console.Color.RED)
+        write_stdout('\n[UbootFastbootFilter] Sending newline ...\n\n', console.Color.RED)
         self.miniterm.serial.write(self.miniterm.newline)
 
     def enable(self):
         if not self.timer:
-            self.timer = Threading.RepeatTimer(0.5, self.send_newline)
+            self.timer = threading.RepeatTimer(0.5, self.send_newline)
             self.timer.daemon = True
             self.timer.start()
         self.enabled = True
@@ -415,9 +415,9 @@ class Miniterm(object):
         self.break_state = False
         if command_port:
             command_port = int(command_port)
-        self.command_server = CommandSocket.Server(port=command_port)
-        self.rx_state = Console.OutputStreamState()
-        #self.rx_state.set_fg(Console.Color.GREEN)
+        self.command_server = commandsocket.Server(port=command_port)
+        self.rx_state = console.OutputStreamState()
+        #self.rx_state.set_fg(console.Color.GREEN)
         #self.rx_state.save_default()
         self._init_filters()
 
@@ -512,7 +512,7 @@ class Miniterm(object):
 
     def write_echo(self, msg):
         sys.stdout.state.push()
-        sys.stdout.state.set_fg(Console.Color.YELLOW)
+        sys.stdout.state.set_fg(console.Color.YELLOW)
         sys.stdout.write(msg)
         sys.stdout.state.pop()
 
@@ -686,7 +686,7 @@ def do_send(args):
     port = args.command_port
     if port:
         port = int(port)
-    client = CommandSocket.Client(host=host, port=port)
+    client = commandsocket.Client(host=host, port=port)
     msg = ' '.join(args.cmd)
     print "Client: sending '" + msg + "'"
     reply = client.send(msg)

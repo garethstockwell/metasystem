@@ -2,6 +2,7 @@
 # Modules
 #------------------------------------------------------------------------------
 
+from __future__ import absolute_import
 import threading
 
 __all__ = ['RepeatTimer']

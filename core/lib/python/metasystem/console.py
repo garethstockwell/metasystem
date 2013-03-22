@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #------------------------------------------------------------------------------
 # Modules
 #------------------------------------------------------------------------------
@@ -7,7 +9,7 @@ import os
 import sys
 from types import BuiltinMethodType, MethodType
 
-from Wrapper import Wrapper
+from wrapper import Wrapper
 
 __all__ = ['Color', 'Intensity']
 
@@ -333,4 +335,46 @@ elif os.name == 'posix':
 
 else:
     raise NotImplementedError("Sorry no implementation for your platform (%s) available." % sys.platform)
+
+
+#------------------------------------------------------------------------------
+# Unit tests
+#------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    import os
+    import sys
+
+    def print_break():
+        sys.stdout.write("\n")
+        sys.stderr.write("\n")
+
+    sys.stdout.write("out-default-default\n")
+    sys.stderr.write("err-default-default\n")
+
+    print_break()
+
+    sys.stdout.state.set_fg(Color.RED)
+    sys.stdout.write("out-red-default\n")
+    sys.stderr.write("err-default-default\n")
+
+    print_break()
+
+    sys.stdout.state.set_bg(Color.WHITE)
+    sys.stdout.write("out-red-white\n")
+    sys.stderr.write("err-default-default\n")
+
+    print_break()
+
+    sys.stderr.state.set_fg(Color.BLUE)
+    sys.stdout.write("out-red-white\n")
+    sys.stderr.write("err-blue-default\n")
+
+    print_break()
+
+    sys.stderr.state.set_bg(Color.YELLOW)
+    sys.stdout.write("out-red-white\n")
+    sys.stderr.write("err-blue-yellow\n")
+
+    print_break()
 

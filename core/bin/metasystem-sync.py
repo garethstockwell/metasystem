@@ -121,8 +121,8 @@ import sys
 from time import time
 
 sys.path.append(os.path.join(sys.path[0], '../lib/python'))
-import Console
-from Console import Color
+from metasystem import console
+from metasystem.console import Color
 
 
 #------------------------------------------------------------------------------

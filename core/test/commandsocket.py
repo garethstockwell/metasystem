@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 
-# Script for testing CommandSocket module
+# Script for testing commandsocket module
 
 import logging
 import os
 import sys
 
 sys.path.append(os.path.join(sys.path[0], '../lib/python'))
-import CommandSocket
+from metasystem import commandsocket
 
 def do_client(args):
     msg = ' '.join(args)
     print "Client: sending '" + msg + "'"
-    client = CommandSocket.Client()
+    client = commandsocket.Client()
     reply = client.send(msg)
     print "Reply: '" + reply + "'"
 
 def do_server():
-    server = CommandSocket.Server()
+    server = commandsocket.Server()
     while True:
         msg = server.get_message()
         print "Server: message '" + msg.msg + "'"
