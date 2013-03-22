@@ -97,8 +97,7 @@ Project paths are specified in the .metasystem-dirinfo files, via entries such a
 
 Files
 
-* bin/metasystem-dirinfo
-* templates/metasystem-dirinfo
+* core/templates/metasystem-dirinfo
 
 
 Shell environment management
@@ -119,8 +118,8 @@ This config file is parsed by a python script which writes out a shell script; t
 
 Files
 
-* bin/metasystem-profile.py
-* templates/local/config/profile.ini
+* modules/profile/bin/metasystem-profile.py
+* core/templates/local/config/profile.ini
 
 Shell aliases
 
@@ -147,9 +146,9 @@ By using a cd hook, the identity can automatically be set when navigating into a
 
 Files
 
-* bin/metasystem-id.py
-* bin/scm-wrapper.sh
-* templates/local/config/id.ini
+* core/bin/metasystem-id.py
+* core/bin/scm-wrapper.sh
+* core/templates/local/config/id.ini
 
 Shell aliases
 
@@ -178,8 +177,8 @@ Metadata about each project (its name; where on the local filesystem it lives; i
 
 Files
 
-* bin/sync.py
-* templates/local/config/sync.ini
+* core/bin/metasystem-sync.py
+* core/templates/local/config/sync.ini
 
 
 Variable and function naming conventions
@@ -209,13 +208,6 @@ Environment variables
 Some important environment variables set during login are:
 
 METASYSTEM_HOSTNAME
-
-METASYSTEM_IDS
-List of identities available for the 'id-set' command.
-
-METASYSTEM_ID_TYPES
-List of identity types available for the 'id-set' command.
-e.g. git, hg
 
 METASYSTEM_OS
 OS on which the system is running.
