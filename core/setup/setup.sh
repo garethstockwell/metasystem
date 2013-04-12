@@ -275,13 +275,20 @@ function archive_existing_files()
 function install_files()
 {
 	print_banner Installing files
-	login_file=profile
-	test $METASYSTEM_OS != "windows" && login_file=bashrc
-	local cmd="$METASYSTEM_CORE_BIN/subst-vars.sh \
-		$METASYSTEM_SETUP/files/home/$login_file $HOME/.$login_file"
-	execute $cmd
+
+	local files='bashrc profile'
+	local src=
+	for src in $files; do
+		local dst=$src
+		test $METASYSTEM_OS == "windows" && src=${src}-windows
+		local cmd="$METASYSTEM_CORE_BIN/subst-vars.sh \
+			$METASYSTEM_SETUP/files/home/$src $HOME/.$dst"
+		execute $cmd
+	done
+
 	execute rm -f $HOME/.metasystem-config
 	execute cp $METASYSTEM_SETUP/files/home/metasystem-config $HOME/.metasystem-config
+
 	if [ "$METASYSTEM_OS" == "linux" ]
 	then
 		execute mkdir -p ~/.config/autostart
@@ -316,7 +323,8 @@ function setup_windows()
 function setup_cygwin()
 {
 	print_banner Cygwin-specific setup
-	files='perl python'
+	#local files='perl python'
+	local files=
 	for file in $files
 	do
 		execute mv /usr/bin/$file $ARCHIVE_DIR/usr/bin/$file

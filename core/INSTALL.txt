@@ -63,6 +63,12 @@ Using Cygwin instead of MSYS
 
 Install Python >=2.7
 http://superuser.com/questions/394236/how-to-install-python-2-7-with-unix-libraries-on-cygwin
+Need to install following modules in Cygwin, in order to build corresponding Python modules
+* libreadline
+* libncurses-dev
+* libbz2-dev
+* libz-dev
+Still fails to build crypt module
 
 
 -------------------------------------------------------------------------------
