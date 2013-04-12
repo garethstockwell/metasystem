@@ -44,8 +44,10 @@ Run 'sync init'
 
 Install Console2
 Add tab definitions for MinGW, Cygwin:
+	Cygwin: C:\cygwin\bin\bash.exe --login -i
 	MSYS: C:\MinGW\msys\1.0\bin\bash.exe --login -i
 	DOS:  cmd.exe
+	server:	C:\cygwin\bin\bash.exe --login -c "$METASYSTEM_ROOT/modules/ssh/bin/ssh-wrapper.sh -Y -t server screen -RR"
 
 Set up mount points in /etc/fstab
 C:\MinGW\   /mingw
@@ -60,6 +62,10 @@ Set up firefox (see below)
 -------------------------------------------------------------------------------
 Using Cygwin instead of MSYS
 -------------------------------------------------------------------------------
+
+Edit /etc/passwd to set home directory to /cygdrive/c/Users/<username>
+- Note that Cygwin can pick up %HOME% instead, but some programs (e.g. ssh)
+  will still query /etc/passwd, so it is better to set it there
 
 Install following Python packages
 * libreadline
