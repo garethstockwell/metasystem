@@ -61,13 +61,16 @@ Set up firefox (see below)
 Using Cygwin instead of MSYS
 -------------------------------------------------------------------------------
 
-Install Python >=2.7
-http://superuser.com/questions/394236/how-to-install-python-2-7-with-unix-libraries-on-cygwin
-Need to install following modules in Cygwin, in order to build corresponding Python modules
+Install following Python packages
 * libreadline
 * libncurses-dev
 * libbz2-dev
 * libz-dev
+* rsync
+* ssh
+
+Install Python >=2.7
+http://superuser.com/questions/394236/how-to-install-python-2-7-with-unix-libraries-on-cygwin
 Still fails to build crypt module
 
 
