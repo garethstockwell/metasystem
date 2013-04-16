@@ -3,6 +3,31 @@
 # Integration layer for smartcd (https://github.com/cxreg/smartcd)
 
 #------------------------------------------------------------------------------
+# Functions required by smartcd_install
+#------------------------------------------------------------------------------
+
+function do_smartcd_install_templates()
+{
+	local src_dir=$1
+	local dst_dir=~/.smartcd/templates
+	if [[ -e $src_dir ]]; then
+		[[ ! -d $dst_dir ]] && mkdir -p $dst_dir
+		for name in `'ls' $src_dir`; do
+			echo "Installing smartcd template '$name' ..."
+			rm -f $dst_dir/$name
+			cp $src_dir/$name $dst_dir
+		done
+	fi
+}
+
+function smartcd_install_templates()
+{
+	do_smartcd_install_templates $METASYSTEM_CD_ROOT/templates
+	do_smartcd_install_templates $METASYSTEM_LOCAL_ROOT/templates/smartcd
+}
+
+
+#------------------------------------------------------------------------------
 # Dependency check
 #------------------------------------------------------------------------------
 
@@ -28,6 +53,7 @@ if [[ $? != 0 ]]; then
 		\\make install
 		source ~/.smartcd/lib/core/smartcd
 		smartcd config
+		smartcd_install_templates
 	}
 
 	return 1
@@ -93,26 +119,6 @@ function _metasystem_export()
 function _metasystem_unset()
 {
 	empty_function
-}
-
-function do_smartcd_install_templates()
-{
-	local src_dir=$1
-	local dst_dir=~/.smartcd/templates
-	if [[ -e $src_dir ]]; then
-		[[ ! -d $dst_dir ]] && mkdir -p $dst_dir
-		for name in `'ls' $src_dir`; do
-			echo "Installing smartcd template '$name' ..."
-			rm -f $dst_dir/$name
-			cp $src_dir/$name $dst_dir
-		done
-	fi
-}
-
-function smartcd_install_templates()
-{
-	do_smartcd_install_templates $METASYSTEM_CD_ROOT/templates
-	do_smartcd_install_templates $METASYSTEM_LOCAL_ROOT/templates/smartcd
 }
 
 alias scd-ee='smartcd edit enter'
