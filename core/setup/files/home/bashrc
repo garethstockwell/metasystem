@@ -1,3 +1,5 @@
+source ~/.profile
+
 if [[ -n $PS1 ]]; then
 	source ~/.metasystem-config
 	. ${METASYSTEM_ROOT}/home/shrc
