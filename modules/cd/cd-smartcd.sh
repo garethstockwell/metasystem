@@ -26,6 +26,26 @@ function smartcd_install_templates()
 	do_smartcd_install_templates $METASYSTEM_LOCAL_ROOT/templates/smartcd
 }
 
+function _metasystem_smartcd_install()
+{
+	local script_dir=~/.smartcd/scripts/$(pwd -P)
+	local force=
+	[[ "$1" == "-force" ]] && force=1
+	[[ "$1" == "--force" ]] && force=1
+	if [[ -e $script_dir/bash_enter && -z $force ]]; then
+		echo "$script_dir/bash_enter already exists"
+		echo "Use --force to overwrite it"
+	else
+		smartcd template install metasystem
+	fi
+}
+
+function _metasystem_dirinfo_init()
+{
+	_metasystem_dirinfo_install $*
+	_metasystem_smartcd_install $*
+}
+
 
 #------------------------------------------------------------------------------
 # Dependency check
@@ -49,11 +69,16 @@ if [[ $? != 0 ]]; then
 		fi
 
 		echo "Installing smartcd ..."
-		cd $smartcd_dir
-		\\make install
+		pushd $smartcd_dir
+		make install
 		source ~/.smartcd/lib/core/smartcd
 		smartcd config
 		smartcd_install_templates
+		popd
+
+		pushd $HOME
+		_metasystem_dirinfo_init
+		popod
 	}
 
 	return 1
@@ -63,26 +88,6 @@ fi
 #------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
-
-function _metasystem_smartcd_install()
-{
-	local script_dir=~/.smartcd/scripts/$(pwd -P)
-	local force=
-	[[ "$1" == "-force" ]] && force=1
-	[[ "$1" == "--force" ]] && force=1
-	if [[ -e $script_dir/bash_enter && -z $force ]]; then
-		echo "$script_dir/bash_enter already exists"
-		echo "Use --force to overwrite it"
-	else
-		smartcd template install metasystem
-	fi
-}
-
-function _metasystem_dirinfo_init()
-{
-	_metasystem_dirinfo_install $*
-	_metasystem_smartcd_install $*
-}
 
 function metasystem_parse_dirinfo()
 {
