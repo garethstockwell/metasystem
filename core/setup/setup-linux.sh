@@ -7,7 +7,6 @@
 #------------------------------------------------------------------------------
 
 SCRIPT_DIR=$(dirname $(readlink -f $0))
-[[ -z $METASYSTEM_CORE_LIB ]] && export METASYSTEM_CORE_LIB=$SCRIPT_DIR/../lib
 source $METASYSTEM_CORE_LIB_BASH/utils.sh
 
 #------------------------------------------------------------------------------
@@ -407,7 +406,7 @@ function setup_java()
 	#execute aptitude $yes update
 
 	local jdk_bin=~/Downloads/jdk.bin
-	local jdk_dir=/opt/java/x86_64
+	local jdk_dir=/opt/java
 	local jdk_tmp_dir=/tmp/java
 	test -e $jdk_bin || error "JDK file $jdk_bin not found: download from http://www.java.com/en/download/linux_manual.jsp?locale=en"
 	execute rm -rf $jdk_dir
