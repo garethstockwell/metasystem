@@ -10,7 +10,28 @@ smartcd_lib=$HOME/.smartcd/lib/core/smartcd
 [[ -e $smartcd_lib ]] && source $smartcd_lib
 unset smartcd_lib
 
-func_exists smartcd || return 1
+func_exists smartcd
+if [[ $? != 0 ]]; then
+	function smartcd_install()
+	{
+		local smartcd_dir=$METASYSTEM_ROOT/../smartcd
+		if [[ -d $smartcd_dir ]]; then
+			echo "$smartcd_dir already exists - skipping clone"
+		else
+			echo "Cloning smartcd ..."
+			local smartcd_repo_url=git://github.com/garethstockwell/smartcd.git
+			git clone $smartcd_repo_url $(nativepath $smartcd_dir)
+		fi
+
+		echo "Installing smartcd ..."
+		cd $smartcd_dir
+		\\make install
+		source ~/.smartcd/lib/core/smartcd
+		smartcd config
+	}
+
+	return 1
+fi
 
 
 #------------------------------------------------------------------------------
