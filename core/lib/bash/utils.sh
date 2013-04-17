@@ -59,7 +59,6 @@ metasystem_declare_stub map.sh map_clear
 # misc.sh
 metasystem_declare_stub misc.sh assert_superuser
 metasystem_declare_stub misc.sh assert_not_superuser
-metasystem_declare_stub misc.sh check_os
 metasystem_declare_stub misc.sh assert_is_linux
 metasystem_declare_stub misc.sh assert_is_ubuntu
 metasystem_declare_stub misc.sh log_file
@@ -73,6 +72,9 @@ metasystem_declare_stub path.sh path_prepend
 metasystem_declare_stub path.sh path_prepend_if_exists
 metasystem_declare_stub path.sh path_remove
 metasystem_declare_stub path.sh path_shorten
+
+# platform.sh
+metasystem_declare_stub platform.sh query_platform
 
 # string.sh
 metasystem_declare_stub string.sh lowercase

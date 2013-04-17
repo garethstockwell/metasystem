@@ -558,7 +558,7 @@ done
 parse_command_line $args
 
 # sudo discards METASYSTEM_OS* variables, so recreate them here
-check_os
+query_platform
 
 assert_is_ubuntu
 

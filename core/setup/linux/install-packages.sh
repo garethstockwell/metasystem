@@ -272,7 +272,7 @@ done
 parse_command_line $args
 
 # sudo discards METASYSTEM_OS* variables, so recreate them here
-check_os
+query_platform
 
 ### HACK ###
 METASYSTEM_OS_VERSION=12.04

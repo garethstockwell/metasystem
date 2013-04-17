@@ -19,53 +19,6 @@ function assert_not_superuser()
 	test `whoami` != "root" || error "Must not be run as superuser"
 }
 
-function check_os()
-{
-	METASYSTEM_OS=
-	METASYSTEM_OS_VENDOR=
-	METASYSTEM_OS_VERSION=
-	METASYSTEM_PLATFORM=
-
-	if [ ! -z `uname | grep -i ^cygwin` ]
-	then
-		METASYSTEM_OS=windows
-		METASYSTEM_OS_VENDOR=microsoft
-		METASYSTEM_PLATFORM=cygwin
-		export CYGWIN_HOME=/cygdrive/c/cygwin
-	fi
-
-	if [ ! -z `uname | grep -i ^mingw` ]
-	then
-		METASYSTEM_OS=windows
-		METASYSTEM_OS_VENDOR=microsoft
-		METASYSTEM_PLATFORM=mingw
-		export MSYS_HOME=/c/MinGW/msys/1.0
-		export TERM=msys
-	fi
-
-	if [ ! -z `uname | grep -i ^darwin` ]
-	then
-		METASYSTEM_OS=mac
-		METASYSTEM_OS_VENDOR=apple
-		METASYSTEM_OS_VERSION=`sw_vers -productVersion`
-		METASYSTEM_PLATFORM=unix
-	fi
-
-	if [ -e /etc/issue ]
-	then
-		METASYSTEM_OS=linux
-		METASYSTEM_OS_VENDOR=`cat /etc/issue | awk '{ print $1 }' | tr 'A-Z' 'a-z'`
-		METASYSTEM_OS_VERSION=`cat /etc/issue | awk '{ print $2 }' | tr 'A-Z' 'a-z'`
-		METASYSTEM_PLATFORM=unix
-	fi
-
-	export METASYSTEM_OS
-	export METASYSTEM_OS_VENDOR
-	export METASYSTEM_OS_VERSION
-	export METASYSTEM_PLATFORM
-	export METASYSTEM_HOSTNAME=$HOSTNAME
-}
-
 function assert_is_linux()
 {
 	test "$METASYSTEM_OS" == "linux" || error "Not Linux"
