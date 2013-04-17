@@ -78,7 +78,7 @@ if [[ $? != 0 ]]; then
 
 		pushd $HOME
 		_metasystem_dirinfo_init
-		popod
+		popd
 	}
 
 	return 1
