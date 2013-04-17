@@ -32,6 +32,7 @@ pull
 rebase
 revert
 tag
+write-config
 '
 
 WRITE_ACTIONS_HG='
@@ -45,6 +46,7 @@ resolve
 revert
 rollback
 tag
+write-config
 '
 
 #------------------------------------------------------------------------------
@@ -121,5 +123,7 @@ function execute_tool()
 
 parse_command_line "$@"
 generate_config
-execute_tool "$@"
+if [[ $arg_action != write-config ]]; then
+	execute_tool "$@"
+fi
 
