@@ -271,13 +271,15 @@ do
 done
 parse_command_line $args
 
-# sudo discards METASYSTEM_OS* variables, so recreate them here
-query_platform
-
-### HACK ###
-METASYSTEM_OS_VERSION=12.04
-
 assert_is_linux
+
+# Trim version number
+oIFS="$IFS"
+IFS=.
+set -- $METASYSTEM_OS_VERSION
+export METASYSTEM_OS_VERSION=$1.$2
+IFS="$oIFS"
+
 linux_distro_version=${METASYSTEM_OS_VENDOR}-${METASYSTEM_OS_VERSION}
 
 test "$opt_help" == yes && print_usage && exit 0

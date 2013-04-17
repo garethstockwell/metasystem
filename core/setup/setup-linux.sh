@@ -271,7 +271,7 @@ function setup_debian()
 function install_aptitude()
 {
 	print_banner Installing aptitude
-	execute apt-get install aptitude
+	execute apt-get install $yes aptitude
 	execute aptitude $yes update
 	execute aptitude $yes upgrade
 }
@@ -280,7 +280,7 @@ function install_packages()
 {
 	local list=$1
 	print_banner "Installing package list '$list'"
-	execute `dirname $0`/linux/install-packages.sh $yes $list
+	execute $SCRIPT_DIR/linux/install-packages.sh $yes $list
 }
 
 function install_xplanetFX()
@@ -411,7 +411,7 @@ function setup_java()
 
 	test -d $jdk_dir && echo "JDK already installed in $jdk_dir" && return 0
 
-	test -e $jdk_bin || error "JDK file $jdk_bin not found: download from http://www.java.com/en/download/linux_manual.jsp?locale=en"
+	test -e $jdk_bin || error "JDK file $jdk_bin not found: download from http://www.oracle.com/technetwork/java/javase/downloads/jdk6downloads-1902814.html"
 	execute rm -rf $jdk_dir
 	execute mkdir -p $jdk_dir
 	execute rm -rf $jdk_tmp_dir
@@ -556,9 +556,6 @@ do
 	args="$args \"$arg\""
 done
 parse_command_line $args
-
-# sudo discards METASYSTEM_OS* variables, so recreate them here
-query_platform
 
 assert_is_ubuntu
 

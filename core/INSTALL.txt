@@ -15,7 +15,7 @@ Installing metasystem on a Windows host
 -------------------------------------------------------------------------------
 
 Install MinGW / MSYS
-Change home directory 
+Change home directory
 	Edit /etc/profile to contain "HOME=/c/Users/$LOGNAME"
 
 Install
@@ -155,20 +155,12 @@ Installing metasystem on a Linux host
 
 Install graphics drivers
 
-Run metasystem/setup/ams-post-install.sh
-
-Clone git@github.com:${MY_NAME_NO_DOTS}/smartcd.git
-	cd smartcd
-	make install
-	source ~/.smartcd/lib/core/smartcd
-	smartcd config
-
 Clone metasystem.git
 
 Run metasystem/setup/setup.sh
 Run metasystem/setup/setup-linux.sh
 
-smartcd_install_templates
+smartcd_install
 
 Set up firefox (see below)
 
@@ -182,9 +174,14 @@ Create SMB mountpoints:
 * //MW7HXQS1YQVAL3/ntfs-data /mnt/acn-lon-dsk-win/ntfs-data smbfs credentials=/etc/samba/credentials,noauto,user 0 0
 
 Mount ntfs-data
-/dev/sda2	/media/ntfs-data	ntfs-3g	defaults	0	0	
+/dev/sda2	/media/ntfs-data	ntfs-3g	defaults	0	0
 
 Install software updates
+
+To set up for Android development:
+sudo -E $METASYSTEM_ROOT/core/setup/setup-linux.sh android -y
+(Note: -E is required to propagate METASYSTEM_* environment variables to the
+subshell in which the script runs)
 
 
 -------------------------------------------------------------------------------
@@ -198,10 +195,6 @@ Install firefox addons
 	Tree-style tab
 	Ubiquity
 		Note: for new versions of Firefox, use community version (https://bitbucket.org/satyr/ubiquity/downloads/tip.xpi)
-	New tab toolbar button
-	Password Exporter
-	Redirector
-	FoxyProxy
 Install ubiquity commands from $METASYSTEM_CORE_SHELL/lib/firefox/ubiquity
 
 
@@ -219,7 +212,7 @@ Configure with MAC address from NLL file
 Partitions
 -------------------------------------------------------------------------------
 
-To modify the partition table on an ACN Win7 installation:
+To modify the partition table on a Win7 installation:
 
 1. Delete the BDEDrive partition
 a. bcdboot c:\windows /s c:
