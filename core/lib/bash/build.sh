@@ -34,6 +34,7 @@ function make()
 	local log=$METASYSTEM_MAKE_LOG
 	local measure_time=$METASYSTEM_MEASURE_TIME
 	local vanilla=$METASYSTEM_MAKE_VANILLA
+	local jobs_specified=
 
 	for x in "$@"; do
 		case $x in
@@ -62,6 +63,11 @@ function make()
 				measure_time=
 				;;
 
+			-j*)
+				jobs_specified=1
+				args="$args $x"
+				;;
+
 			# Redirection breaks ncurses
 			menuconfig)
 				vanilla=1
@@ -79,7 +85,7 @@ function make()
 		$cmd
 	else
 		local rc=0
-		if [[ $parallel == 1 ]]; then
+		if [[ -z $jobs_specified && $parallel == 1 ]]; then
 			local ncpus=$(number_of_processors)
 			if [[ -n $ncpus ]]; then
 				local njobs=$ncpus
