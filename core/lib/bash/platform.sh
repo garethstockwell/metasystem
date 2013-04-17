@@ -62,7 +62,7 @@ function query_platform()
 			fi
 	esac
 
-	if [[ METASYSTEM_OS == 'linux' && -e /etc/issue ]]; then
+	if [[ $METASYSTEM_OS == 'linux' && -e /etc/issue ]]; then
 		METASYSTEM_OS_VENDOR=`cat /etc/issue | awk '{ print $1 }' | tr 'A-Z' 'a-z'`
 		METASYSTEM_OS_VERSION=`cat /etc/issue | awk '{ print $2 }' | tr 'A-Z' 'a-z'`
 	fi
