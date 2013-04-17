@@ -274,6 +274,9 @@ parse_command_line $args
 # sudo discards METASYSTEM_OS* variables, so recreate them here
 check_os
 
+### HACK ###
+METASYSTEM_OS_VERSION=12.04
+
 assert_is_linux
 linux_distro_version=${METASYSTEM_OS_VENDOR}-${METASYSTEM_OS_VERSION}
 

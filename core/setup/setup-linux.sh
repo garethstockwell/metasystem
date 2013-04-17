@@ -408,6 +408,9 @@ function setup_java()
 	local jdk_bin=~/Downloads/jdk.bin
 	local jdk_dir=/opt/java
 	local jdk_tmp_dir=/tmp/java
+
+	test -d $jdk_dir && echo "JDK already installed in $jdk_dir" && return 0
+
 	test -e $jdk_bin || error "JDK file $jdk_bin not found: download from http://www.java.com/en/download/linux_manual.jsp?locale=en"
 	execute rm -rf $jdk_dir
 	execute mkdir -p $jdk_dir
@@ -490,6 +493,14 @@ SUBSYSTEM==\"usb\", ATTR{idVendor}==\"0451\", ATTR{idProduct}==\"d101\", MODE=\"
 SUBSYSTEM==\"usb\", ATTR{idVendor}==\"0451\", ATTR{idProduct}==\"d022\", MODE=\"0600\", OWNER=\"$ANDROID_USER\"
 # usbboot protocol on panda (PandaBoard)
 SUBSYSTEM==\"usb\", ATTR{idVendor}==\"0451\", ATTR{idProduct}==\"d010\", MODE=\"0600\", OWNER=\"$ANDROID_USER\"
+# adb protocol on grouper/tilapia (Nexus 7)
+SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", ATTR{idProduct}==\"4e42\", MODE=\"0600\", OWNER=\"$ANDROID_USER\"
+# fastboot protocol on grouper/tilapia (Nexus 7)
+SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", ATTR{idProduct}==\"4e40\", MODE=\"0600\", OWNER=\"$ANDROID_USER\"
+# adb protocol on manta (Nexus 10)
+SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", ATTR{idProduct}==\"4ee2\", MODE=\"0600\", OWNER=\"$ANDROID_USER\"
+# fastboot protocol on manta (Nexus 10)
+SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", ATTR{idProduct}==\"4ee0\", MODE=\"0600\", OWNER=\"$ANDROID_USER\"
 " > $rules
 	fi
 }
