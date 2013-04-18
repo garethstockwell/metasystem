@@ -112,6 +112,9 @@ if time_format:
 else:
     retag = re.compile("^([A-Z])/([^\(]+)\(([^\)]+)\): (.*)$")
 
+# Workaround for http://code.google.com/p/android/issues/detail?id=39723
+neg_filters = [re.compile(r'^(.*(nativeGetEnabledTags)).*$')]
+
 # to pick up -d or -e
 adb_args = ' '.join(sys.argv[1:])
 
@@ -126,6 +129,15 @@ while True:
         line = input.readline()
     except KeyboardInterrupt:
         break
+
+    skip = False
+    for neg_re in neg_filters:
+        if neg_re.match(line):
+            skip = True
+            continue
+
+    if skip:
+        continue
 
     match = retag.match(line)
     if not match is None:
