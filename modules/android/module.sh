@@ -6,7 +6,7 @@
 
 function metasystem_android_emulator()
 {
-	local exe=$(which emulator)
+	local exe=$(which emulator-arm)
 	if [[ -z $exe ]]; then
 		echo "Error: emulator not found"
 		return 1
@@ -65,7 +65,9 @@ function metasystem_android_emulator()
 	# Compose command
 	local cmd="$exe $args"
 	[[ -n $opt_verbose ]] && cmd="$cmd -verbose -show-kernel"
-	[[ -z $avd && -n $ANDROID_DEFAULT_AVD ]] && cmd="$cmd @$ANDROID_DEFAULT_AVD"
+
+	# We don't need to use an AVD
+	#[[ -z $avd && -n $ANDROID_DEFAULT_AVD ]] && cmd="$cmd @$ANDROID_DEFAULT_AVD"
 
 	# Create SD card image
 	if [[ -n $opt_sdcard ]]; then
@@ -115,7 +117,7 @@ function metasystem_android_observe()
 	local size=100x25
 	if [[ -n $gt ]]; then
 		$gt --title="adb logcat" --geometry="${size}+0+0" -x bash -c android-adb-logcat.py
-		$gt --title="adb shell" --geometry="${size}+0-0" -x bash -c metasystem_android_shell
+		$gt --title="adb shell" --geometry="${size}+0-0" -x bash -c "adb wait-for-device && adb shell"
 	else
 		echo "Error: gnome-terminal not found" >&2
 	fi
