@@ -20,8 +20,20 @@ function metasystem_android_emulator()
 	local opt_observe=1
 	local opt_verbose=1
 	local opt_dryrun=
-	[[ -e $ANDROID_SDCARD_IMG ]] && opt_sdcard=" -sdcard $ANDROID_SDCARD_IMG"
+
+	[[ -n $ANDROID_SDCARD_IMG && -d $(dirname $ANDROID_SDCARD_IMG) ]] &&\
+		opt_sdcard="$ANDROID_SDCARD_IMG"
+
+	local prev=
+
 	for token in "$@"; do
+		# If the previous option needs an argument, assign it.
+		if [[ -n "$prev" ]]; then
+			eval "$prev=\$token"
+			prev=
+			continue
+		fi
+
 		local append=
 		case $token in
 			-h | --help)
@@ -34,8 +46,7 @@ function metasystem_android_emulator()
 				append=1
 				;;
 			-sdcard)
-				opt_sdcard=
-				append=1
+				prev=opt_sdcard
 				;;
 			-observe | --observe)
 				opt_observe=1
@@ -62,6 +73,8 @@ function metasystem_android_emulator()
 		[[ -n $append ]] && args="$args $token"
 	done
 
+	echo "args=$args"
+
 	# Compose command
 	local cmd="$exe $args"
 	[[ -n $opt_verbose ]] && cmd="$cmd -verbose -show-kernel"
@@ -71,25 +84,20 @@ function metasystem_android_emulator()
 
 	# Create SD card image
 	if [[ -n $opt_sdcard ]]; then
-		if [[ -n $ANDROID_SDCARD_IMG ]]; then
-			if [[ ! -e $ANDROID_SDCARD_IMG ]]; then
-				if [[ -n $(which mksdcard) ]]; then
-					echo "Creating sdcard image $ANDROID_SDCARD_IMAGE with size $ANDROID_EMULATOR_SDCARD_SIZE"
-					if [[ -z $opt_dryrun ]]; then
-						mkdir -p $(dirname $ANDROID_SDCARD_IMG)
-						mksdcard -l e $ANDROID_EMULATOR_SDCARD_SIZE $ANDROID_SDCARD_IMG
-					fi
-				else
-					echo "mksdcard not found"
-					opt_sdcard=
+		if [[ ! -e $opt_sdcard ]]; then
+			if [[ -n $(which mksdcard) ]]; then
+				echo "Creating sdcard image $opt_sdcard with size $ANDROID_EMULATOR_SDCARD_SIZE"
+				if [[ -z $opt_dryrun ]]; then
+					mkdir -p $(dirname $opt_sdcard)
+					mksdcard -l e $ANDROID_EMULATOR_SDCARD_SIZE $opt_sdcard
 				fi
+			else
+				echo "mksdcard not found"
+				opt_sdcard=
 			fi
-		else
-			echo "ANDROID_SDCARD_IMG is not set"
-			opt_sdcard=
 		fi
 	fi
-	[[ -n $opt_sdcard ]] && cmd="$cmd $opt_sdcard"
+	[[ -n $opt_sdcard ]] && cmd="$cmd -sdcard $opt_sdcard"
 
 	# Launch
 	echo $cmd
