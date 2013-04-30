@@ -9,19 +9,20 @@
 #
 #    autostash PATH=__PATH__/bin:$PATH
 #
-# This template is named 'android-app'
+# This template is named 'arm-linux'
 ########################################################################
 
 # Enter any bash_enter commands below here: (leave this line!)
 #------------------------------------------------------------------------------
-# android-app
+# arm-linux
 #------------------------------------------------------------------------------
 
 # This file has a high churn, so we centralise it
-_smartcd_exec_file $METASYSTEM_CD_ROOT/scripts/android-app-enter $(pwd -P)
+_smartcd_exec_file $METASYSTEM_CD_ROOT/scripts/arm-linux-enter $(pwd -P)
 
 # Enter any bash_leave commands below here: (leave this line!)
 #------------------------------------------------------------------------------
-# android-app
+# arm-linux
 #------------------------------------------------------------------------------
+
 
