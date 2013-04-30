@@ -19,7 +19,7 @@ if platform.system() == 'Linux':
 
     def ip():
         child = subprocess.Popen(['ifconfig'], shell=True, stdout=subprocess.PIPE)
-        regex = re.compile(r'.*inet addr:(.*?) .*')
+        regex = re.compile(r'.*inet addr:(.*) .*')
         out, err = child.communicate()
         for line in out.split('\n'):
             m = regex.match(line)
@@ -41,6 +41,6 @@ if sys.argv[1] == 'hostname':
     print hostname()
 
 if sys.argv[1] == 'ip':
-    print ip()
+    print 'IP[' + ip() + ']'
 
 

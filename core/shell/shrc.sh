@@ -190,12 +190,8 @@ alias path='path_split \\n $PATH'
 #------------------------------------------------------------------------------
 
 echo "Hostname:   $METASYSTEM_HOSTNAME"
-[[ -n $(which python) ]] && echo "Domain:     $($METASYSTEM_CORE_BIN/network-info.py domain)"
-if [[ $METASYSTEM_OS == linux ]]; then
-	echo "IP address: "`ifconfig | grep 'inet addr' | head -n1 | awk ' { print $2 } ' | sed -e 's/addr://'`
-else
-	echo "IP address: $($METASYSTEM_CORE_BIN/network-info.py ip)"
-fi
+echo "Domain:     $($METASYSTEM_CORE_BIN/network-info.py domain)"
+echo "IP address: $($METASYSTEM_CORE_BIN/network-info.py ip)"
 echo "OS:         $METASYSTEM_OS"
 echo "OS vendor:  $METASYSTEM_OS_VENDOR"
 echo "OS version: $METASYSTEM_OS_VERSION"
