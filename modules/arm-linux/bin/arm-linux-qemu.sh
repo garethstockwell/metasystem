@@ -36,6 +36,8 @@ opt_initrd=
 opt_memory=
 opt_machine=
 opt_ssh_port=
+opt_graphics=no
+opt_qemu_opts=
 
 
 #------------------------------------------------------------------------------
@@ -66,6 +68,9 @@ Options:
     --memory MEM            Specify memory (default: $DEFAULT_MEMORY)
     --machine MACHINE       Specify machine (default: $DEFAULT_MACHINE)
     --ssh-port PORT         Specify local SSH port (default: $DEFAULT_SSH_PORT)
+
+    --no-graphics           Disable QEMU window
+    --graphics              Enable QEMU window
 
 EOF
 }
@@ -111,6 +116,16 @@ function parse_command_line()
 
 			-ssh-port | --ssh-port)
 				prev=opt_ssh_port
+				;;
+
+			-nographic | --nographic | -no-graphic | --no-graphic | \
+			-nographics | --nographics | -no-graphics | --no-graphics)
+				opt_graphics=no
+				;;
+
+			-graphic | --graphic | \
+			-graphics | --graphics)
+				opt_graphics=yes
 				;;
 
 			# Unrecognized options
@@ -164,6 +179,9 @@ Initial ramdisk ......................... $opt_initrd
 Kernel .................................. $opt_kernel
 Machine ................................. $opt_machine
 Memory .................................. $opt_memory
+Graphics ................................ $opt_graphics
+
+Additional QEMU options ................. $opt_qemu_opts
 
 EOF
 	for arg in $ARGUMENTS; do
@@ -223,7 +241,6 @@ print_banner Starting execution
 
 qemu_options="
 	-M ${opt_machine} -m ${opt_memory} -kernel ${opt_kernel}
-	-serial stdio
 	-redir tcp:${opt_ssh_port}::22
 	-net nic"
 
@@ -231,7 +248,20 @@ kernel_string="console=ttyAMA0 mem=${opt_memory}"
 
 [[ -n $opt_initrd ]] && qemu_options="$qemu_options -initrd ${opt_initrd}"
 
+if [[ $opt_graphics == yes ]]; then
+	qemu_options="$qemu_options -serial stdio"
+else
+	qemu_options="$qemu_options -nographic"
+fi
+
+[[ -n $opt_qemu_options ]] && qemu_options="$qemu_options $opt_qemu_options"
+
 echo -e "qemu-system-arm ${qemu_options}\n\t-append \"${kernel_string}\""
+
+if [[ $opt_graphics == no ]]; then
+	echo -e "\nTo exit the emulator, use 'Ctrl-A x'\n"
+fi
+
 if [[ $opt_dryrun != yes ]]; then
 	qemu-system-arm ${qemu_options} -append "${kernel_string}"
 fi
