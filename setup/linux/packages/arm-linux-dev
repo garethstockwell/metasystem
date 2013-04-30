@@ -15,3 +15,10 @@ patch
 subversion
 texinfo
 
+# Required for NFS mounting
+# http://lists.busybox.net/pipermail/buildroot/2010-February/032488.html
+bridge-utils
+portmap
+nfs-kernel-server
+uml-utilities
+
