@@ -5,3 +5,13 @@
 gcc-arm-linux-gnueabi
 qemu-system
 
+# Required for buildroot
+bison
+flex
+g++
+gettext
+git-core
+patch
+subversion
+texinfo
+

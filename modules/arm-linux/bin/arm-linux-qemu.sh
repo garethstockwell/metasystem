@@ -20,6 +20,7 @@ ARGUMENTS=''
 
 DEFAULT_MEMORY=128M
 DEFAULT_MACHINE=versatilepb
+DEFAULT_SSH_PORT=2200
 
 
 #------------------------------------------------------------------------------
@@ -31,8 +32,10 @@ for arg in $ARGUMENTS; do
 done
 
 opt_kernel=
+opt_initrd=
 opt_memory=
 opt_machine=
+opt_ssh_port=
 
 
 #------------------------------------------------------------------------------
@@ -58,9 +61,11 @@ Options:
     -v, --verbose           Verbose output
     -V, --version           Display version information and exit
 
+    --initrd INITRD         Specify initrd
     --kernel KERNEL         Specify kernel
     --memory MEM            Specify memory (default: $DEFAULT_MEMORY)
     --machine MACHINE       Specify machine (default: $DEFAULT_MACHINE)
+    --ssh-port PORT         Specify local SSH port (default: $DEFAULT_SSH_PORT)
 
 EOF
 }
@@ -88,12 +93,24 @@ function parse_command_line()
 		optarg=`expr "x$token" : 'x[^=]*=\(.*\)'`
 
 		case $token in
+			-initrd | --initrd)
+				prev=opt_initrd
+				;;
+
+            -kernel | --kernel)
+				prev=opt_kernel
+				;;
+
 			-machine | --machine)
 				prev=opt_machine
 				;;
 
 			-memory | --memory)
 				prev=opt_memory
+				;;
+
+			-ssh-port | --ssh-port)
+				prev=opt_ssh_port
 				;;
 
 			# Unrecognized options
@@ -131,6 +148,7 @@ function parse_command_line()
 	# Set defaults
 	[[ -z $opt_machine ]] && opt_machine=$DEFAULT_MACHINE
 	[[ -z $opt_memory ]] && opt_memory=$DEFAULT_MEMORY
+	[[ -z $opt_ssh_port ]] && opt_ssh_port=$DEFAULT_SSH_PORT
 }
 
 function print_summary()
@@ -142,6 +160,7 @@ function print_summary()
 Verbosity ............................... $opt_verbosity
 Dry run ................................. $opt_dryrun
 
+Initial ramdisk ......................... $opt_initrd
 Kernel .................................. $opt_kernel
 Machine ................................. $opt_machine
 Memory .................................. $opt_memory
@@ -169,9 +188,14 @@ done
 
 parse_command_line $args
 
+if [[ -z $opt_initrd ]]; then
+	opt_initrd=$(find . -iname rootfs.cpio.gz)
+fi
+
 if [[ -z $opt_kernel ]]; then
 	opt_kernel=$(find . -iname zImage)
 fi
+[[ -z $opt_kernel ]] && usage_error "No kernel image found"
 
 [[ $opt_help == yes ]] && print_usage && exit 0
 [[ $opt_version == yes ]] && print_version && exit 0
@@ -179,5 +203,11 @@ fi
 
 print_banner Starting execution
 
-execute qemu-system-arm -M $opt_machine -m $opt_memory -kernel $opt_kernel
+cmd="qemu-system-arm	-M ${opt_machine} -m ${opt_memory} -kernel ${opt_kernel}
+						-serial stdio
+						-redir tcp:${opt_ssh_port}::22
+						-append \"mem=${opt_memory}\"
+						-net nic"
+
+execute $cmd
 
