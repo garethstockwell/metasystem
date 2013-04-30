@@ -182,7 +182,7 @@ function find_file()
 	local var=opt_$name
 	local file=$2
 	if [[ -z $(eval echo "\$$var") ]]; then
-		local hits=$(find . -iname $file)
+		local hits=$(find . -iname "$file")
 		if [[ -n $hits ]]; then
 			if [[ $(echo $hits | wc -w) != 1 ]]; then
 				echo "Found multiple instances of $file:"
@@ -209,7 +209,7 @@ done
 parse_command_line $args
 
 # Autodetect
-find_file initrd rootfs.cpio.gz
+find_file initrd rootfs.cpio*
 find_file kernel zImage
 
 [[ $opt_help == yes ]] && print_usage && exit 0
@@ -221,11 +221,18 @@ print_banner Starting execution
 [[ -z $opt_initrd ]] && warn "No ramdisk image found"
 [[ -z $opt_kernel ]] && usage_error "No kernel image found"
 
-cmd="qemu-system-arm	-M ${opt_machine} -m ${opt_memory} -kernel ${opt_kernel}
-						-serial stdio
-						-redir tcp:${opt_ssh_port}::22
-						-append \"mem=${opt_memory}\"
-						-net nic"
+qemu_options="
+	-M ${opt_machine} -m ${opt_memory} -kernel ${opt_kernel}
+	-serial stdio
+	-redir tcp:${opt_ssh_port}::22
+	-net nic"
 
-execute $cmd
+kernel_string="console=ttyAMA0 mem=${opt_memory}"
+
+[[ -n $opt_initrd ]] && qemu_options="$qemu_options -initrd ${opt_initrd}"
+
+echo -e "qemu-system-arm ${qemu_options}\n\t-append \"${kernel_string}\""
+if [[ $opt_dryrun != yes ]]; then
+	qemu-system-arm ${qemu_options} -append "${kernel_string}"
+fi
 
