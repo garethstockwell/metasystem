@@ -176,6 +176,26 @@ EOF
 	done
 }
 
+function find_file()
+{
+	local name=$1
+	local var=opt_$name
+	local file=$2
+	if [[ -z $(eval echo "\$$var") ]]; then
+		local hits=$(find . -iname $file)
+		if [[ -n $hits ]]; then
+			if [[ $(echo $hits | wc -w) != 1 ]]; then
+				echo "Found multiple instances of $file:"
+				for f in $hits; do
+					echo -e "\t$f"
+				done
+				error "Use -$name to disambiguate"
+			fi
+		fi
+		eval "$var=$hits"
+	fi
+}
+
 
 #------------------------------------------------------------------------------
 # Main
@@ -188,20 +208,18 @@ done
 
 parse_command_line $args
 
-if [[ -z $opt_initrd ]]; then
-	opt_initrd=$(find . -iname rootfs.cpio.gz)
-fi
-
-if [[ -z $opt_kernel ]]; then
-	opt_kernel=$(find . -iname zImage)
-fi
-[[ -z $opt_kernel ]] && usage_error "No kernel image found"
+# Autodetect
+find_file initrd rootfs.cpio.gz
+find_file kernel zImage
 
 [[ $opt_help == yes ]] && print_usage && exit 0
 [[ $opt_version == yes ]] && print_version && exit 0
 [[ $opt_verbosity != silent ]] && print_summary
 
 print_banner Starting execution
+
+[[ -z $opt_initrd ]] && warn "No ramdisk image found"
+[[ -z $opt_kernel ]] && usage_error "No kernel image found"
 
 cmd="qemu-system-arm	-M ${opt_machine} -m ${opt_memory} -kernel ${opt_kernel}
 						-serial stdio
