@@ -8,6 +8,7 @@
 
 source $METASYSTEM_CORE_LIB_BASH/list.sh
 source $METASYSTEM_CORE_LIB_BASH/script.sh
+source $METASYSTEM_ARM_LINUX_LIB_BASH/functions.sh
 
 
 #------------------------------------------------------------------------------
@@ -15,7 +16,7 @@ source $METASYSTEM_CORE_LIB_BASH/script.sh
 #------------------------------------------------------------------------------
 
 SCRIPT_VERSION=0.1
-VALID_ACTIONS='download unzip configure'
+VALID_ACTIONS='download unzip configure sync'
 
 DEFAULT_BUILDROOT_VERSION=2013.02
 BUILDROOT_URL_ROOT=http://buildroot.uclibc.org/downloads
@@ -29,7 +30,9 @@ arg_action=
 arg_extra=
 
 opt_force=no
+opt_clean=no
 opt_buildroot_version=
+opt_rootfs=
 
 
 #------------------------------------------------------------------------------
@@ -56,6 +59,8 @@ Options:
 
     -f, --force             Remove old files / folders without prompting
     --buildroot-version VER Specify buildroot version (default $DEFAULT_BUILDROOT_VERSION)
+    --rootfs ROOTFS         Specify rootfs
+    --clean                 Clean rootfs
 
 EOF
 }
@@ -87,6 +92,14 @@ function parse_command_line()
 				prev=opt_buildroot_version
 				;;
 
+			-rootfs | --rootfs)
+				prev=opt_rootfs
+				;;
+
+			-clean | --clean)
+				opt_clean=yes
+				;;
+
 			# Unrecognized options
 			-*)
 				warn "Unrecognized option '$token' ignored"
@@ -108,7 +121,9 @@ function parse_command_line()
 	[[ -z $(list_contains $arg_action $VALID_ACTIONS) ]] &&\
 		usage_error "Invalid action '$arg_action'"
 
+	# Set defaults
 	[[ -z $opt_buildroot_version ]] && opt_buildroot_version=$DEFAULT_BUILDROOT_VERSION
+	[[ -z $opt_rootfs ]] && opt_rootfs=$ARM_LINUX_ROOTFS
 }
 
 function print_summary()
@@ -123,31 +138,9 @@ Dry run ................................. $opt_dryrun
 Action .................................. $arg_action
 
 Buildroot version ....................... $opt_buildroot_version
+rootfs .................................. $opt_rootfs
 
 EOF
-}
-
-function check_does_exist()
-{
-	local path=$1
-	if [[ $opt_dryrun != yes && ! -e $path ]]; then
-		error "Path $path does not exist"
-	fi
-}
-
-function check_does_not_exist()
-{
-	local path=$1
-	local r=0
-	if [[ $opt_dryrun != yes ]]; then
-		if [[ -e $path ]]; then
-			if [[ $opt_force != yes ]]; then
-				ask "Path $path exists - remove?" || r=1
-			fi
-			[[ $r = 0 ]] && execute rm -rf $path
-		fi
-	fi
-	return $r
 }
 
 
@@ -176,7 +169,32 @@ function action_configure()
 	print_banner "Configuring buildroot"
 	check_does_exist ${BUILDROOT_FOLDER}
 	execute cd ${BUILDROOT_FOLDER}
-	echo "Now execute 'make menuconfig'"
+	execute make menuconfig
+}
+
+function action_sync()
+{
+	print_banner "Syncing rootfs"
+	rootfs_tar=${BUILDROOT_FOLDER}/output/images/rootfs.tar
+	check_does_exist ${BUILDROOT_FOLDER}
+	check_does_exist ${rootfs_tar}
+	[[ -z $opt_rootfs ]] && error "No rootfs specified"
+	if [[ $opt_clean == yes ]]; then
+		local remove=yes
+		[[ $opt_dryrun != yes && $opt_force != yes ]] && ask "Remove existing rootfs?" || remove=no
+		[[ $remove == yes ]] && execute sudo rm -rf $opt_rootfs
+	fi
+	if [[ -d $opt_rootfs ]]; then
+		local tmp_rootfs=/tmp/rootfs
+		execute sudo rm -rf $tmp_rootfs
+		execute mkdir -p $tmp_rootfs
+		execute sudo tar -C $tmp_rootfs -xf $rootfs_tar
+		execute sudo rsync -av $tmp_rootfs/ $opt_rootfs
+		execute sudo rm -rf $tmp_rootfs
+	else
+		execute mkdir -p $opt_rootfs
+		execute sudo tar -C $opt_rootfs -xf $rootfs_tar
+	fi
 }
 
 
@@ -195,7 +213,7 @@ parse_command_line $args
 [[ $opt_version == yes ]] && print_version && exit 0
 [[ $opt_verbosity != silent ]] && print_summary
 
-BUILDROOT_FOLDER=buildroot-${opt_buildroot_version}
+BUILDROOT_FOLDER=buildroot
 BUILDROOT_TARBALL=${BUILDROOT_FOLDER}.tar.bz2
 
 eval action_${arg_action//-/_}
