@@ -278,7 +278,7 @@ function export_nfs()
 		rm -f /tmp/exports
 		mv /etc/exports /tmp/exports
 		cat /tmp/exports | grep -v $opt_rootfs > /etc/exports
-		sh -c "echo \"$opt_rootfs *(rw,sync,no_root_squash,no_subtree_check)\" >> /etc/exports"
+		sh -c "echo \"$opt_rootfs 192.168.0.0/255.255.0.0(rw,sync,no_root_squash,no_subtree_check,insecure)\" >> /etc/exports"
 	fi
 	execute exportfs -ra
 	echo -e "\nCreating tap0 ..."
