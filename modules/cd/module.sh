@@ -46,6 +46,16 @@ function autostash()
 	export "$@"
 }
 
+function autostash_if_undefined()
+{
+	local args="$@"
+	local var=${args%=*}
+	local value=${args#*=}
+	if [[ -n $var && -z $(eval echo \$$var) ]]; then
+		autostash $var=$value
+	fi
+}
+
 alias dirinfo-init='_metasystem_dirinfo_init'
 alias rcd=metasystem_rcd
 
