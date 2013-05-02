@@ -2,13 +2,15 @@
 
 # arm-linux-kernel
 
+# Helper script for downloading and compiling Linux kernel
+
 #------------------------------------------------------------------------------
 # Imports
 #------------------------------------------------------------------------------
 
 source $METASYSTEM_CORE_LIB_BASH/list.sh
 source $METASYSTEM_CORE_LIB_BASH/script.sh
-source $METASYSTEM_ARM_LINUX_LIB_BASH/functions.sh
+source $METASYSTEM_ARM_LINUX_LIB_BASH/misc.sh
 
 
 #------------------------------------------------------------------------------

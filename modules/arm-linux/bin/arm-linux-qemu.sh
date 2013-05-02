@@ -2,11 +2,9 @@
 
 # arm-linux-qemu
 
-# TODO
-# NFS
-#	- Set NFS root
-#	- Write qemu-ifup.sh into $NFS/sbin
-#	- Helpers for setting up server?
+# Helper script for launching QEMU, with Linux guest
+# Exports rootfs to the guest via NFS
+# Sets up host-guest networking via TUN/TAP
 
 #------------------------------------------------------------------------------
 # Imports
@@ -15,6 +13,8 @@
 source $METASYSTEM_CORE_LIB_BASH/list.sh
 source $METASYSTEM_CORE_LIB_BASH/misc.sh
 source $METASYSTEM_CORE_LIB_BASH/script.sh
+source $METASYSTEM_ARM_LINUX_LIB_BASH/misc.sh
+source $METASYSTEM_ARM_LINUX_LIB_BASH/comms.sh
 
 
 #------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ source $METASYSTEM_CORE_LIB_BASH/script.sh
 
 SCRIPT_VERSION=0.1
 
-VALID_ACTIONS='launch nfs-setup nfs-config'
+VALID_ACTIONS='setup launch'
 DEFAULT_ACTION=launch
 
 DEFAULT_MEMORY=128M
@@ -34,12 +34,6 @@ DEFAULT_GDB_HOST_PORT=1033
 
 SSH_GUEST_PORT=22
 GDB_GUEST_PORT=2345
-
-TUN_IP_LEAF=10.1
-QEMU_IP_LEAF=200
-
-TAP0_IP=192.168.10.1
-TAP0_MASK=192.168.10.255
 
 IFUP_SCRIPT=$PWD/scripts/qemu-ifup.sh
 
@@ -247,80 +241,19 @@ function find_file()
 	fi
 }
 
-function check_rootfs()
-{
-	[[ -z $opt_rootfs ]] && error "No rootfs specified"
-	[[ ! -d $opt_rootfs ]] && error "rootfs directory '$opt_rootfs' not found"
-	[[ ! -e $opt_rootfs/sbin/init ]] && error "Invalid rootfs $opt_rootfs: /sbin/init not found"
-}
-
-function query_host_network()
-{
-	print_banner "Network information"
-	host_ip=$(ifconfig | grep 'inet addr' | head -n1 | awk ' { print $2 } ' | sed -e 's/addr://')
-	host_gateway=$(route -n | head -n3 | tail -n1 | awk '{ print $2 }')
-	host_mask='255.255.255.0'
-	qemu_ip=${host_ip%*.*}.${QEMU_IP_LEAF}
-	tun_ip=${host_ip%*.*.*}.${TUN_IP_LEAF}
-
-	echo "Host IP address ............... $host_ip"
-	echo "Host gateway .................. $host_gateway"
-	echo "Host mask ..................... $host_mask"
-	echo "QEMU IP address ............... $qemu_ip"
-	echo "TUN IP address ................ $tun_ip"
-}
-
-function export_nfs()
-{
-	assert_superuser
-	echo "Appending $opt_rootfs to /etc/exports ..."
-	if [[ $opt_dryrun != yes ]]; then
-		rm -f /tmp/exports
-		mv /etc/exports /tmp/exports
-		cat /tmp/exports | grep -v $opt_rootfs > /etc/exports
-		sh -c "echo \"$opt_rootfs 192.168.0.0/255.255.0.0(rw,sync,no_root_squash,no_subtree_check,insecure)\" >> /etc/exports"
-	fi
-	execute exportfs -ra
-	echo -e "\nCreating tap0 ..."
-	execute tunctl -u $(logname)
-	execute ifconfig tap0 $tun_ip up
-}
-
-function generate_ifup()
-{
-	mkdir -p $(dirname $IFUP_SCRIPT)
-	cat > $IFUP_SCRIPT << EOF
-#!/bin/sh
-
-IP_TUN=$tun_ip
-IP_QEMU=$qemu_ip
-
-sudo /sbin/ifconfig \$1 \$IP_TUN
-sudo bash -c 'echo 1 >/proc/sys/net/ipv4/ip_forward'
-sudo route add -host \$IP_QEMU dev tap0
-sudo bash -c 'echo 1 >/proc/sys/net/ipv4/conf/tap0/proxy_arp'
-sudo arp -Ds \$IP_QEMU eth0 pub
-
-EOF
-}
-
 
 #------------------------------------------------------------------------------
 # Actions
 #------------------------------------------------------------------------------
 
-function action_nfs_setup()
+function action_setup()
 {
-	print_banner "Setting up NFS"
-	check_rootfs
-}
-
-function action_nfs_config()
-{
-	print_banner "Configuring NFS"
-	check_rootfs
-	generate_ifup
-	export_nfs
+	print_banner "Configuring host"
+	assert_superuser
+	check_rootfs $opt_rootfs
+	generate_ifup_script $IFUP_SCRIPT
+	nfs_export $opt_rootfs
+	create_tap
 }
 
 function action_launch()
@@ -329,7 +262,7 @@ function action_launch()
 
 	[[ -z $opt_kernel ]] && usage_error "No kernel image found"
 	if [[ -n $opt_rootfs ]]; then
-		check_rootfs
+		check_rootfs $opt_rootfs
 	else
 		[[ -z $opt_initrd ]] && warn "No ramdisk image found"
 	fi
@@ -353,7 +286,7 @@ function action_launch()
 	local net_opts="-net nic"
 	if [[ -n $opt_rootfs ]]; then
 		net_opts="-net nic,vlan=0 -net tap,ifname=tap0,script=$IFUP_SCRIPT"
-		kernel_string="$kernel_string root=/dev/nfs rw nfsroot=$host_ip:$opt_rootfs ip=$qemu_ip:$host_ip:$host_gateway:$host_mask"
+		kernel_string="$kernel_string root=/dev/nfs rw nfsroot=$host_ip:$opt_rootfs ip=$vm_ip:$host_ip:$host_gateway:$host_mask"
 	else
 		[[ -n $opt_initrd ]] && qemu_options=$(echo -e "$qemu_options\n\t-initrd ${opt_initrd}")
 	fi
@@ -394,5 +327,4 @@ find_file kernel zImage
 query_host_network
 
 eval action_${arg_action//-/_}
-
 
