@@ -16,10 +16,11 @@ source $METASYSTEM_ARM_LINUX_LIB_BASH/functions.sh
 #------------------------------------------------------------------------------
 
 SCRIPT_VERSION=0.1
-VALID_ACTIONS='download unzip configure sync'
+VALID_ACTIONS='clone download unzip configure sync'
 
 DEFAULT_BUILDROOT_VERSION=2013.02
 BUILDROOT_URL_ROOT=http://buildroot.uclibc.org/downloads
+BUILDROOT_REPO_URL=git://git.busybox.net/buildroot
 
 
 #------------------------------------------------------------------------------
@@ -33,6 +34,7 @@ opt_force=no
 opt_clean=no
 opt_buildroot_version=
 opt_rootfs=
+opt_tag=
 
 
 #------------------------------------------------------------------------------
@@ -61,6 +63,9 @@ Options:
     --buildroot-version VER Specify buildroot version (default $DEFAULT_BUILDROOT_VERSION)
     --rootfs ROOTFS         Specify rootfs
     --clean                 Clean rootfs
+
+Options for clone:
+    --tag TAG               Check out specified tag
 
 EOF
 }
@@ -100,6 +105,10 @@ function parse_command_line()
 				opt_clean=yes
 				;;
 
+			-tag | --tag)
+				prev=opt_tag
+				;;
+
 			# Unrecognized options
 			-*)
 				warn "Unrecognized option '$token' ignored"
@@ -124,6 +133,9 @@ function parse_command_line()
 	# Set defaults
 	[[ -z $opt_buildroot_version ]] && opt_buildroot_version=$DEFAULT_BUILDROOT_VERSION
 	[[ -z $opt_rootfs ]] && opt_rootfs=$ARM_LINUX_ROOTFS
+
+	[[ $arg_action != clone && -n $opt_tag ]] &&\
+		warn "Ignoring option -tag"
 }
 
 function print_summary()
@@ -162,6 +174,20 @@ function action_unzip()
 	check_does_exist ${BUILDROOT_TARBALL}
 	check_does_not_exist ${BUILDROOT_FOLDER}
 	execute tar xjvf ${BUILDROOT_TARBALL}
+	if [[ $opt_dryrun != yes ]]; then
+		echo ${opt_buildroot_version} > ${BUILDROOT_FOLDER}/version.txt
+	fi
+}
+
+function action_clone()
+{
+	print_banner "Cloning buildroot"
+	check_does_not_exist ${BUILDROOT_FOLDER}
+	execute git clone ${BUILDROOT_REPO_URL} ${BUILDROOT_FOLDER}
+	if [[ -n $opt_tag ]]; then
+		execute cd ${BUILDROOT_FOLDER}
+		execute git checkout ${opt_tag} -b ${opt_tag}
+	fi
 }
 
 function action_configure()
