@@ -227,7 +227,7 @@ function _metasystem_prompt()
 	# Do this first to ensure we get the correct value of $?
 	local rc=$?
 	local prompt_rc=
-	[[ $rc != 0 ]] && local prompt_rc="${NAKED_LIGHT_PURPLE}$rc ${NAKED_NO_COLOUR}"
+	[[ $rc != 0 ]] && local prompt_rc="${LIGHT_PURPLE}$rc ${NO_COLOUR}"
 
 	local prompt=
 
@@ -244,14 +244,14 @@ function _metasystem_prompt()
 	local hostname=$HOSTNAME
 	[[ -z $hostname ]] && hostname=$HOST
 	[[ -n $METASYSTEM_PROFILE_HOST ]] && hostname=$METASYSTEM_PROFILE_HOST
-	prompt="${prompt}${NAKED_LIGHT_BLUE}${user}@${hostname} ${NAKED_LIGHT_YELLOW}${_path_shorten}${NAKED_NO_COLOUR}"
+	prompt="${prompt}${LIGHT_BLUE}${user}@${hostname} ${LIGHT_YELLOW}${_path_shorten}${NO_COLOUR}"
 
 	prompt="${prompt}${_prompt_tools}${_prompt_ids}"
 
 	local prompt_hooks="$(_metasystem_prompt_hooks)"
 	[[ -n $prompt_hooks ]] && prompt="${prompt}\n${prompt_hooks}"
 
-	local prompt_time="${NAKED_LIGHT_YELLOW}${time}${NAKED_NO_COLOUR}"
+	local prompt_time="${LIGHT_YELLOW}${time}${NO_COLOUR}"
 	echo "\n${prompt}\n${prompt_rc}${prompt_time} \$ "
 }
 
@@ -348,7 +348,7 @@ function _metasystem_update_prompt_ids()
 		do
 			local id_type_uc=$(uppercase $id_type)
 			eval local id=\$METASYSTEM_ID_${id_type_uc}
-			_prompt_ids="${_prompt_ids} ${LIGHT_CYAN}$id_type:$id${NAKED_NO_COLOUR}"
+			_prompt_ids="${_prompt_ids} ${LIGHT_CYAN}$id_type:$id${NO_COLOUR}"
 		done
 	fi
 }

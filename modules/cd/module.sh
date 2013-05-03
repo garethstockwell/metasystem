@@ -83,9 +83,9 @@ function _metasystem_cd_hook_prompt()
 {
 	local ret=
 	[[ -n $METASYSTEM_DIRINFO_LABEL ]] &&
-		ret="${NAKED_LIGHT_PURPLE}${METASYSTEM_DIRINFO_LABEL}${NAKED_NO_COLOUR} "
+		ret="${LIGHT_PURPLE}${METASYSTEM_DIRINFO_LABEL}${NO_COLOUR} "
 	[[ -n $_metasystem_short_dirinfo_root ]] &&\
-		ret="${ret}${NAKED_LIGHT_PURPLE}(${_metasystem_short_dirinfo_root})${NAKED_NO_COLOUR}"
+		ret="${ret}${LIGHT_PURPLE}(${_metasystem_short_dirinfo_root})${NO_COLOUR}"
 	echo $ret
 }
 

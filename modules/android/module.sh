@@ -362,7 +362,7 @@ alias android-push-binary=metasystem_android_push_binary
 function _metasystem_hook_android_prompt()
 {
 	if [[ -n $TARGET_PRODUCT && -n $TARGET_BUILD_VARIANT ]]; then
-		echo "${NAKED_LIGHT_GREEN}android: ${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}${NAKED_NO_COLOR}"
+		echo "${LIGHT_GREEN}android: ${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}${NO_COLOR}"
 	fi
 }
 

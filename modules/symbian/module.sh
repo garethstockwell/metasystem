@@ -111,7 +111,7 @@ export SF_TOOLS_DIR=~/work/sync/hg/sf/oss/MCL/sftools/fbf/utilities
 function _metasystem_hook_symbian_prompt()
 {
 	[[ -n $EPOCROOT ]] &&\
-		echo "${NAKED_LIGHT_RED}epoc: $EPOCROOT${NAKED_NO_COLOUR}"
+		echo "${LIGHT_RED}epoc: $EPOCROOT${NO_COLOUR}"
 }
 
 

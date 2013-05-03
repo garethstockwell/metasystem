@@ -117,8 +117,8 @@ function _metasystem_hook_git_prompt()
 	local local_branch="$(git_current_branch)" || return
 	if [[ -n $local_branch ]]; then
 		local content=
-		local start=${NAKED_LIGHT_CYAN}
-		local end=${NAKED_NO_COLOR}
+		local start=${LIGHT_CYAN}
+		local end=${NO_COLOR}
 
 		if [[ -n $METASYSTEM_ID_GIT ]]; then
 			content="${content} ${start}${METASYSTEM_ID_GIT}${end}"
@@ -142,15 +142,15 @@ function _metasystem_hook_git_prompt()
 		local status_out="$($GIT_EXE status -unormal 2>/dev/null)"
 
 		if [[ $status_out =~ Your\ branch\ is\ ahead ]]; then
-			lstatus="${lstatus} ${NAKED_LIGHT_YELLOW}ahead${end}"
+			lstatus="${lstatus} ${LIGHT_YELLOW}ahead${end}"
 		elif [[ $status_out =~ Your\ branch\ is\ behind ]]; then
-			lstatus="${lstatus} ${NAKED_LIGHT_YELLOW}behind${end}"
+			lstatus="${lstatus} ${LIGHT_YELLOW}behind${end}"
 		fi
 
 		if [[ $status_out =~ nothing\ to\ commit ]]; then
-			lstatus="${lstatus} ${NAKED_LIGHT_GREEN}clean${end}"
+			lstatus="${lstatus} ${LIGHT_GREEN}clean${end}"
 		else
-			lstatus="${lstatus}${NAKED_LIGHT_RED}"
+			lstatus="${lstatus}${LIGHT_RED}"
 			if [[ $status_out =~ Changes\ to\ be\ committed ]]; then
 				lstatus="${lstatus} staged"
 			fi
