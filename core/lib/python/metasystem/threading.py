@@ -4,6 +4,7 @@
 
 from __future__ import absolute_import
 import threading
+from threading import *
 
 __all__ = ['RepeatTimer']
 
