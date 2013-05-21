@@ -206,6 +206,7 @@ echo "Platform:   $METASYSTEM_PLATFORM"
 function _metasystem_prompt_update_cd()
 {
 	_path_shorten=$(path_shorten $PWD)
+	[[ $TERM == xterm ]] && xterm_set_title ${_path_shorten}
 }
 
 # Called from smartcd scripts
