@@ -11,4 +11,5 @@ echo "CROSS_COMPILE .............. $CROSS_COMPILE"
 autostash CROSS_COMPILER_VERSION=$(arm-linux-gnueabi-gcc --version 2>/dev/null | head -n1 | awk '{print $3}' | head -c-2)
 echo "Cross compiler version ..... $CROSS_COMPILER_VERSION"
 echo "KDIR ....................... $KDIR"
+echo "KBUILD_OUTPUT .............. $KBUILD_OUTPUT"
 
