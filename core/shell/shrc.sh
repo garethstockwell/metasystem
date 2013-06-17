@@ -27,7 +27,7 @@ echo -e "$_METASYSTEM_RULE\n"
 #------------------------------------------------------------------------------
 
 # Ensure that we start in the home directory
-cd $HOME
+#cd $HOME
 
 export METASYSTEM_CORE_ROOT=$METASYSTEM_ROOT/core
 export METASYSTEM_CORE_BIN=$METASYSTEM_CORE_ROOT/bin

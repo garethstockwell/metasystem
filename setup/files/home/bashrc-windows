@@ -1,6 +1,6 @@
 if [[ -n $PS1 ]]; then
 	source ~/.metasystem-config
 	. ${HOME}/work/sync/git/github/metasystem/home/shrc
-	metasystem_cd ~
+	#metasystem_cd ~
 fi
 
