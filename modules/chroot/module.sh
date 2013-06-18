@@ -37,3 +37,13 @@ function _metasystem_hook_chroot_prompt()
 	echo $ret
 }
 
+function _metasystem_enter_chroot()
+{
+    local name=$1
+    local dir=$2
+    local cmd="schroot -c $name -p"
+    [[ -n $dir ]] && cmd="$cmd -d $dir"
+    echo $cmd
+    $cmd
+}
+

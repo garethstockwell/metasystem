@@ -506,10 +506,19 @@ function _metasystem_set_projectdirs()
 				eval _${project_env_prefix}_DIRS_SET=
 				eval _metasystem_export ${project_env_prefix}_BUILD_DIR=
 				eval _metasystem_export ${project_env_prefix}_SOURCE_DIR=
+				eval _metasystem_export ${project_env_prefix}_CHROOT=
 				_metasystem_projectdirs_updated=1
 			fi
 		fi
 	fi
+}
+
+function _metasystem_set_project_chroot()
+{
+	local project=$1
+	local project_env_prefix=$(metasystem_project_env_prefix $project)
+	local chroot=$2
+	eval _metasystem_export ${project_env_prefix}_CHROOT=$chroot
 }
 
 function _metasystem_projects_print()
@@ -544,36 +553,42 @@ function _metasystem_projects_print()
 	done
 }
 
-function metasystem_project_cd_build()
+function _metasystem_enter_chroot()
 {
-	local arg=$1
+	echo "Error: _metasystem_enter_chroot is undefined" >&2
+	return 1
+}
+
+function _metasystem_project_cd()
+{
+	local type=$1
+	local arg=$2
 	local project=`echo $arg | sed -e 's/\/.*//'`
 	local lpath=`echo $arg | sed -e 's/[a-zA-Z]*\///'`
 	local project_env_prefix=$(metasystem_project_env_prefix $project)
-	eval local build_dir=\$${project_env_prefix}_BUILD_DIR
+	eval local dir=\$${project_env_prefix}_$(uppercase $type)_DIR
+	eval local chroot=\$${project_env_prefix}_CHROOT
 	[[ $lpath == $project ]] && lpath=
-	if [[ -n $build_dir ]]; then
-		metasystem_cd $build_dir/$lpath
+	if [[ -n $dir ]]; then
+		if [[ -n $chroot ]]; then
+			_metasystem_enter_chroot $chroot $dir/$lpath
+		else
+			metasystem_cd $dir/$lpath
+		fi
 	else
 		echo "pcd: '$arg' not recognized"
 		return 1
 	fi
 }
 
+function metasystem_project_cd_build()
+{
+	_metasystem_project_cd build $*
+}
+
 function metasystem_project_cd_source()
 {
-	local arg=$1
-	local project=`echo $arg | sed -e 's/\/.*//'`
-	local lpath=`echo $arg | sed -e 's/[a-zA-Z]*\///'`
-	local project_env_prefix=$(metasystem_project_env_prefix $project)
-	eval local source_dir=\$${project_env_prefix}_SOURCE_DIR
-	[[ $lpath == $project ]] && lpath=
-	if [[ -n $source_dir ]]; then
-		metasystem_cd $source_dir/$lpath
-	else
-		echo "pcd: '$arg' not recognized"
-		return 1
-	fi
+	_metasystem_project_cd source $*
 }
 
 function _metasystem_complete_pcd()

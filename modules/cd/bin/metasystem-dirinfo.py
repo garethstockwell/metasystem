@@ -178,7 +178,7 @@ def handle_id(command, context):
 
 def handle_project(command, context):
     check_args_count(command, 1)
-    check_options(command, ['dir', 'sourcedir', 'builddir'])
+    check_options(command, ['dir', 'sourcedir', 'builddir', 'chroot'])
     [name] = command.args
     assert not name in context['projects'], 'Repeated project on line {0:d}'.format(command.line_number)
     projectdir = ''
@@ -200,6 +200,9 @@ def handle_project(command, context):
         builddir = abspath_mingw(builddir)
     context['output'].write("\n# [{0:d}] {1:s}\n".format(command.line_number, command.line))
     context['output'].write("_metasystem_set_projectdirs {0:s} $(metasystem_unixpath \"{1:s}\") $(metasystem_unixpath \"{2:s}\")\n".format(name, builddir, sourcedir))
+    if 'chroot' in command.options.keys():
+        chroot = command.options['chroot']
+        context['output'].write("_metasystem_set_project_chroot {0:s} {1:s}".format(name, chroot))
     context['projects'].append(name)
 
 def handle_shell(command, context):
