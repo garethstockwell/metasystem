@@ -48,7 +48,57 @@ function _metasystem_dirinfo_init()
 
 
 #------------------------------------------------------------------------------
-# Dependency check
+# Main
+#------------------------------------------------------------------------------
+
+function metasystem_parse_dirinfo()
+{
+	local dir=$1
+	local file=$dir/.metasystem-dirinfo
+	if [[ -e $file ]]; then
+		autostash METASYSTEM_DIRINFO_ROOT=$(dirname $file)
+		metasystem-dirinfo.py -f $file
+		. ${file}.sh
+	fi
+}
+
+function _metasystem_cd()
+{
+	[[ "$1" != "-metasystem-init" ]] && smartcd cd $*
+}
+
+function _metasystem_export()
+{
+	autostash "$@"
+}
+
+function _metasystem_unset()
+{
+	empty_function
+}
+
+alias scd-ee='smartcd edit enter'
+alias scd-el='smartcd edit leave'
+alias scd-ti='smartcd template install'
+
+
+#------------------------------------------------------------------------------
+# Exported variables
+#------------------------------------------------------------------------------
+
+# Allow ~/.smartcd_config to be safely sourced by other scripts (e.g.
+# bin/dirinfo-check.sh)
+export SMARTCD_NOINITIAL=1
+
+#SMARTCD_QUIET=1
+VARSTASH_QUIET=1
+
+export METASYSTEM_DIRINFO_SHELL_DEPRECATE=yes
+#export METASYSTEM_DIRINFO_SHELL_IGNORE=yes
+
+
+#------------------------------------------------------------------------------
+# Main
 #------------------------------------------------------------------------------
 
 smartcd_lib=$HOME/.smartcd/lib/core/smartcd
@@ -84,25 +134,6 @@ if [[ $? != 0 ]]; then
 	return 1
 fi
 
-
-#------------------------------------------------------------------------------
-# Main
-#------------------------------------------------------------------------------
-
-function metasystem_parse_dirinfo()
-{
-	local dir=$1
-	local file=$dir/.metasystem-dirinfo
-	if [[ -e $file ]]; then
-		autostash METASYSTEM_DIRINFO_ROOT=$(dirname $file)
-		metasystem-dirinfo.py -f $file
-		. ${file}.sh
-	fi
-}
-
-# Defer processing of bash_enter for $HOME until end of bashrc
-SMARTCD_NOINITIAL=1
-
 smartcd_config=~/.smartcd_config
 if [[ -e $smartcd_config ]]; then
 	source $smartcd_config
@@ -110,41 +141,4 @@ else
 	echo "Error: $smartcd_config not found"
 fi
 unset smartcd_config
-
-function _metasystem_cd()
-{
-	[[ "$1" != "-metasystem-init" ]] && smartcd cd $*
-}
-
-function _metasystem_export()
-{
-	autostash "$@"
-}
-
-function _metasystem_unset()
-{
-	empty_function
-}
-
-alias scd-ee='smartcd edit enter'
-alias scd-el='smartcd edit leave'
-alias scd-ti='smartcd template install'
-
-#------------------------------------------------------------------------------
-# Exported variables
-#------------------------------------------------------------------------------
-
-# Allow ~/.smartcd_config to be safely sourced by other scripts (e.g.
-# bin/dirinfo-check.sh)
-export SMARTCD_NOINITIAL
-
-#SMARTCD_QUIET=1
-VARSTASH_QUIET=1
-
-export METASYSTEM_DIRINFO_SHELL_DEPRECATE=yes
-#export METASYSTEM_DIRINFO_SHELL_IGNORE=yes
-
-#------------------------------------------------------------------------------
-# Exported functions
-#------------------------------------------------------------------------------
 

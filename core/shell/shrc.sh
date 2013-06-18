@@ -26,8 +26,8 @@ echo -e "$_METASYSTEM_RULE\n"
 # Home
 #------------------------------------------------------------------------------
 
-# Ensure that we start in the home directory
-#cd $HOME
+_metasystem_start_dir=$PWD
+builtin cd $HOME
 
 export METASYSTEM_CORE_ROOT=$METASYSTEM_ROOT/core
 export METASYSTEM_CORE_BIN=$METASYSTEM_CORE_ROOT/bin
@@ -736,4 +736,7 @@ unset f
 echo -e "\n$_METASYSTEM_RULE"
 echo -e "Type 'help' for a list of metasystem functions and aliases"
 echo -e "$_METASYSTEM_RULE"
+
+metasystem_cd $_metasystem_start_dir
+unset _metasystem_start_dir
 
