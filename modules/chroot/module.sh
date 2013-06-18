@@ -26,15 +26,7 @@ function _metasystem_chroot()
 function _metasystem_hook_chroot_prompt()
 {
 	_metasystem_chroot || return
-	local location=$(_metasystem_root_location)
-	ret="${LIGHT_RED}chroot: "
-	if [[ -n $SCHROOT_CHROOT_NAME ]]; then
-		ret="${ret} ${SCHROOT_CHROOT_NAME} ($location)"
-	else
-		ret="${ret} $location"
-	fi
-	ret="${ret}${NO_COLOR}"
-	echo $ret
+	echo "${LIGHT_RED}chroot: $(chroot_desc)${NO_COLOR}"
 }
 
 function _metasystem_enter_chroot()
@@ -45,5 +37,30 @@ function _metasystem_enter_chroot()
     [[ -n $dir ]] && cmd="$cmd -d $dir"
     echo $cmd
     $cmd
+}
+
+function chroot_name()
+{
+	if [[ -n $SCHROOT_CHROOT_NAME ]]; then
+		echo $SCHROOT_CHROOT_NAME
+	fi
+}
+
+function chroot_location()
+{
+	if [[ _metasystem_chroot ]]; then
+		_metasystem_root_location
+	fi
+}
+
+function chroot_desc()
+{
+	local name=$(chroot_name)
+	local location=$(chroot_location)
+	if [[ -n $name ]]; then
+		echo "$name@$location"
+	else
+		echo $location
+	fi
 }
 
