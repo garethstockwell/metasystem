@@ -318,6 +318,7 @@ function setup_ubuntu()
 	then
 		setup_ubuntu-11.10
 	fi
+	gnome_disable_media_mount_window
 }
 
 function setup_ubuntu-11.10()
@@ -389,6 +390,12 @@ function ubuntu-11.10_install_application_indicators()
 	execute apt-add-repository -y ppa:iaz/battery-status
 	execute aptitude $yes update
 	execute aptitude $yes install battery-status
+}
+
+function gnome_disable_media_mount_window()
+{
+	# http://askubuntu.com/questions/191527/disable-auto-opening-nautilus-window-after-auto-mount
+	execute gsettings set org.gnome.desktop.media-handling automount-open false
 }
 
 
