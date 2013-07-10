@@ -1,0 +1,157 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+# Constants
+#------------------------------------------------------------------------------
+
+SCRIPT_NAME=git-rpush
+
+SCRIPT_VERSION=0.1
+
+SCRIPT_ARGS=''
+SCRIPT_VAR_ARGS=1
+
+
+#------------------------------------------------------------------------------
+# Imports
+#------------------------------------------------------------------------------
+
+LIB=$(builtin cd $(dirname $0)/../lib/bash && pwd)
+
+source $LIB/script.sh
+source $LIB/git.sh
+source $LIB/git-submodule.sh
+
+
+#------------------------------------------------------------------------------
+# Variables populated by command-line
+#------------------------------------------------------------------------------
+
+opt_force=no
+
+
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+function print_usage()
+{
+	cat << EOF
+$USAGE_HEADER
+
+$USAGE_STANDARD_OPTIONS
+
+    -f, --force             Force push
+
+EOF
+}
+
+function parse_command_line()
+{
+	eval set -- $unused_args
+
+	for token in "$@"; do
+		# If the previous option needs an argument, assign it.
+		if [[ -n "$prev" ]]; then
+			eval "$prev=\$token"
+			prev=
+			continue
+		fi
+
+		optarg=`expr "x$token" : 'x[^=]*=\(.*\)'`
+
+		case $token in
+			-f | -force | --force)
+				opt_force=yes
+				;;
+
+			# Unrecognized options
+			-*)
+				warn "Unrecognized option '$token' ignored"
+				;;
+
+			# Normal arguments
+			*)
+				handle_arg $token
+				;;
+		esac
+	done
+
+	check_sufficient_args
+}
+
+function print_summary()
+{
+	print_standard_summary
+}
+
+
+#------------------------------------------------------------------------------
+# Helpers
+#------------------------------------------------------------------------------
+
+function git_commit()
+{
+	if [[ $opt_dryrun != yes ]]; then
+		if [[ -n $opt_message ]]; then
+			git commit -F- << EOF
+$opt_message
+EOF
+		else
+			git commit &&\
+			opt_message=$(git log --format=%B -n 1 HEAD)
+		fi
+		check_error_code
+	fi
+}
+
+
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+function git_push()
+{
+	local submodule=$1
+	cd $root/$submodule
+	msg=$(git_unpushed)
+	if [[ $? == 0 ]]; then
+		echo $root/$submodule
+		echo $msg
+		cmd='git push'
+		[[ $opt_force == yes ]] && cmd="$cmd --force"
+		execute $cmd
+		echo
+	fi
+}
+
+
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
+args=
+for arg in "$@"; do
+	args="$args \"$arg\""
+done
+
+parse_standard_arguments $args
+parse_command_line
+
+script_preamble
+
+root=$(pwd)
+[[ ! -d $root/.git ]] && error "$root is not a git repository"
+[[ ! -e $root/.gitmodules ]] && error "$root is not a git submodule repository"
+
+submodules=$extra_args
+[[ -z $submodules ]] && submodules=$(git_submodule_all_paths)
+
+eval set -- $submodules
+for submodule in "$@"; do
+	git_push $submodule
+done
+
+# Push main repo
+git_push
+

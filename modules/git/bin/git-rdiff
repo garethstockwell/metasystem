@@ -1,0 +1,130 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+# Constants
+#------------------------------------------------------------------------------
+
+SCRIPT_NAME=git-rdiff
+
+SCRIPT_VERSION=0.1
+
+SCRIPT_ARGS=''
+SCRIPT_VAR_ARGS=1
+
+
+#------------------------------------------------------------------------------
+# Imports
+#------------------------------------------------------------------------------
+
+LIB=$(builtin cd $(dirname $0)/../lib/bash && pwd)
+
+source $LIB/script.sh
+source $LIB/git.sh
+source $LIB/git-submodule.sh
+
+
+#------------------------------------------------------------------------------
+# Variables populated by command-line
+#------------------------------------------------------------------------------
+
+opt_message=
+git_flags=
+
+
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+function print_usage()
+{
+	cat << EOF
+$USAGE_HEADER
+
+$USAGE_STANDARD_OPTIONS
+
+EOF
+}
+
+function parse_command_line()
+{
+	eval set -- $unused_args
+
+	for token in "$@"; do
+		# If the previous option needs an argument, assign it.
+		if [[ -n "$prev" ]]; then
+			eval "$prev=\$token"
+			prev=
+			continue
+		fi
+
+		optarg=`expr "x$token" : 'x[^=]*=\(.*\)'`
+
+		case $token in
+			# Unrecognized options
+			-*)
+				git_flags="$git_flags $token"
+				;;
+
+			# Normal arguments
+			*)
+				handle_arg $token
+				;;
+		esac
+	done
+
+	check_sufficient_args
+}
+
+function print_summary()
+{
+	print_standard_summary
+}
+
+
+#------------------------------------------------------------------------------
+# Helpers
+#------------------------------------------------------------------------------
+
+function git_diff()
+{
+	local path=$1
+	shift
+	local args="$@"
+	cd $path
+	local out=$(git diff $args 2>&1)
+	if [[ -n $out ]]; then
+		echo $path
+		git diff $args
+		echo
+	fi
+}
+
+
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
+args=
+for arg in "$@"; do
+	args="$args \"$arg\""
+done
+
+parse_standard_arguments $args
+parse_command_line
+
+script_preamble
+
+root=$(pwd)
+[[ ! -d $root/.git ]] && error "$root is not a git repository"
+[[ ! -e $root/.gitmodules ]] && error "$root is not a git submodule repository"
+
+submodules=$extra_args
+[[ -z $submodules ]] && submodules=$(git_submodule_all_paths)
+
+git_diff $root $git_flags
+
+eval set -- $submodules
+for submodule in "$@"; do
+	git_diff $root/$submodule $git_flags
+done
+

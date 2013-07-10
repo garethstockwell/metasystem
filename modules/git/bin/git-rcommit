@@ -1,0 +1,161 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+# Constants
+#------------------------------------------------------------------------------
+
+SCRIPT_NAME=git-rcommit
+
+SCRIPT_VERSION=0.1
+
+SCRIPT_ARGS=''
+SCRIPT_VAR_ARGS=1
+
+
+#------------------------------------------------------------------------------
+# Imports
+#------------------------------------------------------------------------------
+
+LIB=$(builtin cd $(dirname $0)/../lib/bash && pwd)
+
+source $LIB/script.sh
+source $LIB/git.sh
+source $LIB/git-submodule.sh
+
+
+#------------------------------------------------------------------------------
+# Variables populated by command-line
+#------------------------------------------------------------------------------
+
+opt_message=
+
+
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+function print_usage()
+{
+	cat << EOF
+$USAGE_HEADER
+
+$USAGE_STANDARD_OPTIONS
+
+    -m, --message MSG       Commit message
+
+EOF
+}
+
+function parse_command_line()
+{
+	eval set -- $unused_args
+
+	for token in "$@"; do
+		# If the previous option needs an argument, assign it.
+		if [[ -n "$prev" ]]; then
+			eval "$prev=\$token"
+			prev=
+			continue
+		fi
+
+		optarg=`expr "x$token" : 'x[^=]*=\(.*\)'`
+
+		case $token in
+			-m | -message | --message)
+				prev=opt_message
+				;;
+
+			# Unrecognized options
+			-*)
+				warn "Unrecognized option '$token' ignored"
+				;;
+
+			# Normal arguments
+			*)
+				handle_arg $token
+				;;
+		esac
+	done
+
+	check_sufficient_args
+}
+
+function print_summary()
+{
+	print_standard_summary
+}
+
+
+#------------------------------------------------------------------------------
+# Helpers
+#------------------------------------------------------------------------------
+
+function git_commit()
+{
+	if [[ $opt_dryrun != yes ]]; then
+		if [[ -n $opt_message ]]; then
+			git commit -F- << EOF
+$opt_message
+EOF
+		else
+			git commit &&\
+			opt_message=$(git log --format=%B -n 1 HEAD)
+		fi
+		check_error_code
+	fi
+}
+
+
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
+args=
+for arg in "$@"; do
+	args="$args \"$arg\""
+done
+
+parse_standard_arguments $args
+parse_command_line
+
+script_preamble
+
+root=$(pwd)
+[[ ! -d $root/.git ]] && error "$root is not a git repository"
+[[ ! -e $root/.gitmodules ]] && error "$root is not a git submodule repository"
+
+submodules_changed=
+
+submodules=$extra_args
+[[ -z $submodules ]] && submodules=$(git_submodule_all_paths)
+
+eval set -- $submodules
+for submodule in "$@"; do
+	cd $root/$submodule
+	if $(git_uncommitted); then
+		echo "Committing in $PWD"
+		submodules_changed="$submodules_changed $submodule"
+		git_commit
+		echo
+	fi
+done
+
+cd $root
+if [[ -n $submodules_changed ]]; then
+	opt_message="$opt_message
+
+Submodules updated:"
+
+	for submodule in $submodules_changed; do
+		execute git add $submodule
+		opt_message="$opt_message
+$submodule"
+	done
+
+	git_commit
+else
+	if $(git_staged); then
+		git_commit
+	fi
+fi
+
