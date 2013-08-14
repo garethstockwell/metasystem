@@ -7,10 +7,10 @@
 	fp = format-patch
 
 	# Show email address given part of name
-	whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+	#whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
 
 	# Show commits since last merge
-	lc = log ORIG_HEAD.. --stat --no-merges
+	#lc = log ORIG_HEAD.. --stat --no-merges
 
 	# Show concise graph log
 	#glog = log --oneline --decorate --stat --graph
@@ -19,10 +19,14 @@
 	glog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 
 	# See what we are about to push
-	outgoing = log --stat origin..@{0}
-	outgoing-diff = log -p origin..@{0}
+	#outgoing = log --stat origin..@{0}
+	#outgoing-diff = log -p origin..@{0}
 
 	search = grep --color -n
+	
+	# See which commit a tag points to
+	# http://stackoverflow.com/questions/1862423/git-how-to-tell-which-commit-a-tag-points-to
+	tagcommit = !sh -c 'git rev-list $0 | head -n 1'
 
 [color]
 	branch = auto
