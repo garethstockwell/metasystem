@@ -1,8 +1,12 @@
-source ~/.profile
+# .bashrc
+
+if [[ -z $METASYSTEM_ROOT ]]; then
+	source ${METASYSTEM_ROOT}/home/profile
+fi
 
 if [[ -n $PS1 ]]; then
 	source ~/.metasystem-config
-	. ${METASYSTEM_ROOT}/home/shrc
+	source ${METASYSTEM_ROOT}/home/shrc
 	#metasystem_cd ~
 fi
 
