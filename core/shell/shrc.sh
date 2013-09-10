@@ -746,6 +746,7 @@ metasystem_cd -metasystem-init
 _metasystem_init_hooks
 
 # Export final PATH
+path_remove_invalid
 export PATH
 
 # Don't know where these get set...

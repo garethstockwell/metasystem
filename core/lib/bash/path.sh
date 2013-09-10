@@ -73,6 +73,22 @@ function path_shorten()
 	echo $dir
 }
 
+function path_perms()
+{
+	# http://code.google.com/p/git-osx-installer/issues/detail?id=53
+	# http://stackoverflow.com/questions/7997700/git-aliases-causing-permission-denied-error
+	local path="$@"
+	[[ -z $path ]] && path=$PATH
+	echo $path | tr ':' '\n' |xargs ls -ld
+}
+
+function path_remove_invalid()
+{
+	# http://stackoverflow.com/questions/7997700/git-aliases-causing-permission-denied-error
+	PATH=$(for d in ${PATH//:/ }; do [ -x $d ] && printf "$d\n"; done | uniq | tr '\12' ':')
+	export PATH=${PATH%?}
+}
+
 
 #------------------------------------------------------------------------------
 # unix functions
