@@ -354,6 +354,8 @@ alias adb=android-adb.sh
 alias android-pull-kconfig=metasystem_android_pull_kconfig
 alias android-push-binary=metasystem_android_push_binary
 
+alias android-unlock-screen='adb shell input keyevent 26'
+
 
 #------------------------------------------------------------------------------
 # Hooks
