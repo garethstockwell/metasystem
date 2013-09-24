@@ -221,7 +221,7 @@ def do_write_config_file(args, template_dir, config_file, suffix, id):
             destFile = open(destFileName, 'wb')
             subst = os.environ
             subst.update(id.subst)
-            regexp = re.compile('\$\{(.*)\}')
+            regexp = re.compile('\$\{(.*?)\}')
             for line in sourceFile:
                 matches = regexp.findall(line)
                 for m in matches:
