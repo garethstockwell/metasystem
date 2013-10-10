@@ -84,6 +84,6 @@ bindkey "^[0" select 10
 # Status
 #------------------------------------------------------------------------------
 
-hardstatus alwayslastline
-hardstatus string "%{-b gk}%-w%{-b kg}%50>%n %t%{-b gk}%+w%< %-= %C:%s"
+#hardstatus alwayslastline
+#hardstatus string "%{-b gk}%-w%{-b kg}%50>%n %t%{-b gk}%+w%< %-= %C:%s"
 
