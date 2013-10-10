@@ -766,3 +766,5 @@ _metasystem_print_banner "Type 'help' for a list of metasystem functions and ali
 metasystem_cd $_metasystem_start_dir
 unset _metasystem_start_dir
 
+clear
+
