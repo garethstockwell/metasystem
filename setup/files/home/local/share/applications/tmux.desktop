@@ -1,0 +1,8 @@
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=true
+Exec=tmux attach
+Name=Terminal (tmux)
+Icon=gnome-terminal
