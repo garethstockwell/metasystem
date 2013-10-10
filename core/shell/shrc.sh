@@ -4,13 +4,22 @@
 # Banner
 #------------------------------------------------------------------------------
 
-export _METASYSTEM_RULE='-------------------------------------------------------------------------------'
+function _metasystem_print_rule()
+{
+	local cols=80
+	if [[ $COLUMNS -lt $cols ]]; then
+		cols=$COLUMNS
+	fi
+
+	printf "%${cols}s\n" | tr ' ' '-'
+}
 
 function _metasystem_print_banner()
 {
-	echo -e "\n$_METASYSTEM_RULE"
+	echo
+	_metasystem_print_rule
 	echo $1
-	echo -e "$_METASYSTEM_RULE\n"
+	_metasystem_print_rule
 }
 
 
@@ -19,7 +28,7 @@ function _metasystem_print_banner()
 #------------------------------------------------------------------------------
 
 # Print something as early as possible, to show that the shell is starting
-echo -e "$_METASYSTEM_RULE\n"
+_metasystem_print_rule
 
 
 #------------------------------------------------------------------------------
@@ -752,9 +761,7 @@ export PATH
 # Don't know where these get set...
 unset f
 
-echo -e "\n$_METASYSTEM_RULE"
-echo -e "Type 'help' for a list of metasystem functions and aliases"
-echo -e "$_METASYSTEM_RULE"
+_metasystem_print_banner "Type 'help' for a list of metasystem functions and aliases"
 
 metasystem_cd $_metasystem_start_dir
 unset _metasystem_start_dir

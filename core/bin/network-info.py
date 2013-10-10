@@ -18,14 +18,18 @@ if platform.system() == 'Linux':
     import re
 
     def ip():
-        child = subprocess.Popen(['ifconfig'], shell=True, stdout=subprocess.PIPE)
-        regex = re.compile(r'.*inet addr:(.*?) .*')
-        out, err = child.communicate()
-        for line in out.split('\n'):
-            m = regex.match(line)
-            if m:
-                return m.groups()[0]
-        return ''
+        import os
+        with open(os.devnull, 'w') as null:
+            child = subprocess.Popen(['ifconfig'], shell=True,
+                                     stdout=subprocess.PIPE,
+                                     stderr=null)
+            regex = re.compile(r'.*inet addr:(.*?) .*')
+            out, err = child.communicate()
+            for line in out.split('\n'):
+                m = regex.match(line)
+                if m:
+                    return m.groups()[0]
+            return ''
 
 else:
     def ip():
