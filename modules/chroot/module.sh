@@ -23,11 +23,11 @@ function _metasystem_chroot()
 	[[ $(_metasystem_proc_root_location 1) != $(_metasystem_proc_root_location $$) ]]
 }
 
-function _metasystem_hook_chroot_prompt()
-{
-	_metasystem_chroot || return
-	echo "${LIGHT_RED}chroot: $(chroot_desc)${NO_COLOR}"
-}
+#function _metasystem_hook_chroot_prompt()
+#{
+#	_metasystem_chroot || return
+#	echo "${LIGHT_RED}chroot: $(chroot_desc)${NO_COLOR}"
+#}
 
 function _metasystem_enter_chroot()
 {

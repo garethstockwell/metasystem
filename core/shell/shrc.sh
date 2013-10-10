@@ -245,10 +245,17 @@ function _metasystem_prompt()
 		local time='\A'
 	fi
 
+	local chroot=
+	if metasystem_module_loaded chroot; then
+		if _metasystem_chroot; then
+			chroot="${LIGHT_BLUE}[$(chroot_name)]${NO_COLOUR}"
+		fi
+	fi
+
 	local hostname=$HOSTNAME
 	[[ -z $hostname ]] && hostname=$HOST
 	[[ -n $METASYSTEM_PROFILE_HOST ]] && hostname=$METASYSTEM_PROFILE_HOST
-	prompt="${prompt}${LIGHT_BLUE}${user}@${hostname} ${LIGHT_YELLOW}${_path_shorten}${NO_COLOUR}"
+	prompt="${prompt}${LIGHT_BLUE}${user}@${hostname}${chroot} ${LIGHT_YELLOW}${_path_shorten}${NO_COLOUR}"
 
 	prompt="${prompt}${_prompt_tools}${_prompt_ids}"
 
