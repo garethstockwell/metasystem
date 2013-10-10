@@ -90,7 +90,7 @@ alias scd-ti='smartcd template install'
 # bin/dirinfo-check.sh)
 export SMARTCD_NOINITIAL=1
 
-#SMARTCD_QUIET=1
+SMARTCD_QUIET=1
 VARSTASH_QUIET=1
 
 export METASYSTEM_DIRINFO_SHELL_DEPRECATE=yes
