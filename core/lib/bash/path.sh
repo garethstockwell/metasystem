@@ -14,7 +14,7 @@ function path_split()
 	shift
 	local src="$*"
 	local pattern="s/:\([^\\]\)/$replace\1/g"
-	echo $src | sed -e $pattern
+	echo -e $(echo $src | sed -e $pattern)
 }
 
 function path_remove()
@@ -22,7 +22,7 @@ function path_remove()
 	local element=$1
 	shift
 	local src="$*"
-	path_split '\n' "$src" | grep -v "^$element\$" | tr '\n' ':' | sed 's/:$//'
+	path_split \\\\n "$src" | grep -v "^$element\$" | tr '\n' ':' | sed 's/:$//'
 }
 
 function path_append()

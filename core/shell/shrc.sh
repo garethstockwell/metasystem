@@ -153,7 +153,7 @@ alias df='df -kh'
 alias less='less -x4 -R'	# R is for cgrep
 
 alias ls='ls -hF'
-if [[ $METASYSTEM_PLATFORM == mac ]]; then
+if [[ $METASYSTEM_OS == mac ]]; then
 	alias ls='ls -hFG'		# add colors for filetype recognition
 else
 	[[ $METASYSTEM_OS != sunos ]] &&\
@@ -185,7 +185,7 @@ alias beep="echo $'\a'"
 # Note: requires 'less -R' to correctly interpret escapes
 alias cgrep='grep --color=always'
 
-alias path='path_split \\n $PATH'
+alias path='path_split \\\\n $PATH'
 
 # Avoid using the DOS ftp client
 [[ $METASYSTEM_PLATFORM == mingw ]] && alias ftp='/bin/ftp.exe'
@@ -215,7 +215,8 @@ echo "Platform:   $METASYSTEM_PLATFORM"
 function _metasystem_prompt_update_cd()
 {
 	_path_shorten=$(path_shorten $PWD)
-	local chroot=$(chroot_desc)
+	local chroot=
+	[[ -n $(declare -f chroot_desc) ]] && chroot=$(chroot_desc)
 	local title=$_path_shorten
 	[[ -n $chroot ]] && title="[$chroot] $title"
 	[[ $TERM == xterm ]] && xterm_set_title $title

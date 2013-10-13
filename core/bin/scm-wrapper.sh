@@ -9,7 +9,22 @@
 # Imports
 #------------------------------------------------------------------------------
 
-SCRIPT_DIR=$(dirname $(readlink -f $0))
+orig_pwd=$(pwd)
+
+script=$0
+builtin cd $(dirname "$script")
+script=$(basename "$script")
+
+# Iterate down a possible chain of symlinks
+while [[ -L $script ]]; do
+	script=$(readlink "$script")
+	builtin cd $(dirname "$script")
+	script=$(basename "$script")
+done
+
+SCRIPT_DIR=$(pwd -P)
+builtin cd $orig_pwd
+
 [[ -z $METASYSTEM_CORE_LIB ]] && export METASYSTEM_CORE_LIB=$SCRIPT_DIR/../lib
 source $METASYSTEM_CORE_LIB_BASH/utils.sh
 
