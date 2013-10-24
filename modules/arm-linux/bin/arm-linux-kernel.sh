@@ -76,10 +76,9 @@ EOF
 
 function parse_command_line()
 {
-	eval set -- $*
-	parse_standard_arguments "$@"
+	eval set -- $unused_args
 
-	for token in $unused_args; do
+	for token in "$@"; do
 		# If the previous option needs an argument, assign it.
 		if [[ -n "$prev" ]]; then
 			eval "$prev=\$token"
@@ -200,7 +199,8 @@ for arg in "$@"; do
 	args="$args \"$arg\""
 done
 
-parse_command_line $args
+parse_standard_args $args
+parse_command_line
 
 [[ $opt_help == yes ]] && print_usage && exit 0
 [[ $opt_version == yes ]] && print_version && exit 0
