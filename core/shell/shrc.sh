@@ -140,6 +140,10 @@ PATH=$(path_remove '^\.$' $PATH)
 
 [[ -d $VIM_HOME ]] && export METASYSTEM_EDITOR=$(metasystem_nativepath $VIM_HOME/vim.exe)
 
+PATH=$(path_append_if_exists /usr/local/sbin $PATH)
+PATH=$(path_append_if_exists /usr/sbin $PATH)
+PATH=$(path_append_if_exists /sbin $PATH)
+
 
 #------------------------------------------------------------------------------
 # Aliases
