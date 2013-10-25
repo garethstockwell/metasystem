@@ -119,7 +119,14 @@ function generate_config()
 	local tool_uc=$(echo $arg_tool | tr 'a-z' 'A-Z')
 	local write_action_var=WRITE_ACTIONS_${tool_uc}
 	local write_actions=$(eval echo \$$write_action_var)
-	if [[ -n $arg_action && -n $(list_contains $arg_action $write_actions) ]]; then
+	local action=$arg_action
+
+	if [[ $arg_tool == git ]]; then
+		local action_alias=$(\git config --get alias.$action)
+		[[ -z $action_alias ]] || action=$action_alias
+	fi
+
+	if [[ -n $action && -n $(list_contains $action $write_actions) ]]; then
 		local id_var=METASYSTEM_ID_${tool_uc}
 		local id=$(eval echo \$$id_var)
 		echo -e "\nGenerating config file for $arg_tool with ID '$id'\n"
