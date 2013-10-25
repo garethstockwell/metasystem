@@ -46,8 +46,8 @@
 	ignore = !([ ! -e .gitignore ] && touch .gitignore) | echo $1 >>.gitignore
 
 	l = log --graph --pretty=format:'%C(yellow)%h %C(green)%cr%C(red)%d%C(reset) %s %C(bold blue)[%an]' --abbrev-commit --date=relative
-	ll = log --stat
-	lp = log --patch
+	ll = log --graph --stat --abbrev-commit --decorate=full
+	lp = log --graph --patch --abbrev-commit --decorate=full
 
 	remove = !git ls-files -z --deleted | xargs -0 git rm
 
