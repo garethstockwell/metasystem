@@ -23,6 +23,7 @@
 	b = branch
 	
 	c = commit
+	ca = commit --amend
 	cm = commit -m
 
 	co = checkout
