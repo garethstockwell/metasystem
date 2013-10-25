@@ -682,7 +682,7 @@ metasystem_register_cd_post_hook _metasystem_projects_cd_post_hook
 # Config files
 #------------------------------------------------------------------------------
 
-function do_rc_update()
+function _metasystem_do_rc_update()
 {
 	local rc=$1
 	echo "Updating ~/.$rc"
@@ -693,22 +693,22 @@ function do_rc_update()
 	fi
 }
 
-function rc_update()
+function _metasystem_rc_update()
 {
 	if [[ -z $1 ]]; then
 		local rcs='astylerc inputrc vimrc screenrc ssh/config'
 		for rc in $rcs; do
-			do_rc_update $rc
+			_metasystem_do_rc_update $rc
 		done
 		echo "Updating ~/.gitconfig ..."
 		echo "Updating ~/.hgrc ..."
-		ids-reset
+		_metasystem_reset_ids
 	else
-		do_rc_update $1
+		_metasystem_do_rc_update $1
 	fi
 }
 
-alias rc-update=rc_update
+alias rc-update=_metasystem_rc_update
 
 
 #==============================================================================

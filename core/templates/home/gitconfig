@@ -1,8 +1,21 @@
 [alias]
 	alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\: \\2/' | sort
 
-	a = !git add . && git status
-	au = !git add -u && git status
+	# Aliases adapted from sources including
+	# http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/`
+	# http://stackoverflow.com/questions/1862423/git-how-to-tell-which-commit-a-tag-points-to
+	# https://github.com/vecio/.linux/blob/master/gitconfig
+
+	a = "!(git status --porcelain --ignore-submodules | grep -E '^[ MARC][MD]' >/dev/null \
+			&& (echo 'Staging changes\n' ; git add .) \
+			|| echo 'No changes to stage\n') ; \
+         git status"
+
+	au = "!(git status --porcelain --ignore-submodules | grep -E '^\\?\\?' >/dev/null \
+			&& (echo 'Staging untracked files\n' ; git add -u) \
+			|| echo 'No untracked files to stage\n') ; \
+         git status"
+
 	aa = !git add . && git add -u && git status
 
 	amend = !git log -n 1 --pretty=tformat:%s%n%n%b | git commit -F - --amend
@@ -11,35 +24,41 @@
 	
 	c = commit
 	cm = commit -m
+
+	co = checkout
 	
 	cp = cherry-pick
 
 	d = diff
 	ds = diff --staged
 
+	f = !git ls-files | grep -i
+	find = !git ls-files | grep -i
+
 	fp = format-patch
+
+	gr = grep -Ii
+	grep = grep -Ii
+
+	# Find from root of repo
+	grt = "!f() { A=$(pwd) && TOPLEVEL=$(git rev-parse --show-toplevel) && cd $TOPLEVEL && git grep --full-name -In $1 | xargs -I{} echo $TOPLEVEL/{} && cd $A; }; f"
 
 	ignore = !([ ! -e .gitignore ] && touch .gitignore) | echo $1 >>.gitignore
 
-	# http://www.jukie.net/bart/blog/pimping-out-git-log
-	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-
-	ll = log --stat --abbrev-commit
-
-	# See what we are about to push
-	#outgoing = log --stat origin..@{0}
-	#outgoing-diff = log -p origin..@{0}
+	l = log --graph --pretty=format:'%C(yellow)%h %C(green)%cr%C(red)%d%C(reset) %s %C(bold blue)[%an]' --abbrev-commit --date=relative
+	ll = log --stat
+	lp = log --patch
 
 	remove = !git ls-files -z --deleted | xargs -0 git rm
 
 	s = status
 	st = status
 
-	search = grep --color -n
-	
 	# See which commit a tag points to
-	# http://stackoverflow.com/questions/1862423/git-how-to-tell-which-commit-a-tag-points-to
-	#tagcommit = !sh -c 'git rev-list $0 | head -n 1'
+	tagcommit = !sh -c 'git rev-list $0 | head -n 1'
+
+[branch]
+	autosetuprebase = always
 
 [color]
 	branch = auto
