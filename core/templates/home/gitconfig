@@ -52,6 +52,8 @@
 
 	remove = !git ls-files -z --deleted | xargs -0 git rm
 
+	rv = remote --verbose
+
 	s = status
 	st = status
 
