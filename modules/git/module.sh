@@ -133,6 +133,13 @@ function metasystem_install_git_hooks()
 	fi
 }
 
+function git_diff()
+{
+	git diff --no-index "$@"
+}
+
+alias diff=git_diff
+
 
 #------------------------------------------------------------------------------
 # Exported variables
