@@ -696,9 +696,12 @@ function _metasystem_do_rc_update()
 function _metasystem_rc_update()
 {
 	if [[ -z $1 ]]; then
-		local rcs='astylerc inputrc vimrc screenrc ssh/config'
+		local rcs=$(builtin cd $METASYSTEM_CORE_TEMPLATES/home &&\
+			        find -type f | sed -e 's/\.\///')
 		for rc in $rcs; do
-			_metasystem_do_rc_update $rc
+			if [[ $rc != gitconfig && $rc != hgrc ]]; then
+				_metasystem_do_rc_update $rc
+			fi
 		done
 		echo "Updating ~/.gitconfig ..."
 		echo "Updating ~/.hgrc ..."
