@@ -15,7 +15,9 @@
 
 function _metasystem_proc_root_location()
 {
-	awk '$5=="/" {print $4}' </proc/$1/mountinfo
+	if [[ -e /proc/$1/mountinfo ]]; then
+		awk '$5=="/" {print $4}' </proc/$1/mountinfo
+	fi
 }
 
 # Returns location of root's / in the host filesystem
