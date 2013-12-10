@@ -67,7 +67,11 @@ alias qcd='qcdb'
 # Unix functions
 #------------------------------------------------------------------------------
 
-[[ $METASYSTEM_PLATFORM == unix ]] && alias qtcreator="metasystem_run_bg $(which qtcreator)"
+_qtcreator=$(which qtcreator 2>/dev/null)
+if [[ -n $_qtcreator && $METASYSTEM_PLATFORM == unix ]]; then
+	alias qtcreator="metasystem_run_bg $_qtcreator"
+fi
+unset _qtcreator
 
 
 #------------------------------------------------------------------------------
