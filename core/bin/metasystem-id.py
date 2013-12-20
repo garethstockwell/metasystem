@@ -207,37 +207,35 @@ def cmd_list(args, config):
         print "types:", str.join(' ', config['types'].keys())
         print "ids:", str.join(' ', config['ids'].keys())
 
-def do_write_config_file(args, template_dir, config_file, suffix, id):
+def do_write_config_file(args, sourceFileName, type, id, overlay=False):
+    config_file = type.config_file
     destFileName = os.path.join(HOME_PATH, '.' + config_file)
-    if template_dir:
-        sourceFileName = os.path.join(template_dir, 'home', config_file)
-        if suffix:
-            destFileName = destFileName + '-' + suffix
-            config_file = config_file + '-' + suffix
-        if os.path.isfile(sourceFileName):
-            if not args.quiet:
-                print "Generating file ~/." + config_file
-            sourceFile = open(sourceFileName, 'r')
-            destFile = open(destFileName, 'wb')
-            subst = os.environ
-            subst.update(id.subst)
-            regexp = re.compile('\$\{(.*?)\}')
-            for line in sourceFile:
-                matches = regexp.findall(line)
-                for m in matches:
-                    line = line.replace('${' + m + '}', subst.get(m, ''))
-                destFile.write(line)
-            return
+    if os.path.isfile(sourceFileName):
+        if not args.quiet:
+            print "Generating file ~/." + config_file
+        sourceFile = open(sourceFileName, 'r')
+        destFile = open(destFileName, 'wb')
+        subst = os.environ
+        subst.update(id.subst)
+        regexp = re.compile('\$\{(.*?)\}')
+        for line in sourceFile:
+            matches = regexp.findall(line)
+            for m in matches:
+                line = line.replace('${' + m + '}', subst.get(m, ''))
+            destFile.write(line)
+        return
+    if overlay:
+        return
     if os.path.isfile(destFileName):
         if not args.quiet:
             print "Removing file ~/." + config_file
         os.remove(destFileName)
 
 def write_config_file(args, type, id):
-    do_write_config_file(args, os.environ.get('METASYSTEM_CORE_TEMPLATES'),
-                         type.config_file, None, id)
-    do_write_config_file(args, os.environ.get('METASYSTEM_LOCAL_TEMPLATES'),
-                         type.config_file, 'local', id)
+    template = os.path.join(os.environ.get('METASYSTEM_ROOT'), 'modules', type.name, 'dotfiles', type.config_file)
+    do_write_config_file(args, template, type, id)
+    template = os.path.join(os.environ.get('METASYSTEM_LOCAL_DOTFILES'), type.name, 'dotfiles', type.config_file)
+    do_write_config_file(args, template, type, id, overlay=True)
 
 def write_shell_script(args, config):
     if not args.quiet:
