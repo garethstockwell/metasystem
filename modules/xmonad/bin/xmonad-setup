@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# xmonad startup script
-#
-# Intended to be run from an xsession configuration
+# xmonad setup script
 #
 # Based on content from
 #     https://github.com/davidbrewer/xmonad-ubuntu-conf/blob/master/start-xmonad
@@ -22,8 +20,4 @@ xrdb -merge ~/.Xresources
 # as Empathy. This prevents prompts you may otherwise get for invalid
 # certificates and the like.
 gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh
-
-# Start xmonad
-exec xmonad
-
 

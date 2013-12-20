@@ -8,22 +8,12 @@
 XMONAD_DIR=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/.. && pwd )
 
 PACKAGES='
+ttf-inconsolata
 xmonad
 '
 
 echo "Installing packages"
 sudo apt-get install ${PACKAGES}
-
-echo "Setting up home directory"
-if [[ ! -d ~/.xmonad ]]; then
-	mkdir ~/.xmonad
-fi
-cp -fv ${XMONAD_DIR}/config/xmonad.hs ~/.xmonad
-cp -fv ${XMONAD_DIR}/bin/xmonad-start ~/.xmonad
-
-cp -fv ${XMONAD_DIR}/config/Xresources ~/.Xresources
-
-xmonad --recompile
 
 echo "Creating xsession configuration"
 desktop_file=/usr/share/xsessions/xmonad.desktop

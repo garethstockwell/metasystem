@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# xmonad startup script
+#
+# Based on content from
+#     https://github.com/davidbrewer/xmonad-ubuntu-conf/blob/master/start-xmonad
+
+${METASYSTEM_XMONAD_BIN}/xmonad-setup &&\
+exec xmonad
+
+
