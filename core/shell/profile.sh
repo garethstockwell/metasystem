@@ -20,11 +20,11 @@ else
 fi
 
 if [[ -d $metasystem_local_root ]]; then
-	export METASYSTEM_LOCAL_ROOT=$(cd $metasystem_local_root && pwd)
+	export METASYSTEM_LOCAL_ROOT=$(builtin cd $metasystem_local_root && pwd)
 	export METASYSTEM_LOCAL_BIN=$METASYSTEM_LOCAL_ROOT/bin
 	export METASYSTEM_LOCAL_LIB=$METASYSTEM_LOCAL_ROOT/lib
 	export METASYSTEM_LOCAL_SHELL=$METASYSTEM_LOCAL_ROOT/shell
-	export METASYSTEM_LOCAL_TEMPLATES=$METASYSTEM_LOCAL_ROOT/templates
+	export METASYSTEM_LOCAL_DOTFILES=$METASYSTEM_LOCAL_ROOT/dotfiles
 	export METASYSTEM_CORE_CONFIG=$METASYSTEM_LOCAL_ROOT/config
 
 	export METASYSTEM_LOCAL_LIB_BASH=$METASYSTEM_LOCAL_LIB/bash

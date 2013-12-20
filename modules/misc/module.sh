@@ -50,3 +50,6 @@ export METASYSTEM_MISC_BIN=$METASYSTEM_MISC_ROOT/bin
 
 PATH=$(path_append $METASYSTEM_MISC_BIN $PATH)
 
+_metasystem_dotfile_register misc astylerc
+_metasystem_dotfile_register misc inputrc
+

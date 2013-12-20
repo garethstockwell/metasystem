@@ -21,3 +21,5 @@ export METASYSTEM_TMUX_BIN=$METASYSTEM_TMUX_ROOT/bin
 
 PATH=$(path_append $METASYSTEM_TMUX_BIN $PATH)
 
+_metasystem_dotfile_register tmux tmux.conf
+

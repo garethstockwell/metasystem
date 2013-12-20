@@ -663,39 +663,62 @@ metasystem_register_cd_post_hook _metasystem_projects_cd_post_hook
 
 
 #------------------------------------------------------------------------------
-# Config files
+# Dotfiles
 #------------------------------------------------------------------------------
 
-function _metasystem_do_rc_update()
+_METASYSTEM_DOTFILES=
+
+function _metasystem_dotfile_register()
 {
-	local rc=$1
-	echo "Updating ~/.$rc"
-	if [[ -e $METASYSTEM_LOCAL_TEMPLATES/home/$rc ]]; then
-		subst-vars.sh --force $METASYSTEM_LOCAL_TEMPLATES/home/$rc ~/.$rc
-	elif [[ -e $METASYSTEM_CORE_TEMPLATES/home/$rc ]]; then
-		subst-vars.sh --force $METASYSTEM_CORE_TEMPLATES/home/$rc ~/.$rc
-	fi
+	local key=$1
+	local src=$2
+	local dst=$3
+	local str=${key}:${src}:${dst}
+	_METASYSTEM_DOTFILES=$(list_append ${str} ${_METASYSTEM_DOTFILES})
 }
 
-function _metasystem_rc_update()
+function _metasystem_dotfile_update()
 {
-	if [[ -z $1 ]]; then
-		local rcs=$(builtin cd $METASYSTEM_CORE_TEMPLATES/home &&\
-			        find -type f | sed -e 's/\.\///')
-		for rc in $rcs; do
-			if [[ $rc != gitconfig && $rc != hgrc ]]; then
-				_metasystem_do_rc_update $rc
+	local search_key=$1
+
+	for entry in $_METASYSTEM_DOTFILES; do
+		local key=$(echo $entry | cut -d: -f1)
+
+		if [[ -z $search_key || $key == $search_key ]]; then
+
+			local src=$(echo $entry | cut -d: -f2)
+			local dst=$(echo $entry | cut -d: -f3)
+
+			if [[ -z $dst ]]; then
+				dst=$src
 			fi
-		done
-		echo "Updating ~/.gitconfig ..."
-		echo "Updating ~/.hgrc ..."
-		_metasystem_reset_ids
-	else
-		_metasystem_do_rc_update $1
-	fi
+
+			local dst_path=$HOME/.${dst}
+
+			local src_path=
+
+			if [[ -n $METASYSTEM_LOCAL_DOTFILES ]]; then
+				src_path=$METASYSTEM_LOCAL_DOTFILES/$key/$src
+				if [[ ! -r $src_path ]]; then
+					src_path=
+				fi
+			fi
+
+			if [[ -z $src_path ]]; then
+				src_path=$METASYSTEM_ROOT/modules/$key/dotfiles/$src
+			fi
+
+			echo "$key: $src -> $dst"
+
+			if [[ ! -z $src_path && -e $src_path ]]; then
+				mkdir -p $(dirname $dst_path)
+				subst-vars.sh --force $src_path $dst_path
+			fi
+		fi
+	done
 }
 
-alias rc-update=_metasystem_rc_update
+alias dotfile-update=_metasystem_dotfile_update
 
 
 #==============================================================================

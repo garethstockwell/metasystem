@@ -126,3 +126,5 @@ PATH=$(path_append $METASYSTEM_SSH_BIN $PATH)
 source $METASYSTEM_SSH_LIB/port-fwd-config.sh
 source $METASYSTEM_SSH_LIB/port-fwd.sh
 
+_metasystem_dotfile_register ssh config ssh/config
+

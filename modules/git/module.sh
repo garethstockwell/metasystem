@@ -235,3 +235,6 @@ function _metasystem_hook_git_prompt()
 GIT_EXE=$(which git)
 PATH=$(path_append $METASYSTEM_GIT_BIN $PATH)
 
+_metasystem_dotfile_register git gitconfig
+_metasystem_dotfile_register git gitconfig-local
+

@@ -43,3 +43,5 @@ function _metasystem_hook_screen_cd_post()
 # Main
 #------------------------------------------------------------------------------
 
+_metasystem_dotfile_register screen screenrc
+
