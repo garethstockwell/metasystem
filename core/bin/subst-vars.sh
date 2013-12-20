@@ -135,9 +135,13 @@ cmd="$cmd
 				gsub(\"[$]{\"var\"}\", ENVIRON[var])
 			}
 		}1'"
+
 test -n "$dest" && cmd="$cmd > $dest"
 
 test "$verbose" == yes && echo $cmd
 
-test -z "$dryrun" && eval $cmd
+if [[ -z "$dryrun" ]]; then
+	eval $cmd
+	chmod $(stat -c %a $src) $dest
+fi
 
