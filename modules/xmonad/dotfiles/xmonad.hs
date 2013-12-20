@@ -224,11 +224,11 @@ myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
 myDzenStyle  = " -h '18' -y '0' -fg '#93a1a1' -bg '#002b36'"
 
 myDzenStatus = "dzen2 -p "
-myDzenStatusSingle = myDzenStatus ++ "-xs 1 -ta l" ++ myDzenStyle
+myDzenStatusSingle = myDzenStatus ++ "-x 0 -w 500 -ta l" ++ myDzenStyle
 myDzenStatusMultiple = myDzenStatus ++ "-xs 1 -ta l" ++ myDzenStyle
 
 myDzenConky = "conky -c ~/.xmonad/conkyrc | dzen2 -p "
-myDzenConkySingle = myDzenConky ++ "-xs 2 -ta r" ++ myDzenStyle
+myDzenConkySingle = myDzenConky ++ "-x 500 -w 500 -ta r" ++ myDzenStyle
 myDzenConkyMultiple = myDzenConky ++ "-xs 2 -ta r" ++ myDzenStyle
 
 myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 180 --widthtype pixel --height 18 --heighttype pixel --transparent true --alpha 0 --tint 0x002b36"
@@ -270,7 +270,7 @@ instance UrgencyHook LibNotifyUrgencyHook where
 
 -- Zombie slaying
 myRestart :: String
-myRestart = "killall -9 dzen2; killall -9 conky; killall -9 trayer; xmonad --recompile && xmonad --restart"
+myRestart = "/usr/bin/killall -9 dzen2; /usr/bin/killall -9 conky; /usr/bin/killall -9 trayer; xmonad --recompile && xmonad --restart"
 
 
 -------------------------------------------------------------------------------
