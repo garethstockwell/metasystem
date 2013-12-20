@@ -22,7 +22,7 @@ import XMonad.Util.Run
 import qualified XMonad.StackSet as W
 --- }}}
 
-myModMask                      = mod1Mask
+myModMask                      = mod4Mask
 
 myTerminal                     = "urxvt"
 
@@ -79,23 +79,30 @@ myLayouts = defaultLayouts
 
 
 --- main {{{
-main = xmonad $ defaultConfig {
-      modMask                  = myModMask
+main = do
+    xmproc <- spawnPipe "xmobar ${HOME}/.xmonad/xmobar.hs"
+    xmonad $ defaultConfig {
+        modMask                  = myModMask
 
-    , terminal                 = myTerminal
+      , terminal                 = myTerminal
 
-    , focusFollowsMouse        = myFocusFollowsMouse
+      , focusFollowsMouse        = myFocusFollowsMouse
 
-    , borderWidth              = myBorderWidth
-    , normalBorderColor        = myNormalBorderColor
-    , focusedBorderColor       = myFocusedBorderColor
+      , borderWidth              = myBorderWidth
+      , normalBorderColor        = myNormalBorderColor
+      , focusedBorderColor       = myFocusedBorderColor
 
-    , workspaces               = myWorkspaces
+      , workspaces               = myWorkspaces
 
-    , layoutHook               = myLayouts
+      , layoutHook               = myLayouts
 
-    , startupHook = do
-        windows $ W.greedyView startupWorkspace
-}
+      , startupHook = do
+          windows $ W.greedyView startupWorkspace
+
+      , logHook = dynamicLogWithPP xmobarPP
+                      { ppOutput = hPutStrLn xmproc
+                      , ppTitle = xmobarColor "green" "" . shorten 50
+                      }
+    }
 --- }}}
 
