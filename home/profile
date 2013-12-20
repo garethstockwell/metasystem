@@ -1,5 +1,9 @@
 # Sourced from ~/.profile
 
+if [[ -e ~/.metasystem-config ]]; then
+	source ~/.metasystem-config
+fi
+
 # Find location of this script
 export METASYSTEM_ROOT=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/.. && pwd )
 

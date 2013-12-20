@@ -5,7 +5,6 @@ if [[ -z $METASYSTEM_ROOT ]]; then
 fi
 
 if [[ -n $PS1 ]]; then
-	source ~/.metasystem-config
 	source ${METASYSTEM_ROOT}/home/shrc
 	#metasystem_cd ~
 fi
