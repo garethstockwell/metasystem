@@ -21,7 +21,7 @@ URxvt*internalBorder:       0
 
 ! Font
 URxvt*xft.Antialias:        true
-URxvt*font:                 xft:inconsolata:pixelSize=12:antialias=true:hinting=true
+URxvt*font:                 xft:inconsolata:pixelSize=10:antialias=true:hinting=true
 URxvt*boldFont:             xft:inconsolata:pixelSize=10:antialias=true:hinting=true
 URxvt*italicFont:           xft:inconsolata:pixelSize=10:antialias=true:hinting=true
 URxvt*boldItalicFont:       xft:inconsolata:pixelSize=10:antialias=true:hinting=true
@@ -33,7 +33,6 @@ URxvt*scrollBar:            false
 URxvt*scrollTtyOutput:      false
 URxvt*scrollWithBuffer:     true
 URxvt*scrollTtyKeypress:    true
-URxvt*urgentOnBell:         true
 
 ! Buffer
 URxvt*buffered:             true
