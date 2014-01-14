@@ -104,6 +104,9 @@ set noedcompatible
 if &t_Co > 2 || has("gui_running")
     " ...then use highlighting
     syntax on
+
+    set background=dark
+    colorscheme solarized
 endif
 
 if has("gui_running")
@@ -131,16 +134,9 @@ let c_minlines = 200
 " also highlight some things in comments
 let c_comment_strings = 1
 
-" use white background in GUI-Mode, black on console
-if has("gui_running")
-"|| &term=="xterm"
-    set bg=light
-else
-    set bg=dark
-endif
-
 " use css when converting syntax to html (2html.vim)
 let html_use_css = 1
+
 
 " ----------------------------------------------------------------------------
 " Menu
