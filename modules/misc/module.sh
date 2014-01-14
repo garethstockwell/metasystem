@@ -21,6 +21,19 @@ function firefox_remove_lock()
 	rm -fv $(find ${firefox_dir} -iname .parentlock)
 }
 
+function edit_source()
+{
+	local dirs="$@"
+	[[ -n $dirs ]] || dirs=$PWD
+	local files=
+	for dir in $dirs; do
+		for suffix in h hpp hxx cpp; do
+			files="$files $(find $dir -iname *.$suffix)"
+		done
+		files="$files $(find $dir -iname *.c | grep -v mod.c)"
+	done
+	gvim $files &
+}
 
 
 #------------------------------------------------------------------------------
