@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# xmonad startup script
+#
+# Intended to be run from an xsession configuration
+#
+# Based on content from
+#     https://github.com/davidbrewer/xmonad-ubuntu-conf/blob/master/start-xmonad
+
+XMONAD_DIR=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/.. && pwd )
+
+xrdb -merge ~/.Xresources
+
+# TODO: screen configuration
+
+# TODO: background
+
+# TODO: stalonetray
+
+# Run the gnome-keyring-daemon to avoid issues you otherwise may encounter
+# when using gnome applications which expect access to the keyring, such
+# as Empathy. This prevents prompts you may otherwise get for invalid
+# certificates and the like.
+gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh
+
+# Start xmonad
+exec xmonad
+
+

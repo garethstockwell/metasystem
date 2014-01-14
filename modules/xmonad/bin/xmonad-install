@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# xmonad installation script
+#
+# Based on content from
+#     https://github.com/davidbrewer/xmonad-ubuntu-conf/blob/master/start-xmonad
+
+XMONAD_DIR=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/.. && pwd )
+
+PACKAGES='
+xmonad
+'
+
+echo "Installing packages"
+sudo apt-get install ${PACKAGES}
+
+echo "Setting up home directory"
+if [[ ! -d ~/.xmonad ]]; then
+	mkdir ~/.xmonad
+fi
+cp -fv ${XMONAD_DIR}/config/xmonad.hs ~/.xmonad
+cp -fv ${XMONAD_DIR}/bin/xmonad-start ~/.xmonad
+
+cp -fv ${XMONAD_DIR}/config/Xresources ~/.Xresources
+
+xmonad --recompile
+
+echo "Creating xsession configuration"
+desktop_file=/usr/share/xsessions/xmonad.desktop
+if [[ -e ${desktop_file} ]]; then
+	if [[ -e ${desktop_file}.orig ]]; then
+		echo "Error: ${desktop_file}.orig" already exists
+		exit 1
+	fi
+	sudo mv ${desktop_file} ${desktop_file}.orig
+fi
+sudo cp -v ${XMONAD_DIR}/config/xmonad.desktop ${desktop_file}
+

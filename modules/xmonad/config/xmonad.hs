@@ -29,7 +29,7 @@ myTerminal                     = "urxvt"
 myNormalBorderColor            = "#dddddd"
 myFocusedBorderColor           = "#ff0000"
 
-myBorderWidth                  = 0
+myBorderWidth                  = 1
 
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse            = True
