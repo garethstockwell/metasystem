@@ -6,6 +6,16 @@
 !==============================================================================
 
 !------------------------------------------------------------------------------
+! xft
+!------------------------------------------------------------------------------
+
+Xft.antialias:              true
+Xft.dpi:                    125
+Xft.hinting:                true
+Xft.hintstyle:              slight
+
+
+!------------------------------------------------------------------------------
 ! rxvt
 !
 ! Based on content from
@@ -20,11 +30,10 @@ URxvt*transparent:          false
 URxvt*internalBorder:       0
 
 ! Font
-URxvt*xft.Antialias:        true
-URxvt*font:                 xft:inconsolata:pixelSize=10:antialias=true:hinting=true
-URxvt*boldFont:             xft:inconsolata:pixelSize=10:antialias=true:hinting=true
-URxvt*italicFont:           xft:inconsolata:pixelSize=10:antialias=true:hinting=true
-URxvt*boldItalicFont:       xft:inconsolata:pixelSize=10:antialias=true:hinting=true
+URxvt*font:                 xft:inconsolata:size=8
+URxvt*boldFont:             xft:inconsolata:size=8
+URxvt*italicFont:           xft:inconsolata:size=8
+URxvt*boldItalicFont:       xft:inconsolata:size=8
 !URxvt*letterSpace:         -1
 
 ! Scroll
