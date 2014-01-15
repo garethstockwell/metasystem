@@ -19,10 +19,15 @@ export METASYSTEM_XMONAD_BIN=$METASYSTEM_XMONAD_ROOT/bin
 # Functions
 #------------------------------------------------------------------------------
 
-function xmonad_restart()
+function xmonad_recompile()
 {
 	_metasystem_dotfile_update xmonad &&\
-	xmonad --recompile && xmonad --restart
+	xmonad --recompile
+}
+
+function xmonad_restart()
+{
+	xmonad_recompile && xmonad --restart
 }
 
 

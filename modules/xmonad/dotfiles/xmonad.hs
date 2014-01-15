@@ -1,4 +1,15 @@
--- Imports {{{
+-- xmonad.hs
+--
+-- Based on content from
+--     http://pbrisbin.com
+--     http://www.untaken.org/my-perfect-xmonad-setup/
+--     https://github.com/davidbrewer/xmonad-ubuntu-conf
+--     http://blog.liangzan.net/blog/2012/01/19/my-solarized-themed-arch-linux-setup/
+
+-------------------------------------------------------------------------------
+-- Imports
+-------------------------------------------------------------------------------
+
 import XMonad
 
 import Control.Monad ( liftM2 )
@@ -23,11 +34,16 @@ import XMonad.Layout.PerWorkspace (onWorkspace)
 import XMonad.Layout.Fullscreen
 
 import XMonad.Util.EZConfig
+import XMonad.Util.NamedWindows
 import XMonad.Util.Run
 
 import qualified Data.Map as M
-import qualified XMonad.StackSet as W ( focusDown, sink, shift, greedyView )
---- }}}
+import qualified XMonad.StackSet as W ( findTag, focusDown, sink, shift, greedyView )
+
+
+-------------------------------------------------------------------------------
+-- Basic setup
+-------------------------------------------------------------------------------
 
 myModMask                      = mod4Mask
 
@@ -40,6 +56,11 @@ myBorderWidth                  = 1
 
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse            = True
+
+
+-------------------------------------------------------------------------------
+-- Workspaces
+-------------------------------------------------------------------------------
 
 myWorkspaceTerm                = "1:term"
 
@@ -70,6 +91,11 @@ myWorkspaces =
     ]
 
 startupWorkspace             = myWorkspaceTerm
+
+
+-------------------------------------------------------------------------------
+-- LayoutHook
+-------------------------------------------------------------------------------
 
 defaultLayouts = smartBorders(avoidStruts(
   -- ResizableTall layout has a large master window on the left,
@@ -104,6 +130,11 @@ defaultLayouts = smartBorders(avoidStruts(
   ||| Circle))
 
 myLayoutHook = avoidStruts $ defaultLayouts
+
+
+-------------------------------------------------------------------------------
+-- ManageHook
+-------------------------------------------------------------------------------
 
 myManageHook :: ManageHook
 myManageHook = composeAll $ concat
@@ -159,14 +190,21 @@ myManageHook = composeAll $ concat
     myShiftsRemote = ["remmina"]
     --myShiftsMisc = []
 
-myRestart :: String
-myRestart = "killall -9 dzen2; killall -9 conky; killall -9 trayer; xmonad --recompile && xmonad --restart"
+
+-------------------------------------------------------------------------------
+-- Keys
+-------------------------------------------------------------------------------
 
 myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
 
          , ("M-q", spawn myRestart)
 
          ]
+
+
+-------------------------------------------------------------------------------
+-- Status bar
+-------------------------------------------------------------------------------
 
 myDzenStyle  = " -h '18' -y '0' -fg '#93a1a1' -bg '#002b36'"
 
@@ -176,7 +214,12 @@ myDzenStatus = "dzen2 -p -xs 1 -ta l" ++ myDzenStyle
 -- Place on second monitor (-xs 2)
 myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -p -xs 2 -ta r" ++ myDzenStyle
 
-myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand false --width 10 --transparent true --alpha 0 --tint 0x002b36 --height 18"
+myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 180 --widthtype pixel --height 18 --heighttype pixel --transparent true --alpha 0 --tint 0x002b36"
+
+
+-------------------------------------------------------------------------------
+-- LogHook
+-------------------------------------------------------------------------------
 
 myLogHook status = workspaceNamesPP defaultPP {
       ppOutput  = hPutStrLn status
@@ -188,6 +231,25 @@ myLogHook status = workspaceNamesPP defaultPP {
     , ppLayout  = \y -> ""
     , ppTitle   = dzenColor "#ffffff" "" . wrap " " " "
     } >>= dynamicLogWithPP >> updatePointer (Relative 0.5 0.5)
+
+
+-------------------------------------------------------------------------------
+-- UrgencyHook
+-------------------------------------------------------------------------------
+
+data LibNotifyUrgencyHook = LibNotifyUrgencyHook deriving (Read, Show)
+
+instance UrgencyHook LibNotifyUrgencyHook where
+    urgencyHook LibNotifyUrgencyHook w = do
+        name     <- getName w
+        Just idx <- fmap (W.findTag w) $ gets windowset
+
+        safeSpawn "notify-send" [show name, "workspace " ++ idx]
+
+
+-------------------------------------------------------------------------------
+-- Startup
+-------------------------------------------------------------------------------
 
 myStartupHook = do
     spawnOn "1:term" myTerminal
@@ -201,14 +263,25 @@ myStartupHook = do
 
     spawnOn "7:remote" "remmina"
 
---- main {{{
+-- Zombie slaying
+myRestart :: String
+myRestart = "killall -9 dzen2; killall -9 conky; killall -9 trayer; xmonad --recompile && xmonad --restart"
+
+
+-------------------------------------------------------------------------------
+-- Main
+-------------------------------------------------------------------------------
+
 main = do
 
     status <- spawnPipe myDzenStatus
     conky  <- spawnPipe myDzenConky
     tray   <- spawnPipe myTrayer
 
-    xmonad $ defaultConfig {
+    xmonad
+        $ withUrgencyHook LibNotifyUrgencyHook
+        $ defaultConfig
+    {
         modMask                  = myModMask
 
       , terminal                 = myTerminal
@@ -230,5 +303,4 @@ main = do
       , logHook                  = myLogHook status
 
     } `additionalKeysP` myKeys
---- }}}
 

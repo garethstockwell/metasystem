@@ -52,6 +52,10 @@ URxvt*underlineColor:       yellow
 ! External programs
 URxvt*urlLauncher:          firefox
 
+! Bell urgency
+URxvt*urgentOnBell:         true
+URxvt*visualBell:           true
+
 
 !------------------------------------------------------------------------------
 ! Colors
