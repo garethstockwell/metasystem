@@ -160,7 +160,7 @@ myManageHook = composeAll $ concat
     --myShiftsMisc = []
 
 myRestart :: String
-myRestart = "for pid in $(pgrep dzen2); do kill -9 $pid; done && for pid in $(pgrep conky); do kill -9 $pid; done && xmonad --recompile && xmonad --restart"
+myRestart = "killall -9 dzen2; killall -9 conky; killall -9 trayer; xmonad --recompile && xmonad --restart"
 
 myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
 
@@ -168,13 +168,15 @@ myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
 
          ]
 
-myDzenStyle  = " -h '18' -y '0' -fg '#777777' -bg '#222222'"
+myDzenStyle  = " -h '18' -y '0' -fg '#93a1a1' -bg '#002b36'"
 
 -- Place on first monitor (-xs 1)
 myDzenStatus = "dzen2 -p -xs 1 -ta l" ++ myDzenStyle
 
 -- Place on second monitor (-xs 2)
 myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -p -xs 2 -ta r" ++ myDzenStyle
+
+myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand false --width 10 --transparent true --alpha 0 --tint 0x002b36 --height 18"
 
 myLogHook status = workspaceNamesPP defaultPP {
       ppOutput  = hPutStrLn status
@@ -204,6 +206,7 @@ main = do
 
     status <- spawnPipe myDzenStatus
     conky  <- spawnPipe myDzenConky
+    tray   <- spawnPipe myTrayer
 
     xmonad $ defaultConfig {
         modMask                  = myModMask
