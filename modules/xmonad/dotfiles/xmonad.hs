@@ -41,14 +41,35 @@ myBorderWidth                  = 1
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse            = True
 
+myWorkspaceTerm                = "1:term"
+
+myWorkspaceWeb                 = "2:web"
+
+myWorkspaceEdit                = "3:edit"
+myWorkspaceRun                 = "4:target"
+
+myWorkspaceMail                = "5:mail"
+myWorkspaceChat                = "6:chat"
+
+myWorkspaceMusic               = "7:music"
+
+myWorkspaceRemote              = "8:remote"
+
+myWorkspaceMisc                = "9:misc"
+
 myWorkspaces =
-    [
-        "1:dev",   "2:web",   "3:mail",
-        "4:chat",  "5:music", "6:remote",
-        "7:",      "8:",      "9:"
+    [ myWorkspaceTerm
+    , myWorkspaceWeb
+    , myWorkspaceEdit
+    , myWorkspaceRun
+    , myWorkspaceMail
+    , myWorkspaceChat
+    , myWorkspaceMusic
+    , myWorkspaceRemote
+    , myWorkspaceMisc
     ]
 
-startupWorkspace             = "1:Dev"
+startupWorkspace             = myWorkspaceTerm
 
 defaultLayouts = smartBorders(avoidStruts(
   -- ResizableTall layout has a large master window on the left,
@@ -101,15 +122,15 @@ myManageHook = composeAll $ concat
     , [(className =? x <||> title =? x <||> resource =? x) --> doSink | x <- mySinks]
     , [(className =? x <||> title =? x <||> resource =? x) --> doFullFloat | x <- myFullscreens]
 
-    --, [(className =? x <||> title =? x <||> resource =? x) --> doShift "1:dev" | x <- myShiftsDev]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift "2:web" | x <- myShiftsWeb]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift "3:mail" | x <- myShiftsMail]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift "4:chat" | x <- myShiftsChat]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift "5:music" | x <- myShiftsMusic]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift "6:remote" | x <- myShiftsRemote]
-    --, [(className =? x <||> title =? x <||> resource =? x) --> doShift "7" | x <- myShifts7]
-    --, [(className =? x <||> title =? x <||> resource =? x) --> doShift "8" | x <- myShifts8]
-    --, [(className =? x <||> title =? x <||> resource =? x) --> doShift "9" | x <- myShifts9]
+    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceTerm | x <- myShiftsTerm]
+    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceEdit | x <- myShiftsEdit]
+    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceRun | x <- myShiftsRun]
+    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceWeb | x <- myShiftsWeb]
+    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceMail | x <- myShiftsMail]
+    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceChat | x <- myShiftsChat]
+    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceMusic | x <- myShiftsMusic]
+    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceRemote | x <- myShiftsRemote]
+    --, [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceMisc | x <- myShiftsMisc]
 
     ] where
 
@@ -128,15 +149,15 @@ myManageHook = composeAll $ concat
     -- Run VLC, firefox and VLC on fullscreen
     myFullscreens = ["vlc", "Image Viewer", "firefox"]
     -- Define default workspaces for some programs
-    --myShiftsDev = []
+    myShiftsTerm = [myTerminal]
+    myShiftsEdit = ["gvim"]
+    myShiftsRun = ["qemu", "xterm"]
     myShiftsWeb = ["Firefox-bin", "Firefox", "firefox", "Firefox Web Browser"]
     myShiftsMail = ["thunderbird", "Thunderbird-bin", "thunderbird-bin", "Thunderbird"]
     myShiftsChat = ["Pidgin Internet Messenger", "Buddy List", "pidgin", "Pidgin", "skype", "skype-wrapper", "Skype"]
     myShiftsMusic = ["spotify"]
     myShiftsRemote = ["remmina"]
-    --myShifts7 = []
-    --myShifts8 = []
-    --myShifts9 = []
+    --myShiftsMisc = []
 
 myRestart :: String
 myRestart = "for pid in $(pgrep dzen2); do kill -9 $pid; done && for pid in $(pgrep conky); do kill -9 $pid; done && xmonad --recompile && xmonad --restart"
@@ -164,19 +185,19 @@ myLogHook status = workspaceNamesPP defaultPP {
     , ppSep     = "  "
     , ppLayout  = \y -> ""
     , ppTitle   = dzenColor "#ffffff" "" . wrap " " " "
-    } >>= dynamicLogWithPP >> updatePointer Nearest
+    } >>= dynamicLogWithPP >> updatePointer (Relative 0.5 0.5)
 
 myStartupHook = do
-	spawnOn "1:dev" myTerminal
+    spawnOn "1:term" myTerminal
 
-	spawnOn "2:web" "firefox"
+    spawnOn "2:web" "firefox"
 
-	spawnOn "4:chat" "pidgin"
-	spawnOn "4:chat" "skype"
+    spawnOn "5:chat" "pidgin"
+    spawnOn "5:chat" "skype"
 
-	--spawnOn "5:music" "spotify"
+    --spawnOn "6:music" "spotify"
 
-	spawnOn "6:remote" "remmina"
+    spawnOn "7:remote" "remmina"
 
 --- main {{{
 main = do
@@ -201,7 +222,7 @@ main = do
 
       , manageHook               = myManageHook
 
-      , startupHook				 = myStartupHook
+      , startupHook                 = myStartupHook
 
       , logHook                  = myLogHook status
 
