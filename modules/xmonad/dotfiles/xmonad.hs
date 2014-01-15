@@ -24,14 +24,15 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers (isDialog, isFullscreen, doFullFloat, doCenterFloat)
 import XMonad.Hooks.UrgencyHook
 
-import XMonad.Layout.Grid
-import XMonad.Layout.ResizableTile
-import XMonad.Layout.IM
-import XMonad.Layout.ThreeColumns
-import XMonad.Layout.NoBorders
 import XMonad.Layout.Circle
-import XMonad.Layout.PerWorkspace (onWorkspace)
+import XMonad.Layout.Grid
 import XMonad.Layout.Fullscreen
+import XMonad.Layout.IndependentScreens (countScreens)
+import XMonad.Layout.IM
+import XMonad.Layout.NoBorders
+import XMonad.Layout.PerWorkspace (onWorkspace)
+import XMonad.Layout.ResizableTile
+import XMonad.Layout.ThreeColumns
 
 import XMonad.Util.EZConfig
 import XMonad.Util.NamedWindows
@@ -138,8 +139,10 @@ myLayoutHook = avoidStruts $ defaultLayouts
 
 myManageHook :: ManageHook
 myManageHook = composeAll $ concat
-    [ [ manageDocks ]
-    , [ manageHook defaultConfig ]
+    [ [ manageHook defaultConfig ]
+
+    , [ manageDocks ]
+    , [ manageSpawn ]
 
     , [ isDialog --> doCenterFloat ]
     , [ isFullscreen --> doF W.focusDown <+> doFullFloat ]
@@ -197,7 +200,7 @@ myManageHook = composeAll $ concat
 
 myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
 
-         , ("M-q", spawn myRestart)
+         , ("M-f",             spawnHere "firefox")
 
          ]
 
@@ -264,6 +267,7 @@ main = do
 
     status <- spawnPipe myDzenStatus
     conky  <- spawnPipe myDzenConky
+
     tray   <- spawnPipe myTrayer
 
     xmonad
