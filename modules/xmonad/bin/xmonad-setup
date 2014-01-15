@@ -7,11 +7,31 @@
 
 XMONAD_DIR=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/.. && pwd )
 
+#------------------------------------------------------------------------------
+# Set up X
+#------------------------------------------------------------------------------
+
 xrdb -merge ~/.Xresources
 
 # TODO: screen configuration
 
-# TODO: background
+# Background
+# Use S_base03 from solarized
+xsetroot -solid "#002b36"
+
+#------------------------------------------------------------------------------
+# Launch programs
+#------------------------------------------------------------------------------
+
+# Network monitor
+if hash nm-applet 2>/dev/null; then
+	nm-applet --sm-disable &
+fi
+
+# Screensaver
+if hash xscreensaver 2>/dev/null; then
+	xscreensaver -no-splash &
+fi
 
 # TODO: stalonetray
 
@@ -19,5 +39,7 @@ xrdb -merge ~/.Xresources
 # when using gnome applications which expect access to the keyring, such
 # as Empathy. This prevents prompts you may otherwise get for invalid
 # certificates and the like.
-gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh
+if hash gnome-keyring-daemon 2>/dev/null; then
+	gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh
+fi
 

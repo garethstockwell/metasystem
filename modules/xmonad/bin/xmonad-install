@@ -8,9 +8,12 @@
 XMONAD_DIR=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/.. && pwd )
 
 PACKAGES='
+conky
 dmenu
+dzen2
 ttf-inconsolata
 xmonad
+xscreensaver
 '
 
 echo "Installing packages"

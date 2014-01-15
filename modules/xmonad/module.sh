@@ -16,13 +16,25 @@ export METASYSTEM_XMONAD_BIN=$METASYSTEM_XMONAD_ROOT/bin
 
 
 #------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+function xmonad_restart()
+{
+	_metasystem_dotfile_update xmonad &&\
+	xmonad --recompile && xmonad --restart
+}
+
+
+#------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
 
 PATH=$(path_append $METASYSTEM_XMONAD_BIN $PATH)
 
-_metasystem_dotfile_register xmonad Xresources
+_metasystem_dotfile_register xmonad conkyrc xmonad/conkyrc
 _metasystem_dotfile_register xmonad xmonad.hs xmonad/xmonad.hs
 _metasystem_dotfile_register xmonad xmonad-start xmonad/xmonad-start
 _metasystem_dotfile_register xmonad xmobar.hs xmonad/xmobar.hs
+_metasystem_dotfile_register xmonad Xresources
 
