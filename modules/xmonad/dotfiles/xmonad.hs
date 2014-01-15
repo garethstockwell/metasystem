@@ -207,15 +207,29 @@ myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
 
 -------------------------------------------------------------------------------
 -- Status bar
+--
+-- Single monitor:
+--     left: status
+--     right - N: conky
+--     right: tray
+--
+-- Dual monitor:
+-- Monitor 1:
+--     left: status
+--     right: tray
+-- Monitor 2:
+--     left: conky
 -------------------------------------------------------------------------------
 
 myDzenStyle  = " -h '18' -y '0' -fg '#93a1a1' -bg '#002b36'"
 
--- Place on first monitor (-xs 1)
-myDzenStatus = "dzen2 -p -xs 1 -ta l" ++ myDzenStyle
+myDzenStatus = "dzen2 -p "
+myDzenStatusSingle = myDzenStatus ++ "-xs 1 -ta l" ++ myDzenStyle
+myDzenStatusMultiple = myDzenStatus ++ "-xs 1 -ta l" ++ myDzenStyle
 
--- Place on second monitor (-xs 2)
-myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -p -xs 2 -ta r" ++ myDzenStyle
+myDzenConky = "conky -c ~/.xmonad/conkyrc | dzen2 -p "
+myDzenConkySingle = myDzenConky ++ "-xs 2 -ta r" ++ myDzenStyle
+myDzenConkyMultiple = myDzenConky ++ "-xs 2 -ta r" ++ myDzenStyle
 
 myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 180 --widthtype pixel --height 18 --heighttype pixel --transparent true --alpha 0 --tint 0x002b36"
 
@@ -265,10 +279,17 @@ myRestart = "killall -9 dzen2; killall -9 conky; killall -9 trayer; xmonad --rec
 
 main = do
 
-    status <- spawnPipe myDzenStatus
-    conky  <- spawnPipe myDzenConky
+    nScreens <- countScreens
 
-    tray   <- spawnPipe myTrayer
+    status <- case nScreens of
+        1 -> spawnPipe myDzenStatusSingle
+        _ -> spawnPipe myDzenStatusMultiple
+
+    conky <- case nScreens of
+        1 -> spawnPipe myDzenConkySingle
+        _ -> spawnPipe myDzenConkyMultiple
+
+    tray  <- spawnPipe myTrayer
 
     xmonad
         $ withUrgencyHook LibNotifyUrgencyHook
