@@ -10,7 +10,6 @@
 !------------------------------------------------------------------------------
 
 Xft.antialias:              true
-Xft.dpi:                    125
 Xft.hinting:                true
 Xft.hintstyle:              slight
 
@@ -30,11 +29,13 @@ URxvt*transparent:          false
 URxvt*internalBorder:       0
 
 ! Font
-URxvt*font:                 xft:inconsolata:size=8
-URxvt*boldFont:             xft:inconsolata:size=8
-URxvt*italicFont:           xft:inconsolata:size=8
-URxvt*boldItalicFont:       xft:inconsolata:size=8
-!URxvt*letterSpace:         -1
+URxvt*xft.antialias:        true
+URxvt*xft.hintingx:         true
+URxvt*font:                 xft:inconsolata:pixelsize=16
+URxvt*boldFont:             xft:inconsolata:pixelsize=16
+URxvt*italicFont:           xft:inconsolata:pixelsize=16
+URxvt*boldItalicFont:       xft:inconsolata:pixelsize=16
+URxvt*letterSpace:          0
 
 ! Scroll
 URxvt*scrollStyle:          rxvt
