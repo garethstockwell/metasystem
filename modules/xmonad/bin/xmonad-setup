@@ -23,21 +23,31 @@ xsetroot -solid "#002b36"
 # Launch programs
 #------------------------------------------------------------------------------
 
+function launch()
+{
+	local prog=$1
+	shift
+	if hash $prog 2>/dev/null; then
+		$prog $@ &
+	fi
+}
+
 # Network monitor
-if hash nm-applet 2>/dev/null; then
-	nm-applet --sm-disable &
-fi
+launch nm-applet --sm-disable
 
 # Screensaver
-if hash xscreensaver 2>/dev/null; then
-	xscreensaver -no-splash &
-fi
+launch xscreensaver -no-splash
 
 # Run the gnome-keyring-daemon to avoid issues you otherwise may encounter
 # when using gnome applications which expect access to the keyring, such
 # as Empathy. This prevents prompts you may otherwise get for invalid
 # certificates and the like.
-if hash gnome-keyring-daemon 2>/dev/null; then
-	gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh
-fi
+launch gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh
+
+# Apps
+launch rxvt
+launch firefox
+launch pidgin
+launch skype
+launch remmina
 

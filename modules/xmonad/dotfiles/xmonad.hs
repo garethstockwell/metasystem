@@ -251,18 +251,6 @@ instance UrgencyHook LibNotifyUrgencyHook where
 -- Startup
 -------------------------------------------------------------------------------
 
-myStartupHook = do
-    spawnOn "1:term" myTerminal
-
-    spawnOn "2:web" "firefox"
-
-    spawnOn "5:chat" "pidgin"
-    spawnOn "5:chat" "skype"
-
-    --spawnOn "6:music" "spotify"
-
-    spawnOn "7:remote" "remmina"
-
 -- Zombie slaying
 myRestart :: String
 myRestart = "killall -9 dzen2; killall -9 conky; killall -9 trayer; xmonad --recompile && xmonad --restart"
@@ -281,26 +269,24 @@ main = do
     xmonad
         $ withUrgencyHook LibNotifyUrgencyHook
         $ defaultConfig
-    {
-        modMask                  = myModMask
+            {
+                modMask                  = myModMask
 
-      , terminal                 = myTerminal
+              , terminal                 = myTerminal
 
-      , focusFollowsMouse        = myFocusFollowsMouse
+              , focusFollowsMouse        = myFocusFollowsMouse
 
-      , borderWidth              = myBorderWidth
-      , normalBorderColor        = myNormalBorderColor
-      , focusedBorderColor       = myFocusedBorderColor
+              , borderWidth              = myBorderWidth
+              , normalBorderColor        = myNormalBorderColor
+              , focusedBorderColor       = myFocusedBorderColor
 
-      , workspaces               = myWorkspaces
+              , workspaces               = myWorkspaces
 
-      , layoutHook               = myLayoutHook
+              , layoutHook               = myLayoutHook
 
-      , manageHook               = myManageHook
+              , manageHook               = myManageHook
 
-      , startupHook                 = myStartupHook
+              , logHook                  = myLogHook status
 
-      , logHook                  = myLogHook status
-
-    } `additionalKeysP` myKeys
+            } `additionalKeysP` myKeys
 
