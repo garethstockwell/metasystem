@@ -27,7 +27,12 @@ function xmonad_recompile()
 
 function xmonad_restart()
 {
-	xmonad_recompile && xmonad --restart
+	killall -9 dzen2
+	killall -9 conky
+	killall -9 trayer
+	xmonad_recompile &&\
+	xrdb < ~/.Xresources &&\
+	xmonad --restart
 }
 
 

@@ -126,3 +126,12 @@ URxvt*visualBell:           true
 *color7:                    S_base2
 *color15:                   S_base3
 
+
+!------------------------------------------------------------------------------
+! dzen2
+!------------------------------------------------------------------------------
+
+dzen2.font:                "xft:inconsolata:pixelsize=12"
+dzen2.background:          S_base02
+dzen2.foreground:          S_base00
+

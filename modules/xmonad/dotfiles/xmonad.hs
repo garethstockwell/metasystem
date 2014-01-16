@@ -50,11 +50,6 @@ myModMask                      = mod4Mask
 
 myTerminal                     = "urxvt"
 
-myNormalBorderColor            = "#dddddd"
-myFocusedBorderColor           = "#ff0000"
-
-myBorderWidth                  = 1
-
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse            = True
 
@@ -92,6 +87,52 @@ myWorkspaces =
     ]
 
 startupWorkspace             = myWorkspaceTerm
+
+
+-------------------------------------------------------------------------------
+-- Theme
+-------------------------------------------------------------------------------
+
+-- Solarized
+colorBase03                  = "#002b36"
+colorBase02                  = "#073642"
+colorBase01                  = "#586e75"
+colorBase00                  = "#657b83"
+colorBase0                   = "#839496"
+colorBase1                   = "#93a1a1"
+colorBase2                   = "#eee8d5"
+colorBase3                   = "#fdf6e3"
+colorYellow                  = "#b58900"
+colorOrange                  = "#cb4b16"
+colorRed                     = "#dc322f"
+colorMagenta                 = "#d33682"
+colorViolet                  = "#6c71c4"
+colorBlue                    = "#268bd2"
+colorCyan                    = "#2aa198"
+colorGreen                   = "#859900"
+
+colorBackground              = colorBase03
+colorForeground              = colorBase00
+
+colorNormalBorder            = "#dddddd"
+colorFocusedBorder           = "#ff0000"
+
+fontXft                      = "xft:inconsolta"
+
+fontDmenu                    = fontXft ++ ":pixelsize=12"
+
+
+-------------------------------------------------------------------------------
+-- Layout
+-------------------------------------------------------------------------------
+
+heightStatus                 = 18
+
+widthBorder                  = 1
+
+widthTray                    = 180
+
+widthStatusSingle            = 500
 
 
 -------------------------------------------------------------------------------
@@ -153,18 +194,38 @@ myManageHook = composeAll $ concat
 
     , [(className =? i <||> resource =? i) --> doIgnore | i <- myIgnores]
 
-    , [(className =? x <||> title =? x <||> resource =? x) --> doSink | x <- mySinks]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doFullFloat | x <- myFullscreens]
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doSink | x <- mySinks]
 
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceTerm | x <- myShiftsTerm]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceEdit | x <- myShiftsEdit]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceRun | x <- myShiftsRun]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceWeb | x <- myShiftsWeb]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceMail | x <- myShiftsMail]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceChat | x <- myShiftsChat]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceMusic | x <- myShiftsMusic]
-    , [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceRemote | x <- myShiftsRemote]
-    --, [(className =? x <||> title =? x <||> resource =? x) --> doShift myWorkspaceMisc | x <- myShiftsMisc]
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doFullFloat | x <- myFullscreens]
+
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doShift myWorkspaceTerm | x <- myShiftsTerm]
+
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doShift myWorkspaceEdit | x <- myShiftsEdit]
+
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doShift myWorkspaceRun | x <- myShiftsRun]
+
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doShift myWorkspaceWeb | x <- myShiftsWeb]
+
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doShift myWorkspaceMail | x <- myShiftsMail]
+
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doShift myWorkspaceChat | x <- myShiftsChat]
+
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doShift myWorkspaceMusic | x <- myShiftsMusic]
+
+    , [(className =? x <||> title =? x <||> resource =? x)
+        --> doShift myWorkspaceRemote | x <- myShiftsRemote]
+
+    --, [(className =? x <||> title =? x <||> resource =? x)
+    --    --> doShift myWorkspaceMisc | x <- myShiftsMisc]
 
     ] where
 
@@ -173,25 +234,88 @@ myManageHook = composeAll $ concat
     -- Hook used to push floating windows back into the layout
     -- This is used for gimp windwos to force them into a layout.
     doSink = ask >>= \w -> liftX (reveal w) >> doF (W.sink w)
+
     -- Float dialogs, Download windows and Save dialogs
-    myCFloats = ["Sysinfo", "XMessage"]
-    myTFloats = ["Downloads", "Save As..."]
-    myRFloats = ["Dialog"]
+
+    myCFloats           = [ "Sysinfo"
+                          , "XMessage"
+                          ]
+
+    myTFloats           = [ "Downloads"
+                          , "Save As..."
+                          ]
+
+    myRFloats           = [ "Dialog"
+                          ]
+
     -- Ignore gnome leftovers
-    myIgnores = ["Unity-2d-panel", "Unity-2d-launcher", "desktop_window", "kdesktop"]
-    mySinks = ["gimp"]
+
+    myIgnores           = [ "Unity-2d-panel"
+                          , "Unity-2d-launcher"
+                          , "desktop_window"
+                          , "kdesktop"
+                          ]
+
+    mySinks                = [ "gimp"
+                          ]
+
     -- Run VLC, firefox and VLC on fullscreen
-    myFullscreens = ["vlc", "Image Viewer", "firefox"]
+
+    myFullscreens        = [ "vlc"
+                          , "Image Viewer"
+                          , "firefox"
+                          ]
+
     -- Define default workspaces for some programs
-    myShiftsTerm = [myTerminal]
-    myShiftsEdit = ["gvim"]
-    myShiftsRun = ["qemu", "xterm"]
-    myShiftsWeb = ["Firefox-bin", "Firefox", "firefox", "Firefox Web Browser"]
-    myShiftsMail = ["thunderbird", "Thunderbird-bin", "thunderbird-bin", "Thunderbird"]
-    myShiftsChat = ["Pidgin Internet Messenger", "Buddy List", "pidgin", "Pidgin", "skype", "skype-wrapper", "Skype"]
-    myShiftsMusic = ["spotify"]
-    myShiftsRemote = ["remmina"]
-    --myShiftsMisc = []
+
+    myShiftsTerm        = [ myTerminal
+                          ]
+
+    myShiftsEdit        = [ "gvim"
+                          ]
+
+    myShiftsRun         = [ "qemu"
+                          , "xterm"
+                          ]
+
+    myShiftsWeb         = [ "Firefox-bin"
+                          , "Firefox"
+                          , "firefox"
+                          , "Firefox Web Browser"
+                          ]
+
+    myShiftsMail        = [ "thunderbird"
+                          , "Thunderbird-bin"
+                          , "thunderbird-bin"
+                          , "Thunderbird"
+                          ]
+
+    myShiftsChat        = [ "Pidgin Internet Messenger"
+                          , "Buddy List"
+                          , "pidgin"
+                          , "Pidgin"
+                          , "skype"
+                          , "skype-wrapper"
+                          , "Skype"
+                          ]
+
+    myShiftsMusic        = [ "spotify"
+                          ]
+
+    myShiftsRemote        = [ "remmina"
+
+                          ]
+
+    --myShiftsMisc        = [
+    --                    ]
+
+-------------------------------------------------------------------------------
+-- Dmenu
+-------------------------------------------------------------------------------
+
+myDmenuStyle = "-fn '" ++ fontDmenu ++ "'"
+
+myDmenuRun = "dmenu_run " ++ myDmenuStyle
 
 
 -------------------------------------------------------------------------------
@@ -201,6 +325,8 @@ myManageHook = composeAll $ concat
 myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
 
          , ("M-f",             spawnHere "firefox")
+
+         , ("M-p",             spawnHere myDmenuRun)
 
          ]
 
@@ -221,17 +347,41 @@ myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
 --     left: conky
 -------------------------------------------------------------------------------
 
-myDzenStyle  = " -h '18' -y '0' -fg '#93a1a1' -bg '#002b36'"
+myDzenStyle  = "-h '" ++ show heightStatus ++ "' " ++
+               "-y '0' " ++
+               "-dock "
 
 myDzenStatus = "dzen2 -p "
-myDzenStatusSingle = myDzenStatus ++ "-x 0 -w 500 -ta l" ++ myDzenStyle
-myDzenStatusMultiple = myDzenStatus ++ "-xs 1 -ta l" ++ myDzenStyle
+
+myDzenStatusSingle = myDzenStatus ++
+                     "-x 0 -w " ++
+                     show widthStatusSingle ++
+                     " -ta l " ++
+                     myDzenStyle
+
+myDzenStatusMultiple = myDzenStatus ++
+                       "-xs 1 -ta l " ++
+                       myDzenStyle
 
 myDzenConky = "conky -c ~/.xmonad/conkyrc | dzen2 -p "
-myDzenConkySingle = myDzenConky ++ "-x 500 -w 500 -ta r" ++ myDzenStyle
-myDzenConkyMultiple = myDzenConky ++ "-xs 2 -ta r" ++ myDzenStyle
 
-myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 180 --widthtype pixel --height 18 --heighttype pixel --transparent true --alpha 0 --tint 0x002b36"
+myDzenConkySingle = myDzenConky ++
+                    "-x " ++ show widthStatusSingle ++ " " ++
+                    "-w " ++ show widthStatusSingle ++ " " ++
+                    "-ta r " ++
+                    myDzenStyle
+
+myDzenConkyMultiple = myDzenConky ++
+                      "-xs 2 -ta r " ++
+                      myDzenStyle
+
+myTrayer = "trayer --edge top --align right " ++
+           "--SetDockType true --SetPartialStrut true " ++
+           "--expand true " ++
+           "--widthtype pixel --width " ++ show widthTray ++ " " ++
+           "--heighttype pixel --height " ++ show heightStatus ++ " " ++
+           "--transparent true --alpha 0 " ++
+           "--tint " ++ colorBackground
 
 
 -------------------------------------------------------------------------------
@@ -240,13 +390,13 @@ myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut
 
 myLogHook status = workspaceNamesPP defaultPP {
       ppOutput  = hPutStrLn status
-    , ppCurrent = dzenColor "#3399ff" "" . wrap " " " "
-    , ppHidden  = dzenColor "#dddddd" "" . wrap " " " "
-    , ppHiddenNoWindows = dzenColor "#777777" "" . wrap " " " "
-    , ppUrgent  = dzenColor "#ff0000" "" . wrap " " " "
+    , ppCurrent = dzenColor colorBlue "" . wrap " " " "
+    , ppHidden  = dzenColor colorBase0 "" . wrap " " " "
+    , ppHiddenNoWindows = dzenColor colorBase2 "" . wrap " " " "
+    , ppUrgent  = dzenColor colorRed "" . wrap " " " "
     , ppSep     = "  "
     , ppLayout  = \y -> ""
-    , ppTitle   = dzenColor "#ffffff" "" . wrap " " " "
+    , ppTitle   = dzenColor colorForeground "" . wrap " " " "
     } >>= dynamicLogWithPP >> updatePointer (Relative 0.5 0.5)
 
 
@@ -270,7 +420,10 @@ instance UrgencyHook LibNotifyUrgencyHook where
 
 -- Zombie slaying
 myRestart :: String
-myRestart = "/usr/bin/killall -9 dzen2; /usr/bin/killall -9 conky; /usr/bin/killall -9 trayer; xmonad --recompile && xmonad --restart"
+myRestart = "/usr/bin/killall -9 dzen2; " ++
+            "/usr/bin/killall -9 conky; " ++
+            "/usr/bin/killall -9 trayer; " ++
+            "xmonad --recompile && xmonad --restart"
 
 
 -------------------------------------------------------------------------------
@@ -301,9 +454,9 @@ main = do
 
               , focusFollowsMouse        = myFocusFollowsMouse
 
-              , borderWidth              = myBorderWidth
-              , normalBorderColor        = myNormalBorderColor
-              , focusedBorderColor       = myFocusedBorderColor
+              , borderWidth              = widthBorder
+              , normalBorderColor        = colorNormalBorder
+              , focusedBorderColor       = colorFocusedBorder
 
               , workspaces               = myWorkspaces
 
