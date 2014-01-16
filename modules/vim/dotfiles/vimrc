@@ -496,7 +496,7 @@ vnoremap # :s/^\([ \t]*\)\(.*\)$/#\1\2<cr>:nohl<cr>:silent! set hl<CR>
 vnoremap 3 :s/^\([ \t]*\)#\(.*\)$/\1\2<cr>:nohl<cr>:silent! set hl<CR>
 
 " Allow shift-<arrow key> to select text
-set keymodel=startsel,stopsel
+"set keymodel=startsel,stopsel
 
 " ----------------------------------------------------------------------------
 " Misc
