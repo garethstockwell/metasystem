@@ -22,6 +22,7 @@ import XMonad.Actions.UpdatePointer
 import XMonad.Actions.WorkspaceNames
 
 import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.FadeInactive
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers (isDialog, isFullscreen, doFullFloat, doCenterFloat)
 import XMonad.Hooks.UrgencyHook
@@ -314,6 +315,10 @@ myTrayer = "trayer --edge top --align right " ++
 -- LogHook
 -------------------------------------------------------------------------------
 
+myLogFade :: X ()
+myLogFade = fadeInactiveLogHook fadeAmount
+    where fadeAmount = 0.8
+
 myLogHook status = workspaceNamesPP defaultPP {
       ppOutput  = hPutStrLn status
     , ppCurrent = dzenColor colorBlue "" . wrap " " " "
@@ -323,7 +328,10 @@ myLogHook status = workspaceNamesPP defaultPP {
     , ppSep     = "  "
     , ppLayout  = \y -> ""
     , ppTitle   = dzenColor colorForeground "" . wrap " " " "
-    } >>= dynamicLogWithPP >> updatePointer (Relative 0.5 0.5)
+    }
+    >>= dynamicLogWithPP
+    >> updatePointer (Relative 0.5 0.5)
+    >> myLogFade
 
 
 -------------------------------------------------------------------------------
