@@ -61,19 +61,13 @@ myFocusFollowsMouse            = True
 -------------------------------------------------------------------------------
 
 myWorkspaceTerm                = "1:term"
-
 myWorkspaceWeb                 = "2:web"
-
 myWorkspaceEdit                = "3:edit"
 myWorkspaceTarget              = "4:target"
-
 myWorkspaceMail                = "5:mail"
 myWorkspaceChat                = "6:chat"
-
 myWorkspaceMusic               = "7:music"
-
 myWorkspaceRemote              = "8:remote"
-
 myWorkspaceMisc                = "9:misc"
 
 myWorkspaces =
@@ -245,25 +239,22 @@ myManageHook = (composeAll $ concat
 
 
 -------------------------------------------------------------------------------
+-- Keys
+-------------------------------------------------------------------------------
+
+myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
+         , ("M-f",             spawnHere "firefox")
+         , ("M-p",             spawnHere myDmenuRun)
+         ]
+
+
+-------------------------------------------------------------------------------
 -- Dmenu
 -------------------------------------------------------------------------------
 
 myDmenuStyle = "-fn '" ++ fontDmenu ++ "'"
 
 myDmenuRun = "dmenu_run " ++ myDmenuStyle
-
-
--------------------------------------------------------------------------------
--- Keys
--------------------------------------------------------------------------------
-
-myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
-
-         , ("M-f",             spawnHere "firefox")
-
-         , ("M-p",             spawnHere myDmenuRun)
-
-         ]
 
 
 -------------------------------------------------------------------------------
@@ -382,24 +373,15 @@ main = do
     xmonad
         $ withUrgencyHook LibNotifyUrgencyHook
         $ defaultConfig
-            {
-                modMask                  = myModMask
-
-              , terminal                 = myTerminal
-
-              , focusFollowsMouse        = myFocusFollowsMouse
-
-              , borderWidth              = widthBorder
-              , normalBorderColor        = colorNormalBorder
-              , focusedBorderColor       = colorFocusedBorder
-
-              , workspaces               = myWorkspaces
-
-              , layoutHook               = myLayoutHook
-
-              , manageHook               = myManageHook
-
-              , logHook                  = myLogHook status
-
+            { modMask                  = myModMask
+            , terminal                 = myTerminal
+            , focusFollowsMouse        = myFocusFollowsMouse
+            , borderWidth              = widthBorder
+            , normalBorderColor        = colorNormalBorder
+            , focusedBorderColor       = colorFocusedBorder
+            , workspaces               = myWorkspaces
+            , layoutHook               = myLayoutHook
+            , manageHook               = myManageHook
+            , logHook                  = myLogHook status
             } `additionalKeysP` myKeys
 
