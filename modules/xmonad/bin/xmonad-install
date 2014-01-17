@@ -18,6 +18,11 @@ xscreensaver
 '
 
 echo "Installing packages"
+
+# Add repo which contains xft-enabled versions of dmenu, dzen2
+# See https://launchpad.net/~chilicuil/+archive/sucklesstools
+sudo apt-add-repository ppa:chilicuil/sucklesstools
+
 sudo apt-get install ${PACKAGES}
 
 echo "Creating xsession configuration"
