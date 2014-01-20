@@ -173,16 +173,22 @@ set ru
 " use shortest messages
 "set shm=a
 
-set statusline=%f "tail of the filename
+" Tail of the filename
+set statusline=%f
 
-"display a warning if fileformat isnt unix
+" Buffer number
+set statusline+=\ (%n/%{len(filter(range(1,bufnr('$')),'buflisted(v:val)'))})\ 
+
+" Display a warning if fileformat isnt unix
 set statusline+=%#warningmsg#
 set statusline+=%{&ff!='unix'?'['.&ff.']':''}
 set statusline+=%*
 
-"display a warning if file encoding isnt utf-8
+" Display a warning if file encoding isnt utf-8
 set statusline+=%#warningmsg#
+
 set statusline+=%{(&fenc!='utf-8'&&&fenc!='')?'['.&fenc.']':''}
+
 set statusline+=%*
 
 set statusline+=%h "help file flag
@@ -190,12 +196,16 @@ set statusline+=%y "filetype
 set statusline+=%r "read only flag
 set statusline+=%m "modified flag
 
-"display a warning if &et is wrong, or we have mixed-indenting
+" Display a warning if &et is wrong, or we have mixed-indenting
 set statusline+=%#error#
+
 set statusline+=%{StatuslineTabWarning()}
+
 set statusline+=%*
 
+" Right-align remainder
 set statusline+=%= "left/right separator
+
 "set statusline+=%{StatuslineCurrentHighlight()}\ \ "current highlight
 set statusline+=%c, "cursor column
 set statusline+=%l/%L "cursor line/total lines
@@ -476,23 +486,23 @@ endif
 " ----------------------------------------------------------------------------
 
 " Appends / insert current date
-nmap _d "=strftime("%d.%m.%Y")<CR>p
-nmap _D "=strftime("%d.%m.%Y")<CR>P
+"nmap _d "=strftime("%d.%m.%Y")<CR>p
+"nmap _D "=strftime("%d.%m.%Y")<CR>P
 
 " Changes directory to the one of the current file
-nmap _h :cd%:h<CR>
+"nmap _h :cd%:h<CR>
 
 " Suppresses all spaces at end/beginning of lines
-nmap _s :%s/\s\+$//<CR>
-nmap _S :%s/^\s\+//<CR>
+"nmap _s :%s/\s\+$//<CR>
+"nmap _S :%s/^\s\+//<CR>
 
 " Converts file format to/from unix
-command Unixformat :set ff=unix
-command Dosformat :set ff=dos
+"command Unixformat :set ff=unix
+"command Dosformat :set ff=dos
 
 " Folkes magic # adder/remover
-vnoremap # :s/^\([ \t]*\)\(.*\)$/#\1\2<cr>:nohl<cr>:silent! set hl<CR>
-vnoremap 3 :s/^\([ \t]*\)#\(.*\)$/\1\2<cr>:nohl<cr>:silent! set hl<CR>
+"vnoremap # :s/^\([ \t]*\)\(.*\)$/#\1\2<cr>:nohl<cr>:silent! set hl<CR>
+"vnoremap 3 :s/^\([ \t]*\)#\(.*\)$/\1\2<cr>:nohl<cr>:silent! set hl<CR>
 
 " Allow shift-<arrow key> to select text
 "set keymodel=startsel,stopsel
@@ -518,4 +528,31 @@ set mouse=a
 
 " don't redraw when don't have to
 set lazyredraw
+
+" ----------------------------------------------------------------------------
+" Buffers
+" ----------------------------------------------------------------------------
+
+nnoremap <Leader>l :ls<CR>
+
+" Forward / back
+nnoremap <Leader>[ :bp<CR>
+nnoremap <Leader>] :bn<CR>
+
+" Switch to last used buffer
+nnoremap <Leader>, :e#<CR>
+
+nnoremap <Leader>1 :1b<CR>
+nnoremap <Leader>2 :2b<CR>
+nnoremap <Leader>3 :3b<CR>
+nnoremap <Leader>4 :4b<CR>
+nnoremap <Leader>5 :5b<CR>
+nnoremap <Leader>6 :6b<CR>
+nnoremap <Leader>7 :7b<CR>
+nnoremap <Leader>8 :8b<CR>
+nnoremap <Leader>9 :9b<CR>
+nnoremap <Leader>0 :10b<CR>
+
+" Show list of buffers and prompt for number to switch to
+nnoremap <Leader>. :buffers<CR>:buffer<Space>
 

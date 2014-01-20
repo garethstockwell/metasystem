@@ -32,7 +32,7 @@ function edit_source()
 		done
 		files="$files $(find $dir -iname *.c | grep -v mod.c)"
 	done
-	gvim $files &
+	vim $files
 }
 
 
