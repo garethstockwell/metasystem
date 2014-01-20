@@ -142,6 +142,11 @@ test "$verbose" == yes && echo $cmd
 
 if [[ -z "$dryrun" ]]; then
 	eval $cmd
-	chmod $(stat -c %a $src) $dest
+	if [[ $METASYSTEM_OS == mac ]]; then
+		perm=$(stat -f %p $src)
+	else
+		perm=$(stat -c %a $src)
+	fi
+	chmod $perm $dest
 fi
 
