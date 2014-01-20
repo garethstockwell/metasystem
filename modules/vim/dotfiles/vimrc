@@ -137,7 +137,6 @@ let c_comment_strings = 1
 " use css when converting syntax to html (2html.vim)
 let html_use_css = 1
 
-
 " ----------------------------------------------------------------------------
 " Menu
 " ----------------------------------------------------------------------------
@@ -519,7 +518,4 @@ set mouse=a
 
 " don't redraw when don't have to
 set lazyredraw
-
-
-
 
