@@ -244,6 +244,7 @@ myManageHook = (composeAll $ concat
 -------------------------------------------------------------------------------
 
 myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
+         , ("M-S-<Return>",    spawnHere myTerminal)
          , ("M-f",             spawnHere "firefox")
          , ("M-p",             spawnHere myDmenuRun)
          ]
