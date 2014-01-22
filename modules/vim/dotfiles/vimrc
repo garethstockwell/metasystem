@@ -540,7 +540,7 @@ nnoremap <Leader>[ :bp<CR>
 nnoremap <Leader>] :bn<CR>
 
 " Switch to last used buffer
-nnoremap <Leader>, :e#<CR>
+nnoremap <Leader>. :e#<CR>
 
 nnoremap <Leader>1 :1b<CR>
 nnoremap <Leader>2 :2b<CR>
@@ -554,5 +554,5 @@ nnoremap <Leader>9 :9b<CR>
 nnoremap <Leader>0 :10b<CR>
 
 " Show list of buffers and prompt for number to switch to
-nnoremap <Leader>. :buffers<CR>:buffer<Space>
+nnoremap <Leader><Leader> :buffers<CR>:buffer<Space>
 
