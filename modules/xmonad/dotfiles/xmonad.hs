@@ -132,7 +132,7 @@ widthBorder                  = 1
 
 widthTray                    = 180
 
-widthStatusSingle            = 500
+widthStatusSingle            = 640
 
 
 -------------------------------------------------------------------------------
