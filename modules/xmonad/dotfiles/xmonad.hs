@@ -25,16 +25,17 @@ import XMonad.Actions.WorkspaceNames
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.FadeInactive
 import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.ManageHelpers (isDialog, isFullscreen, doFullFloat, doCenterFloat)
+import XMonad.Hooks.ManageHelpers ( isDialog, isFullscreen,
+                                    doFullFloat, doCenterFloat )
 import XMonad.Hooks.UrgencyHook
 
 import XMonad.Layout.Circle
 import XMonad.Layout.Grid
 import XMonad.Layout.Fullscreen
-import XMonad.Layout.IndependentScreens (countScreens)
+import XMonad.Layout.IndependentScreens ( countScreens )
 import XMonad.Layout.IM
 import XMonad.Layout.NoBorders
-import XMonad.Layout.PerWorkspace (onWorkspace)
+import XMonad.Layout.PerWorkspace ( onWorkspace )
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.ThreeColumns
 
@@ -43,7 +44,8 @@ import XMonad.Util.NamedWindows
 import XMonad.Util.Run
 
 import qualified Data.Map as M
-import qualified XMonad.StackSet as W ( findTag, focusDown, sink, shift, greedyView )
+import qualified XMonad.StackSet as W ( findTag, focusDown,
+                                        sink, shift, greedyView )
 
 
 -------------------------------------------------------------------------------
