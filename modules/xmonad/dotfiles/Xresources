@@ -31,11 +31,8 @@ URxvt*internalBorder:       0
 ! Font
 URxvt*xft.antialias:        true
 URxvt*xft.hintingx:         true
-URxvt*font:                 xft:inconsolata:pixelsize=16
-URxvt*boldFont:             xft:inconsolata:pixelsize=16
-URxvt*italicFont:           xft:inconsolata:pixelsize=16
-URxvt*boldItalicFont:       xft:inconsolata:pixelsize=16
-URxvt*letterSpace:          0
+URxvt*font:                 xft:inconsolata:pixelsize=12
+URxvt*letterSpace:          -1
 
 ! Scroll
 URxvt*scrollStyle:          rxvt
