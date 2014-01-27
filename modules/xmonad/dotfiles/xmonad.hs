@@ -15,6 +15,7 @@ import XMonad
 import Control.Monad ( liftM2 )
 
 import Data.Char ( toLower )
+import Data.List ( intercalate )
 
 import XMonad.Actions.Plane
 import XMonad.Actions.SpawnOn
@@ -281,35 +282,52 @@ myDzenStyle  = "-h '" ++ show heightStatus ++ "' " ++
 
 myDzenStatus = "dzen2 -p "
 
-myDzenStatusSingle = myDzenStatus ++
-                     "-x 0 -w " ++
-                     show widthStatusSingle ++
-                     " -ta l " ++
-                     myDzenStyle
+myDzenStatusSingle = intercalate " "
+                         [ myDzenStatus,
+                           "-x",         "0",
+                           "-w",         show widthStatusSingle,
+                           "-ta",        "l",
+                           myDzenStyle
+                         ]
 
-myDzenStatusMultiple = myDzenStatus ++
-                       "-xs 1 -ta l " ++
-                       myDzenStyle
+myDzenStatusMultiple = intercalate " "
+                         [ myDzenStatus,
+                           "-xs",        "1",
+                           "-ta",        "l",
+                           myDzenStyle
+                         ]
 
 myDzenConky = "conky -c ~/.xmonad/conkyrc | dzen2 -p "
 
-myDzenConkySingle = myDzenConky ++
-                    "-x " ++ show widthStatusSingle ++ " " ++
-                    "-w " ++ show widthStatusSingle ++ " " ++
-                    "-ta r " ++
-                    myDzenStyle
+myDzenConkySingle = intercalate " "
+                         [ myDzenConky,
+                           "-x",         show widthStatusSingle,
+                           "-w",         show widthStatusSingle,
+                           "-ta",        "r",
+                           myDzenStyle ]
 
-myDzenConkyMultiple = myDzenConky ++
-                      "-xs 2 -ta r " ++
-                      myDzenStyle
+myDzenConkyMultiple = intercalate " "
+                         [ myDzenConky,
+                           "-xs",        "2",
+                           "-ta",        "r",
+                           myDzenStyle
+                         ]
 
-myTrayer = "trayer --edge top --align right " ++
-           "--SetDockType true --SetPartialStrut true " ++
-           "--expand true " ++
-           "--widthtype pixel --width " ++ show widthTray ++ " " ++
-           "--heighttype pixel --height " ++ show heightStatus ++ " " ++
-           "--transparent true --alpha 0 " ++
-           "--tint " ++ colorBackground
+myTrayer = intercalate " "
+               [ "trayer",
+                 "--edge",               "top",
+                 "--align",              "right",
+                 "--SetDockType",        "true",
+                 "--SetPartialStrut",    "true",
+                 "--expand",             "true",
+                 "--widthtype",          "pixel",
+                 "--width",              show widthTray,
+                 "--heighttype",         "pixel",
+                 "--height",             show heightStatus,
+                 "--transparent",        "true",
+                 "--alpha",              "0",
+                 "--tint",               colorBackground
+               ]
 
 
 -------------------------------------------------------------------------------
