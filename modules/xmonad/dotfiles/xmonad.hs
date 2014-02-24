@@ -214,7 +214,7 @@ myManageShift = composeAll
 
         myClassesTerm      = [ myTerminal ]
         myClassesWeb       = [ "firefox" ]
-        myClassesEdit      = [ "gvim" ]
+        myClassesEdit      = [ "adt", "eclipse", "gvim" ]
         myClassesTarget    = [ "gvncviewer", "qemu", "xterm" ]
         myClassesMail      = [ "thunderbird" ]
         myClassesChat      = [ "pidgin", "skype" ]
