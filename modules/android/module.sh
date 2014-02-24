@@ -331,8 +331,10 @@ export ANDROID_TARGET_SSH_PORT=2222
 export ANDROID_DEFAULT_AVD=15
 
 export ANDROID_EMULATOR_SDCARD_SIZE=512M
-export ANDROID_SDK_DIR=~/work/local/sdks/android/aosp/sdk
-export ANDROID_NDK_DIR=~/work/local/sdks/android/aosp/ndk
+
+export ANDROID_ADT_DIR=~/work/local/sdk/android/adt/current
+export ANDROID_NDK_DIR=~/work/local/sdk/android/ndk/current
+export ANDROID_STUDIO_DIR=~/work/local/sdk/android/studio/current
 
 export ANDROID_AUTO_LUNCH=1
 export ANDROID_SET_KERNEL_COMPILATION_VARS=1
@@ -377,6 +379,20 @@ PATH=$(path_append $METASYSTEM_ANDROID_BIN $PATH)
 
 source $METASYSTEM_ANDROID_ROOT/shell/bash-completion.sh
 
+if [[ -d $ANDROID_ADT_DIR ]]; then
+	PATH=$(path_prepend $ANDROID_ADT_DIR/eclipse $PATH)
+	export ANDROID_SDK_DIR=$ANDROID_ADT_DIR/sdk
+else
+	export ANDROID_ADT_DIR=
+fi
+
+if [[ -d $ANDROID_STUDIO_DIR ]]; then
+	PATH=$(path_prepend $ANDROID_STUDIO_DIR/bin $PATH)
+	export ANDROID_SDK_DIR=$ANDROID_STUDIO_DIR/sdk
+else
+	export ANDROID_STUDIO_DIR=
+fi
+
 if [[ -d $ANDROID_SDK_DIR ]]; then
 	PATH=$(path_prepend $ANDROID_SDK_DIR/platform-tools $PATH)
 	PATH=$(path_prepend $ANDROID_SDK_DIR/tools $PATH)
@@ -384,5 +400,7 @@ fi
 
 if [[ -d $ANDROID_NDK_DIR ]]; then
 	PATH=$(path_prepend $ANDROID_NDK_DIR $PATH)
+else
+	export ANDROID_NDK_DIR=
 fi
 
