@@ -219,7 +219,7 @@ myManageShift = composeAll
         myClassesMail      = [ "thunderbird" ]
         myClassesChat      = [ "pidgin", "skype" ]
         myClassesMusic     = [ "spotify" ]
-        myClassesRemote    = [ "remmina" ]
+        myClassesRemote    = [ "remmina", "vmplayer" ]
         myClassesMisc      = [ ]
 
         -- Hook used to shift windows without focusing them
