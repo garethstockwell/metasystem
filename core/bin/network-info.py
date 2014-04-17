@@ -1,50 +1,23 @@
 #!/usr/bin/env python
 
+import os
 import sys
-import socket
 
-def domain():
-    return socket.getfqdn().replace(socket.gethostname()+'.', '')
+sys.path.append(os.path.join(os.path.dirname(
+        sys.argv[0]), os.pardir, 'lib', 'python'))
 
-def fqdn():
-    return socket.getfqdn()
+from metasystem import network
 
-def hostname():
-    return socket.gethostname()
+if len(sys.argv) > 1:
+    if sys.argv[1] == 'domain':
+        print network.domain()
 
-import platform
-if platform.system() == 'Linux':
-    import subprocess
-    import re
+    if sys.argv[1] == 'fqdn':
+        print network.fqdn()
 
-    def ip():
-        import os
-        with open(os.devnull, 'w') as null:
-            child = subprocess.Popen(['ifconfig'], shell=True,
-                                     stdout=subprocess.PIPE,
-                                     stderr=null)
-            regex = re.compile(r'.*inet addr:(.*?) .*')
-            out, err = child.communicate()
-            for line in out.split('\n'):
-                m = regex.match(line)
-                if m:
-                    return m.groups()[0]
-            return ''
+    if sys.argv[1] == 'hostname':
+        print network.hostname()
 
-else:
-    def ip():
-        return socket.gethostbyname(socket.gethostname())
-
-if sys.argv[1] == 'domain':
-    print domain()
-
-if sys.argv[1] == 'fqdn':
-    print fqdn()
-
-if sys.argv[1] == 'hostname':
-    print hostname()
-
-if sys.argv[1] == 'ip':
-    print ip()
-
+    if sys.argv[1] == 'ip':
+        print network.ip_addr()
 

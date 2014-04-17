@@ -1,2 +1,4 @@
 # metasystem
 
+from errors import *
+
