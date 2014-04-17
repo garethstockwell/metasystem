@@ -62,8 +62,7 @@ class Program(daemon.Program):
         logging.info("do_init")
 
         if self.args.cookie is None:
-            import socket
-            self.args.cookie = socket.gethostname()
+            self.args.cookie = network.fqdn()
 
         logging.debug('cookie = {0:s}'.format(str(self.args.cookie)))
 

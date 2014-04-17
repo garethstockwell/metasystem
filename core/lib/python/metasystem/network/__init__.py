@@ -246,18 +246,17 @@ def hostname():
     return socket.gethostname()
 
 
-def target_ip_addr(save=False):
+def get_ip_addr(fqdn):
     """
-    Get IP address of target machine
+    Get IP address of specified machine
     """
 
     client = NetworkConfigClient()
     result = client.request()
     logging.debug('Received {0:d} configurations'.format(len(result)))
-    if len(result) == 1:
-        ip_addr = result[0].ip_addr
-        logging.debug('Received {0:s} from broadcast'.format(ip_addr))
-        return ip_addr
+    for r in result:
+        if r.fqdn == fqdn:
+            return r.ip_addr
 
     return None
 
