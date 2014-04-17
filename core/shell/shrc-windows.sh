@@ -4,9 +4,6 @@
 # PATH
 #------------------------------------------------------------------------------
 
-# AESS tools
-PATH=$(path_append_if_exists /c/apps/aess $PATH)
-
 # GIT
 PATH=$(path_append_if_exists $_METASYSTEM_APPS/git/bin $PATH)
 
