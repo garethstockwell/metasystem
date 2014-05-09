@@ -55,6 +55,7 @@ import qualified XMonad.StackSet as W ( findTag, focusDown,
 myModMask                      = mod4Mask
 
 myTerminal                     = "urxvt"
+myBrowser                      = "firefox"
 
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse            = True
@@ -213,7 +214,7 @@ myManageShift = composeAll
         myClassesSink      = [ "gimp" ]
 
         myClassesTerm      = [ myTerminal ]
-        myClassesWeb       = [ "firefox" ]
+        myClassesWeb       = [ myBrowser ]
         myClassesEdit      = [ "adt", "eclipse", "gvim" ]
         myClassesTarget    = [ "gvncviewer", "qemu", "xterm" ]
         myClassesMail      = [ "thunderbird" ]
@@ -250,7 +251,7 @@ myTerminalRun = myTerminal ++ " -e tmux attach -t default"
 
 myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
          , ("M-S-<Return>",    spawnHere myTerminalRun)
-         , ("M-f",             spawnHere "firefox")
+         , ("M-S-b",           spawnHere myBrowser)
          , ("M-p",             spawnHere myDmenuRun)
          ]
 
