@@ -339,9 +339,11 @@ myTrayer = intercalate " "
 -- LogHook
 -------------------------------------------------------------------------------
 
+-- Set fadeAmount to < 1.0 to make unfocussed windows semi-transparent
+
 myLogFade :: X ()
 myLogFade = fadeInactiveLogHook fadeAmount
-    where fadeAmount = 0.8
+    where fadeAmount = 1.0
 
 myLogHook status = workspaceNamesPP defaultPP {
       ppOutput  = hPutStrLn status
