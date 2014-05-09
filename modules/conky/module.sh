@@ -11,5 +11,5 @@ command_exists conky || return 1
 # Main
 #------------------------------------------------------------------------------
 
-_metasystem_dotfile_register xmonad desktop conky/desktop
+_metasystem_dotfile_register conky desktop conky/desktop %
 

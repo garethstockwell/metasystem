@@ -9,6 +9,15 @@
 #	foo123bar
 
 #------------------------------------------------------------------------------
+# Constants
+#------------------------------------------------------------------------------
+
+DEFAULT_START=$
+DEFAULT_OPEN={
+DEFAULT_CLOSE=}
+
+
+#------------------------------------------------------------------------------
 # Global variables
 #------------------------------------------------------------------------------
 
@@ -18,6 +27,11 @@ verbose=
 dryrun=
 src=
 dest=
+
+opt_start=
+opt_open=
+opt_close=
+
 
 #------------------------------------------------------------------------------
 # Functions
@@ -36,6 +50,10 @@ Options:
   -o, --output OUTPUT     output file
   -v, --verbose           verbose output
   -n, --dry-run           don't execute
+
+  --start CHAR            start character (default: $DEFAULT_START)
+  --open CHAR             open character (default: $DEFAULT_OPEN)
+  --close CHAR            close character (default: $DEFAULT_CLOSE)
 
 If INPUT is omitted, input is read from STDIN.
 If OUTPUT is omitted, output is written to STDOUT.
@@ -75,6 +93,15 @@ function parse_command_line()
 			-v | --verbose)
 				verbose=yes
 				;;
+			--start)
+				prev=opt_start
+				;;
+			--open)
+				prev=opt_open
+				;;
+			--close)
+				prev=opt_close
+				;;
 			*=*)
 				local key=`expr "x$option" : 'x\([^=]*\)='`
 				local value=`echo "$optarg" | sed "s/'/'\\\\\\\\''/g"`
@@ -95,7 +122,12 @@ function parse_command_line()
 				;;
 		esac
 	done
+
+	[[ -n $opt_start ]] || opt_start=$DEFAULT_START
+	[[ -n $opt_open ]] || opt_open=$DEFAULT_OPEN
+	[[ -n $opt_close ]] || opt_close=$DEFAULT_CLOSE
 }
+
 
 #------------------------------------------------------------------------------
 # Main
@@ -130,9 +162,9 @@ test -n "$dest" && cmd="rm -f $dest && "
 cmd="$cmd
 	 cat $src |
 		awk '{
-			while(match(\$0, \"[$]{[^}]*}\")) {
+			while(match(\$0, \"[${opt_start}]${opt_open}[^${opt_close}]*${opt_close}\")) {
 				var = substr(\$0, RSTART+2, RLENGTH-3);
-				gsub(\"[$]{\"var\"}\", ENVIRON[var])
+				gsub(\"[${opt_start}]${opt_open}\"var\"${opt_close}\", ENVIRON[var])
 			}
 		}1'"
 

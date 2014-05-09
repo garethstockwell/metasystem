@@ -673,7 +673,8 @@ function _metasystem_dotfile_register()
 	local key=$1
 	local src=$2
 	local dst=$3
-	local str=${key}:${src}:${dst}
+	local start=$4
+	local str=${key}:${src}:${dst}:${start}
 	_METASYSTEM_DOTFILES=$(list_append ${str} ${_METASYSTEM_DOTFILES})
 }
 
@@ -688,6 +689,7 @@ function _metasystem_dotfile_update()
 
 			local src=$(echo $entry | cut -d: -f2)
 			local dst=$(echo $entry | cut -d: -f3)
+			local start=$(echo $entry | cut -d: -f4)
 
 			if [[ -z $dst ]]; then
 				dst=$src
@@ -708,11 +710,16 @@ function _metasystem_dotfile_update()
 				src_path=$METASYSTEM_ROOT/modules/$key/dotfiles/$src
 			fi
 
-			echo "$key: $src -> $dst"
+			echo "$key: $src -> $dst [$start]"
 
 			if [[ ! -z $src_path && -e $src_path ]]; then
 				mkdir -p $(dirname $dst_path)
-				subst-vars.sh --force $src_path $dst_path
+
+				args=
+				if [[ -n $start ]]; then
+					args="--start $start"
+				fi
+				subst-vars.sh --force $src_path $dst_path $args
 			fi
 		fi
 	done
