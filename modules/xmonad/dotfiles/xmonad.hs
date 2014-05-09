@@ -246,8 +246,10 @@ myManageHook = (composeAll $ concat
 -- Keys
 -------------------------------------------------------------------------------
 
+myTerminalRun = myTerminal ++ " -e tmux attach -t default"
+
 myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
-         , ("M-S-<Return>",    spawnHere myTerminal)
+         , ("M-S-<Return>",    spawnHere myTerminalRun)
          , ("M-f",             spawnHere "firefox")
          , ("M-p",             spawnHere myDmenuRun)
          ]

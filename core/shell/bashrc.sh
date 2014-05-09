@@ -65,6 +65,9 @@ HISTCONTROL=ignoredups:ignorespace
 # append to the history file, don't overwrite it
 shopt -s histappend
 
+set -o ignoreeof            # Cause Ctrl-d not to exit the shell, unless
+                            # pressed 10 times
+
 
 #------------------------------------------------------------------------------
 # Command-line completion

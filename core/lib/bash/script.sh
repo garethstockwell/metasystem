@@ -207,15 +207,3 @@ EOF
 	done
 }
 
-
-function ask()
-{
-	local msg="$@"
-	[[ -z $msg ]] && msg="Confirm?"
-	read -p "$msg [y|n] " -n 1
-	echo
-	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-		return 1
-	fi
-}
-
