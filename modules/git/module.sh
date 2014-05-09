@@ -163,6 +163,8 @@ alias gcd='cd $(git_root)'
 # Hooks
 #------------------------------------------------------------------------------
 
+if [[ $METASYSTEM_OS != windows ]]; then
+
 # http://railstips.org/blog/archives/2009/02/02/bedazzle-your-bash-prompt-with-git-info/
 # Alternatively, from http://asemanfar.com/Current-Git-Branch-in-Bash-Prompt
 # git name-rev HEAD 2> /dev/null | awk "{ print \\$2 }"
@@ -226,6 +228,8 @@ function _metasystem_hook_git_prompt()
 		fi
 	fi
 }
+
+fi # !windows
 
 
 #------------------------------------------------------------------------------
