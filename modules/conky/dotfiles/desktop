@@ -1,0 +1,112 @@
+# conkyrc
+#
+# Based on files including the following:
+# http://blog.brixandersen.dk/wp-content/uploads/dotconkyrc
+#
+
+
+#------------------------------------------------------------------------------
+# General
+#------------------------------------------------------------------------------
+
+background no
+
+
+#------------------------------------------------------------------------------
+# Font
+#------------------------------------------------------------------------------
+
+use_xft yes
+font inconsolata-12
+uppercase no
+
+
+#------------------------------------------------------------------------------
+# Update
+#------------------------------------------------------------------------------
+
+update_interval 3
+total_run_times 0
+
+
+#------------------------------------------------------------------------------
+# Window
+#------------------------------------------------------------------------------
+
+own_window no
+double_buffer yes
+
+minimum_size 1024 768
+maximum_width 1024
+
+alignment top_left
+gap_x 0
+gap_y 0
+
+draw_borders no
+stippled_borders 8
+border_width 1
+
+draw_shades yes
+
+draw_outline no
+
+use_spacer none
+
+no_buffers yes
+
+
+#------------------------------------------------------------------------------
+# Colors
+#------------------------------------------------------------------------------
+
+default_color white
+default_shade_color black
+default_outline_color black
+color0 000000
+color1 00ffb7
+color2 00ffb7
+
+
+#------------------------------------------------------------------------------
+# Sampling
+#------------------------------------------------------------------------------
+
+cpu_avg_samples 2
+net_avg_samples 2
+
+
+#------------------------------------------------------------------------------
+# Content
+#------------------------------------------------------------------------------
+
+TEXT
+
+${voffset 50}
+${offset 50} ${color2}System
+${offset 50} ${color1} $nodename $kernel
+${offset 50} ${color1} Uptime:${color2} $uptime ${color1} Load:${color2} $loadavg
+
+${voffset 10}
+${offset 50} ${color2}CPU
+${offset 50} ${color1} Frequency: ${color2}$freq MHz ${color1} Temperature:${color2} $acpitemp C
+${offset 50} ${color1} Load: ${color2}$cpu% ${cpubar cpu0 6,228}
+${offset 50} ${color1} ${cpugraph cpu0 24,300 000000 33b0dc}
+
+${voffset 10}
+${offset 50} ${color2}Disk
+${offset 50} ${color1} I/O:${color2} $diskio
+${offset 50} ${color1} ${diskiograph 24,300 000000 33b0dc}
+
+${voffset 10}
+${offset 50} ${color2}Network (eth0)
+${offset 50} ${color1} IPv4: ${color2}${addr eth0} ${color #144556}
+${offset 50} ${color1} Down: ${color2}${downspeed eth0} k/s ${color1} Up:${color2} ${upspeed eth0} k/s
+${offset 50} ${color1} ${downspeedgraph eth0 12,300 000000 33b0dc}
+${offset 50} ${voffset -3}${color1} ${upspeedgraph eth0 12,300 000000 33b0dc}
+
+${voffset 10}
+${offset 50} ${color2}Memory
+${offset 50} ${color1} RAM: ${color2}$mem ($memperc%) ${membar 6,146}
+${offset 50} ${color1} Swap: ${color2}$swap ($swapperc%) ${swapbar 6,146}
+
