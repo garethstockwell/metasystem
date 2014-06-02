@@ -529,6 +529,9 @@ set mouse=a
 " don't redraw when don't have to
 set lazyredraw
 
+" Write to a file using "sudo tee"
+cmap w!! silent execute 'w !sudo tee > /dev/null "%"' \| edit!
+
 " ----------------------------------------------------------------------------
 " Buffers
 " ----------------------------------------------------------------------------
