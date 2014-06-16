@@ -28,7 +28,7 @@ function usage()
 {
 	local dir=$1
 	[[ -z $dir ]] && dir=.
-	ls -1A $dir | tr '\n' '\0' | xargs -0 du -sk | sort -n
+	find $dir -mindepth 1 -maxdepth 1 -exec du -sk {} \; | sort -n
 }
 
 # Repeat character specified number of times
