@@ -114,7 +114,7 @@ class Program(object):
                 self.args, self.unknown_args = self.parser.parse_known_args()
             else:
                 self.args = self.parser.parse_args()
-        except metasystem.UsageError, e:
+        except metasystem.UsageError as e:
             self.parser.print_help()
             sys.stderr.write('\n' + str(e) + '\n')
             sys.exit(1)

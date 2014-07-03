@@ -368,7 +368,7 @@ def check_output(filename, args):
         if args.force:
             os.remove(filename)
         else:
-            raise IOError, "Output file '" + filename + "' already exists"
+            raise IOError("Output file '" + filename + "' already exists")
 
 
 def write_output(stackwalk, args, config):
@@ -393,7 +393,7 @@ if args.debug:
     logging.getLogger().setLevel(logging.DEBUG)
 
 if os.environ['ANDROID_PRODUCT_OUT'] == '':
-    raise IOError, "ANDROID_PRODUCT_OUT is not set - have you lunched?"
+    raise IOError("ANDROID_PRODUCT_OUT is not set - have you lunched?")
 
 # Compose default output directory path
 if not args.out_dir:

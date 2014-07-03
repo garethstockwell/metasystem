@@ -70,7 +70,7 @@ def PrintUsage():
 
 def ExtractRequiredIniField(config, section, field, target):
 	if config.has_option(section, field) != True:
-		raise IOError, "Required field '" + field + "' in section '" + section + "' not found in config file"
+		raise IOError("Required field '" + field + "' in section '" + section + "' not found in config file")
 	CONFIG[target] = config.get(section, field)
 
 
@@ -82,7 +82,7 @@ def ExtractOptionalIniFieldInt(config, section, field, target):
 def ParseIniFile(fileName):
 	config = ConfigParser.RawConfigParser()
 	if len(config.read(fileName)) == 0:
-		raise IOError, "Failed to read config file " + fileName
+		raise IOError("Failed to read config file " + fileName)
 	ExtractRequiredIniField(config, 'source', 'url', 'source_url')
 	ExtractRequiredIniField(config, 'output', 'dir', 'output_dir')
 
@@ -108,7 +108,7 @@ def ParseIniFile(fileName):
 def ProcessCommandLine():
 	if len(sys.argv) < 2:
 		PrintUsage()
-		raise IOError, "Invalid command line arguments"
+		raise IOError("Invalid command line arguments")
 	ParseIniFile(sys.argv[1])
 
 

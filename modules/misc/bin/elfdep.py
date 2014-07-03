@@ -176,9 +176,8 @@ class DependencyResolver(object):
             if soname != '':
                 if soname in self._sonames.keys():
                     sofile = self._sonames[soname]
-                    raise IOError, \
-                          "Error: soname '{0}' appears in multiplesofiles({1}, {2}, ...)".format(
-                              soname, sofile, filename)
+                    raise IOError("Error: soname '{0}' appears in multiplesofiles({1}, {2}, ...)".format(
+                              soname, sofile, filename))
                 self._sonames[soname] = filename
                 logging.debug("[SONAME] {0} -> {1}".format(soname, filename))
 
@@ -507,7 +506,7 @@ def file_exists(filename):
 
 def assert_file_exists(filename):
     if not file_exists(filename):
-        raise IOError, "Error: file '" + filename + "' not found\n"
+        raise IOError("Error: file '" + filename + "' not found\n")
 
 
 def list_dir(path):

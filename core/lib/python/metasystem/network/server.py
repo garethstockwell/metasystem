@@ -133,9 +133,9 @@ class Client(object):
                 if rx_obj.error is None:
                     result = rx_obj.payload
                 else:
-                    raise tzmpp.NetworkError, rx_obj.error
+                    raise tzmpp.NetworkError(rx_obj.error)
             else:
-                raise tzmpp.NetworkError, 'Received malformed reply'
+                raise tzmpp.NetworkError('Received malformed reply')
 
         finally:
             sock.close()
@@ -224,7 +224,7 @@ class Server(object):
             except socket.timeout:
                 pass
 
-            except Exception, e:
+            except Exception as e:
                 logging.error(e)
                 logging.error('Received malformed message from {0:s}'.format(str(addr)))
 

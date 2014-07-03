@@ -343,7 +343,7 @@ class FilterChain(object):
 
     def append(self, f):
         if self.find_filter(f.name()):
-            raise Exception, 'Filter %s is already in the chain' % (f.name())
+            raise Exception('Filter %s is already in the chain' % (f.name()))
         self.filters.append(f)
 
     def find_filter(self, key):
@@ -552,7 +552,7 @@ class Miniterm(object):
                         self.write_rx("%s " % c.encode('hex'))
                 sys.stdout.flush()
 
-        except serial.SerialException, e:
+        except serial.SerialException as e:
             self.alive = False
             # would be nice if the console reader could be interruptted at this
             # point...
@@ -657,7 +657,7 @@ def do_connect(args):
                             convert_outgoing=convert_outgoing,
                             repr_mode=repr_mode,
                             command_port=args.command_port)
-    except serial.SerialException, e:
+    except serial.SerialException as e:
         sys.stderr.write("could not open port %r: %s\n" % (args.port, e))
         sys.exit(1)
 

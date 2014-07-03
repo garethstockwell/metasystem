@@ -126,8 +126,8 @@ def extract_required_field(parser, section, field):
     if parser.has_option(section, field):
         result = parser.get(section, field)
     else:
-        raise IOError, "Required field '" + field + "' in section '" \
-                       + section + "' not found in config file"
+        raise IOError("Required field '" + field + "' in section '" \
+                       + section + "' not found in config file")
     return result
 
 def extract_optional_field(parser, section, field):
@@ -158,7 +158,7 @@ def parse_ini(args):
     fileName = os.path.join(os.environ.get('METASYSTEM_CORE_CONFIG'), 'id.ini')
     parser = ConfigParser.RawConfigParser()
     if len(parser.read(fileName)) == 0:
-        raise IOError, "Failed to read config file " + fileName
+        raise IOError("Failed to read config file " + fileName)
 
     config['default_id'] = parser.get('common', 'default_id')
 
@@ -258,12 +258,12 @@ def cmd_set(args, config):
     if not args.type in config['types']:
         print_types(config)
         print
-        raise IOError, "type '" + args.type + "' not recognized"
+        raise IOError("type '" + args.type + "' not recognized")
     type = config['types'][args.type]
     if not args.id in config['ids']:
         print_ids(config)
         print
-        raise IOError, "id '" + args.id + "' not recognized"
+        raise IOError("id '" + args.id + "' not recognized")
     id = config['ids'][args.id]
     type.current_id = args.id
     write_shell_script(args, config)
@@ -290,7 +290,7 @@ def check_env():
     for var in REQUIRED_VARS:
         value = os.environ.get(var)
         if value == None or value == '':
-            raise IOError, "Environment variable '{0:s}' not set".format(var)
+            raise IOError("Environment variable '{0:s}' not set".format(var))
 
 def print_error(message):
     print >> sys.stderr, 'Error:', message

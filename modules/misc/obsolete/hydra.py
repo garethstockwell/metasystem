@@ -50,7 +50,7 @@ def check_env():
     for var in REQUIRED_VARS:
         value = os.environ.get(var)
         if value == None or value == '':
-            raise IOError, "Environment variable '{0:s}' not set".format(var)
+            raise IOError("Environment variable '{0:s}' not set".format(var))
 
 def PrintToConsole(message, color = None):
     Console.stdout.set_fg(color)
@@ -73,7 +73,7 @@ def Call(command, options):
     if not options.dry_run:
         ret = subprocess.call(command.split())
         if 0 != ret:
-            raise IOError, "Command '" + command + "' failed with error " + str(ret)
+            raise IOError("Command '" + command + "' failed with error " + str(ret))
 
 def Execute(command, options):
     print command
@@ -633,8 +633,8 @@ def ExtractRequiredIniField(parser, section, field, host = None):
         if parser.has_option(section, field):
             result = parser.get(section, field)
         else:
-            raise IOError, "Required field '" + field + "' in section '" \
-                       + section + "' not found in config file"
+            raise IOError("Required field '" + field + "' in section '" \
+                       + section + "' not found in config file")
     return result
 
 
@@ -666,7 +666,7 @@ def ParseIniFile(options):
     parser = ConfigParser.RawConfigParser()
     fileName = options.ini_filename
     if len(parser.read(fileName)) == 0:
-        raise IOError, "Failed to read config file " + fileName
+        raise IOError("Failed to read config file " + fileName)
 
     config['local_root'] = ExtractRequiredIniField(parser, 'local', 'path')
     config['remote_root'] = ExtractRequiredIniField(parser, 'remote', options.server)

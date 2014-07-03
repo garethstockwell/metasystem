@@ -114,13 +114,13 @@ class Daemon(object):
                 logging.debug('Checking whether process {0:d} is still running'.format(pid))
                 os.kill(pid, 0)
                 running = True
-            except Exception, e:
+            except Exception as e:
                 logging.debug(e)
                 logging.debug('Removing stale PID file')
                 self._delete_pidfile()
 
         if running:
-            raise metasystem.DaemonError, 'Already running with PID {0:d}'.format(pid)
+            raise metasystem.DaemonError('Already running with PID {0:d}'.format(pid))
 
         child = True
 
@@ -147,7 +147,7 @@ class Daemon(object):
                 os.kill(pid, signal.SIGTERM)
                 time.sleep(grace_period)
                 os.kill(pid, signal.SIGKILL)
-            except OSError, e:
+            except OSError as e:
                 e = str(e)
                 if e.find('No such process') > 0:
                     metasystem.utils.unlink_silent(self.pid_file)
@@ -186,7 +186,7 @@ class Daemon(object):
         try:
             logging.debug('Checking whether process {0:d} is still running'.format(pid))
             os.kill(pid, 0)
-        except Exception, e:
+        except Exception as e:
             pid = None
 
         return pid
@@ -218,8 +218,8 @@ class Daemon(object):
                     import time
                     time.sleep(1)
                     return False
-        except OSError, e:
-            raise metasystem.DaemonError, 'First fork failed: {0:s}'.format(str(e))
+        except OSError as e:
+            raise metasystem.DaemonError('First fork failed: {0:s}'.format(str(e)))
 
         pid = os.getpid()
         ppid = pid
@@ -239,8 +239,8 @@ class Daemon(object):
                 sys.stdout.flush()
                 sys.stderr.flush()
                 sys.exit(0)
-        except OSError, e:
-            raise metasystem.DaemonError, 'Second fork failed: {0:s}'.format(str(e))
+        except OSError as e:
+            raise metasystem.DaemonError('Second fork failed: {0:s}'.format(str(e)))
 
         pid = os.getpid()
         logging.debug('Second fork child PID: {0:d}'.format(pid))
@@ -416,7 +416,7 @@ class Program(metasystem.script.Program):
         if not self.args.pid_file:
             if self.args.func != Program._daemon_start or not self.args.daemon_fg:
                 msg = 'Cannot perform action without --pidfile'
-                raise metasystem.DaemonError, msg
+                raise metasystem.DaemonError(msg)
 
         fg = False
         if self.args.func == Program._daemon_start:

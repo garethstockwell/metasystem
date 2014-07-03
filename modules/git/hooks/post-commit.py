@@ -388,7 +388,7 @@ def process_kwargs(defaults, kwargs):
     '''
     diff = set(kwargs.keys()) - set(defaults.keys())
     if diff:
-        raise TypeError, 'Error: invalid arguments: %s' % list(diff)
+        raise TypeError('Error: invalid arguments: %s' % list(diff))
     defaults.update(kwargs)
     return defaults
 

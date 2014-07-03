@@ -131,7 +131,7 @@ def process_file(args):
         if handler:
             handler(command, context)
         else:
-            raise IOError, "Invalid command '{0:s}'".format(command.command)
+            raise IOError("Invalid command '{0:s}'".format(command.command))
     postamble(context)
 
 def preamble(context):
@@ -248,7 +248,7 @@ def check_env():
     for var in REQUIRED_VARS:
         value = os.environ.get(var)
         if value == None or value == '':
-            raise IOError, "Environment variable '{0:s}' not set".format(var)
+            raise IOError("Environment variable '{0:s}' not set".format(var))
 
 def print_error(message):
     print >> sys.stderr, 'Error:', message

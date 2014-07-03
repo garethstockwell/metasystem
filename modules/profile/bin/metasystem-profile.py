@@ -211,7 +211,7 @@ def check_env():
     for var in REQUIRED_VARS:
         value = os.environ.get(var)
         if value == None or value == '':
-            raise IOError, "Environment variable '{0:s}' not set".format(var)
+            raise IOError("Environment variable '{0:s}' not set".format(var))
 
 def print_message(msg, args):
     if verbosity(args) == Verbosity.Loud:
@@ -263,7 +263,7 @@ def parse_ini_file(args):
     config['parser'] = ConfigParser.RawConfigParser()
     ini_file = os.path.abspath(os.path.join(os.environ.get('METASYSTEM_CORE_CONFIG'), 'profile.ini'))
     if len(config['parser'].read(ini_file)) == 0:
-        raise IOError, "Failed to read config file " + ini_file
+        raise IOError("Failed to read config file " + ini_file)
     return config
 
 def detect_host(config, args):

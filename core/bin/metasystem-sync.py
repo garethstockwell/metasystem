@@ -151,7 +151,7 @@ def check_env():
     for var in REQUIRED_VARS:
         value = os.environ.get(var)
         if value == None or value == '':
-            raise IOError, "Environment variable '{0:s}' not set".format(var)
+            raise IOError("Environment variable '{0:s}' not set".format(var))
 
 
 def PrintToConsole(message, color = None):
@@ -180,7 +180,7 @@ def Execute(command, options, flag = True):
             if 0 != r:
                 PrintError("'" + command + "' failed with error " + str(r))
                 success = False
-        except OSError, e:
+        except OSError as e:
             PrintError("'" + command + "' failed:")
             PrintError(str(e))
     return success
@@ -432,8 +432,8 @@ class Project:
         self.name = name
         self.auto = auto
         if direction and direction != 'push' and direction != 'pull':
-            raise IOError, "Direction '" + direction + \
-                           "' in project '" + name + " is invalid"
+            raise IOError("Direction '" + direction + \
+                           "' in project '" + name + " is invalid")
         self.direction = direction
         self.local = local
         self.local_path = local_path
@@ -711,7 +711,7 @@ class UnisonProject(Project):
     def _sync(self, remote, options, subdir = ''):
         try:
             profile = self._generateProfile(remote)
-        except Exception, e:
+        except Exception as e:
             print e
             return False
 
@@ -844,7 +844,7 @@ class RsyncProject(Project):
 def process_kwargs(defaults, kwargs):
     diff = set(kwargs.keys()) - set(defaults.keys())
     if diff:
-        raise TypeError, 'Error: invalid arguments: %s' % list(diff)
+        raise TypeError('Error: invalid arguments: %s' % list(diff))
     defaults.update(kwargs)
     return defaults
 
@@ -862,7 +862,7 @@ def ExtractRequiredIniField(parser, section, field, **kwargs):
     if not result:
         msg = "Required field '" + field + "' in section '" \
               + section + "' not found in config file"
-        raise IOError, msg
+        raise IOError(msg)
     return result
 
 
@@ -898,7 +898,7 @@ def ParseIniFile(fileName):
 
     parser = ConfigParser.RawConfigParser()
     if len(parser.read(fileName)) == 0:
-        raise IOError, "Failed to read config file " + fileName
+        raise IOError("Failed to read config file " + fileName)
 
     ParseLocal(parser, config)
     ParseRemotes(parser, config)
@@ -929,8 +929,8 @@ def ParseLocal(parser, config):
             if hostname == config['hostname']:
                 config['local'] = Local(name, root, projects)
     if not config.get('local'):
-        raise IOError, "No local definition found for hostname '" + \
-                       config['hostname'] + "'"
+        raise IOError("No local definition found for hostname '" + \
+                       config['hostname'] + "'")
 
 
 def ParseRemotes(parser, config):
@@ -941,8 +941,8 @@ def ParseRemotes(parser, config):
             host_root = 'root(' + config['local'].name + ')'
             root = ExtractOptionalIniField(parser, section, 'root', local=config['local'].name)
             if not root:
-                raise IOError, "Remote '" + name + "' has neither 'root' nor '" \
-                               + host_root + "' property"
+                raise IOError("Remote '" + name + "' has neither 'root' nor '" \
+                               + host_root + "' property")
             scm_bare = ExtractOptionalIniFieldBool(parser, section, 'scm_bare', default=True)
             config['remotes'][name] = Remote(name, root, scm_bare)
         if section.startswith('remote-alias:'):
@@ -977,7 +977,7 @@ def ParseProjectGroups(parser, config):
         if section.startswith('project-group:'):
             name = section[14:]
             if name in config['projects'].keys():
-                raise IOError, "Name '" + name + "' refers to both a project and a project-group"
+                raise IOError("Name '" + name + "' refers to both a project and a project-group")
             project_list = ExtractRequiredIniField(parser, section, 'projects', local=config['local'].name)
             group = ProjectGroup(name)
             group.projects = project_list.split()
@@ -1066,8 +1066,8 @@ def InvalidProjectType(parser, name, auto, config):
     section = 'project:' + name
     local = config['local']
     type = ExtractRequiredIniField(parser, section, 'type', local=local.name)
-    raise IOError, "Project type '" + type + "' for project '" + name \
-                   + "' is not supported"
+    raise IOError("Project type '" + type + "' for project '" + name \
+                   + "' is not supported")
 
 
 def CreateCommandLineParser():
@@ -1145,7 +1145,7 @@ def GetProjects(action, args, config):
             elif project in config['project-groups'].keys():
                 result += config['project-groups'][entry].projects
             else:
-                raise IOError, "'" + entry + "' does not refer to a project or project group"
+                raise IOError("'" + entry + "' does not refer to a project or project group")
     return result
 
 
@@ -1241,7 +1241,7 @@ def ActionInit(commandLine, config):
                 result[name] = projectSuccess
                 success &= projectSuccess
                 print timer
-            except Exception, e:
+            except Exception as e:
                 print e
                 result[name] = False
                 success = False
@@ -1282,7 +1282,7 @@ def ActionSync(commandLine, config):
                 result[name] = projectSuccess
                 success &= projectSuccess
                 print timer
-            except Exception, e:
+            except Exception as e:
                 print e
                 result[name] = False
                 success = False

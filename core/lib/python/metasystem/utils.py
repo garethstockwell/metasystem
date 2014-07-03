@@ -292,5 +292,5 @@ def get_input(prompt, valid=None, tries=3):
             return value
         tries -= 1
 
-    raise metasystem.InputError, 'Invalid value'
+    raise metasystem.InputError('Invalid value')
 

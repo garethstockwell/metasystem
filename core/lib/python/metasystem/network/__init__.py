@@ -383,7 +383,7 @@ class NetworkConfigServer(object):
                 config = NetworkConfig()
                 if not config.get(self.if_name):
                     msg = 'Failed to get configuration for interface {0:s}'.format(self.if_name)
-                    raise metasystem.NetworkError, msg
+                    raise metasystem.NetworkError(msg)
 
                 config.cookie = self.cookie
 
@@ -477,7 +477,7 @@ class NetworkConfigClient(object):
                 else:
                     logging.debug('Received malformed message from {0:s}'.format(rx_addr))
 
-            except socket.error, e:
+            except socket.error as e:
                 logging.debug(e)
                 break
 
