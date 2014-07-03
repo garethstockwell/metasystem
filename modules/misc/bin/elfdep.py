@@ -71,6 +71,8 @@ $ elfdep.py libmedia.so --graph out.png
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import logging
 import os.path
@@ -395,7 +397,7 @@ class Graph(object):
             delete = False
         self._gvfile = tempfile.NamedTemporaryFile(delete=delete)
         if args.debug:
-            print "GraphViz file name = " + self._gvfile.name
+            print("GraphViz file name = " + self._gvfile.name)
 
     def _write_header(self):
         self._gvfile.write("digraph elfdep {\n")
@@ -463,7 +465,7 @@ class ArgumentParser(argparse.ArgumentParser):
 #------------------------------------------------------------------------------
 
 def print_error(message):
-    print >> sys.stderr, 'Error:', message
+    print('Error:', message, file=sys.stderr)
 
 
 def parse_command_line():
@@ -485,14 +487,14 @@ def print_summary(args, *initial_group):
     maxkeylen = max([len(key) for key in keys])
     maxvaluelen = max([len(str(getattr(args, key))) for key in keys])
     rightcolpos = LINE_WIDTH - maxvaluelen - 2
-    print '-' * LINE_WIDTH
-    print 'Summary of options'
-    print '-' * LINE_WIDTH
+    print('-' * LINE_WIDTH)
+    print('Summary of options')
+    print('-' * LINE_WIDTH)
     for key in initial_group:
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
     for key in sorted(list(set(keys) - set(initial_group))):
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
-    print '-' * LINE_WIDTH
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
+    print('-' * LINE_WIDTH)
 
 
 def file_exists(filename):
@@ -533,20 +535,20 @@ def forward_search(builder, args):
 
     tree = builder.dependency_tree(args.filename)
 
-    print "Search paths:"
-    print "\n".join(builder.get_paths())
+    print("Search paths:")
+    print("\n".join(builder.get_paths()))
 
     visitor = NodeCollector()
     tree.walk(visitor, args.depth)
     forward = map(lambda node: node.path, visitor.result())
-    print "\n{0} resolved forward dependencies:".format(len(forward))
-    print "\n".join(path_list(forward, args.full_paths))
+    print("\n{0} resolved forward dependencies:".format(len(forward)))
+    print("\n".join(path_list(forward, args.full_paths)))
 
     visitor = UnresolvedCollector()
     tree.walk(visitor, 0)
     unresolved = visitor.result()
-    print "\n{0} unresolved forward dependencies:".format(len(unresolved))
-    print "\n".join(sorted(unresolved))
+    print("\n{0} unresolved forward dependencies:".format(len(unresolved)))
+    print("\n".join(sorted(unresolved)))
 
     if args.graph:
         graph = Graph(args)
@@ -572,8 +574,8 @@ def reverse_search(builder, args):
     visitor = NodeCollector()
     tree.walk(visitor, args.depth)
     result = map(lambda node: node.path, visitor.result())
-    print "\n{0} reverse dependencies:".format(len(result))
-    print "\n".join(path_list(result, args.full_paths))
+    print("\n{0} reverse dependencies:".format(len(result)))
+    print("\n".join(path_list(result, args.full_paths)))
 
 
 #------------------------------------------------------------------------------

@@ -109,6 +109,8 @@
 # Modules
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import ConfigParser
 import copy
 from datetime import timedelta
@@ -172,7 +174,7 @@ def PrintWarning(message):
 
 def Execute(command, options, flag = True):
     if Verbosity.Silent != options.verbosity:
-        print '\n' + command
+        print('\n' + command)
     success = True
     if flag:
         try:
@@ -388,7 +390,7 @@ class History:
         for name in self.config['projects'].keys():
             project = self.config['projects'][name]
             history = self._project(name)
-            print
+            print()
             project.printHistory(history, now)
 
 
@@ -483,11 +485,11 @@ class Project:
         return os.path.join(self.local.root, self.local_path)
 
     def printHistory(self, history, now):
-        print self.name + ' [' + self.type + ']: '
+        print(self.name + ' [' + self.type + ']: ')
         if history:
             self._printHistory(history, now)
         else:
-            print '    Never synchronised'
+            print('    Never synchronised')
 
     def _printHistory(self, history, now):
         sys.stdout.write('    Last pull:            ')
@@ -544,7 +546,7 @@ class ScmProject(Project):
             operations.append('push')
 
         if not options.quiet:
-            print "\nChanging directory to " + self.fullLocalPath() + " ..."
+            print("\nChanging directory to " + self.fullLocalPath() + " ...")
             os.chdir(self.fullLocalPath())
 
         overallSuccess = True
@@ -610,7 +612,7 @@ class GitProject(ScmProject):
         else:
             command = 'git status'
         if not options.quiet:
-            print "Changing directory to " + self.fullLocalPath() + " ..."
+            print("Changing directory to " + self.fullLocalPath() + " ...")
             os.chdir(self.fullLocalPath())
             Execute(command, options)
         # 'git status' returns 1 if there are uncommitted changes
@@ -712,7 +714,7 @@ class UnisonProject(Project):
         try:
             profile = self._generateProfile(remote)
         except Exception as e:
-            print e
+            print(e)
             return False
 
         success = True
@@ -730,7 +732,7 @@ class UnisonProject(Project):
             # Unison has no -dry-run option, so we resort to nastiness...
             # Run without -batch, and send 'q' when asked whether to
             # proceed
-            print '\n' + command
+            print('\n' + command)
             process = subprocess.Popen(command.split(),
                                        shell=True,
                                        stdout=subprocess.PIPE,
@@ -812,7 +814,7 @@ class RsyncProject(Project):
         return Execute(command, options, execute)
 
     def _push(self, remote, options, subdir):
-        print "\nChanging directory to " + self.fullLocalPath() + " ..."
+        print("\nChanging directory to " + self.fullLocalPath() + " ...")
         os.chdir(self.fullLocalPath())
         command = 'rsync -azvvrl '
         if self.rsync_options:
@@ -1158,33 +1160,33 @@ def GetProjects(action, args, config):
 def ActionList(commandLine, config):
     commandLine['args'].pop(0)
     ruler = '-----------------------------------------------------------------------'
-    print
-    print "INI filename:     " + commandLine['options'].ini_filename
-    print
-    print ruler
-    print "Local"
-    print ruler
-    print
-    print FormatKeyValue('hostname', config['hostname'])
-    print config['local']
-    print
-    print ruler
-    print "Remotes"
-    print ruler
+    print()
+    print("INI filename:     " + commandLine['options'].ini_filename)
+    print()
+    print(ruler)
+    print("Local")
+    print(ruler)
+    print()
+    print(FormatKeyValue('hostname', config['hostname']))
+    print(config['local'])
+    print()
+    print(ruler)
+    print("Remotes")
+    print(ruler)
     for name in config['remotes'].keys():
-        print "\n", config['remotes'][name]
-    print
-    print ruler
-    print "Projects"
-    print ruler
+        print("\n", config['remotes'][name])
+    print()
+    print(ruler)
+    print("Projects")
+    print(ruler)
     for name in config['projects'].keys():
-        print "\n", config['projects'][name]
-    print
-    print ruler
-    print "Project groups"
-    print ruler
+        print("\n", config['projects'][name])
+    print()
+    print(ruler)
+    print("Project groups")
+    print(ruler)
     for name in config['project-groups'].keys():
-        print "\n", config['project-groups'][name]
+        print("\n", config['project-groups'][name])
 
 
 
@@ -1205,12 +1207,12 @@ def PrintResults(timer, result):
 
 def printLocal(config):
     PrintToConsole("Local\n\n", Color.GREEN)
-    print config['local']
+    print(config['local'])
 
 
 def printProject(project, options, config):
     remote = project.getRemote(options, config)
-    print project.getFormat(remote)
+    print(project.getFormat(remote))
 
 
 def ActionInit(commandLine, config):
@@ -1230,7 +1232,7 @@ def ActionInit(commandLine, config):
         if os.path.exists(project.local_path):
             PrintToConsole("\nSkipping project '" + project.name + "' [" + project.type + "]\n", \
                Color.CYAN)
-            print "Local path '" + project.local_path + "' already exists"
+            print("Local path '" + project.local_path + "' already exists")
         else:
             PrintToConsole("\nInitialising project '" + project.name + "' [" + project.type + "] ...\n\n", \
                            Color.GREEN)
@@ -1240,9 +1242,9 @@ def ActionInit(commandLine, config):
                 projectSuccess = project.init(history, options, config)
                 result[name] = projectSuccess
                 success &= projectSuccess
-                print timer
+                print(timer)
             except Exception as e:
-                print e
+                print(e)
                 result[name] = False
                 success = False
 
@@ -1281,9 +1283,9 @@ def ActionSync(commandLine, config):
                 projectSuccess = project.sync(history, options, subdir)
                 result[name] = projectSuccess
                 success &= projectSuccess
-                print timer
+                print(timer)
             except Exception as e:
-                print e
+                print(e)
                 result[name] = False
                 success = False
         else:
@@ -1303,7 +1305,7 @@ def ActionStatus(commandLine, config):
     for name in projectNames:
         project = config['projects'][name]
         if not commandLine['options'].quiet:
-            print "\nStatus of project '" + name + "' [" + project.type + "] ..."
+            print("\nStatus of project '" + name + "' [" + project.type + "] ...")
         success &= project.status(commandLine['options'])
     return success
 

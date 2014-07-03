@@ -6,6 +6,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import ConfigParser
 import os
@@ -196,11 +198,11 @@ def cmd_dump(config, args):
     for category in CATEGORIES:
         env_key = 'METASYSTEM_PROFILE_' + category.upper()
         env_value = os.environ.get(env_key)
-        print '    {0:s} = {1:s}'.format(env_key, env_value or '')
-    print 'Variables:'
+        print('    {0:s} = {1:s}'.format(env_key, env_value or ''))
+    print('Variables:')
     for env_key in get_env_keys(config):
         env_value = os.environ.get(env_key)
-        print '    {0:s} = {1:s}'.format(env_key, env_value or '')
+        print('    {0:s} = {1:s}'.format(env_key, env_value or ''))
 
 
 #------------------------------------------------------------------------------
@@ -215,10 +217,10 @@ def check_env():
 
 def print_message(msg, args):
     if verbosity(args) == Verbosity.Loud:
-        print msg
+        print(msg)
 
 def print_error(message):
-    print >> sys.stderr, 'Error:', message
+    print('Error:', message, file=sys.stderr)
 
 def parse_command_line():
     '''
@@ -249,14 +251,14 @@ def print_summary(args):
     values.append(args.func.func_name)
     maxvaluelen = max([len(str(value)) for value in values])
     rightcolpos = LINE_WIDTH - maxvaluelen - 4
-    print '-' * LINE_WIDTH
-    print 'Summary of options'
-    print '-' * LINE_WIDTH
-    print ' subcommand', ('.' * (rightcolpos - len('subcommand') - 2)), args.func.func_name
+    print('-' * LINE_WIDTH)
+    print('Summary of options')
+    print('-' * LINE_WIDTH)
+    print(' subcommand', ('.' * (rightcolpos - len('subcommand') - 2)), args.func.func_name)
     for key in sorted(list(set(keys))):
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
-    print '-' * LINE_WIDTH
-    print
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
+    print('-' * LINE_WIDTH)
+    print()
 
 def parse_ini_file(args):
     config = {}

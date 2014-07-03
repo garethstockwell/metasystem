@@ -14,6 +14,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import logging
 import os
@@ -589,7 +591,7 @@ class Miniterm(object):
 #------------------------------------------------------------------------------
 
 def print_error(message):
-    print >> sys.stderr, 'Error:', message
+    print('Error:', message, file=sys.stderr)
 
 
 def parse_command_line():
@@ -611,16 +613,16 @@ def print_summary(args, *initial_group):
     maxkeylen = max([len(key) for key in keys])
     maxvaluelen = max([len(str(getattr(args, key))) for key in keys])
     rightcolpos = LINE_WIDTH - maxvaluelen - 2
-    print '-' * LINE_WIDTH
-    print 'Summary of options'
-    print '-' * LINE_WIDTH
+    print('-' * LINE_WIDTH)
+    print('Summary of options')
+    print('-' * LINE_WIDTH)
     for key in initial_group:
-        print ' '+ str(key), ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
+        print(' '+ str(key), ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
     if len(initial_group):
-        print
+        print()
     for key in sorted(list(set(keys) - set(initial_group))):
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
-    print '-' * LINE_WIDTH
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
+    print('-' * LINE_WIDTH)
 
 
 def key_description(character):
@@ -688,9 +690,9 @@ def do_send(args):
         port = int(port)
     client = commandsocket.Client(host=host, port=port)
     msg = ' '.join(args.cmd)
-    print "Client: sending '" + msg + "'"
+    print("Client: sending '" + msg + "'")
     reply = client.send(msg)
-    print "Reply: '" + reply + "'"
+    print("Reply: '" + reply + "'")
 
 
 #------------------------------------------------------------------------------

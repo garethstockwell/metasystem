@@ -61,6 +61,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import os
 import re
@@ -179,9 +181,9 @@ class CommitChecker(object):
 
     def _print_msgs(self):
         if self._filename != '':
-            print >>sys.stderr, '\n' + self._filename
+            print('\n' + self._filename, file=sys.stderr)
         for msg in self._result.msgs:
-            print >>sys.stderr, msg
+            print(msg, file=sys.stderr)
 
     def retval(self):
         return self._result.retval
@@ -365,7 +367,7 @@ class CommitChecker(object):
                             self._filename = m.group(1)
                             self._merge = True
                         else:
-                            print >>sys.stderr, "Warning: cannot parse diff header '{0}'".format(line)
+                            print("Warning: cannot parse diff header '{0}'".format(line), file=sys.stderr)
                             continue
                     print_if_verbose("*** file " + self._filename, args)
                     self._conflict = ('conflict' in self._skip_keys)
@@ -403,7 +405,7 @@ def execute(cmd, args):
     Execute a shell command and capture the output
     '''
     if args.verbose:
-        print '\n' + cmd
+        print('\n' + cmd)
     output = []
     if not args.dry_run:
         process = subprocess.Popen(cmd.split(),
@@ -419,7 +421,7 @@ def execute(cmd, args):
 
 def print_if_verbose(line, args):
     if args.verbose:
-        print line,
+        print(line, end=' ')
 
 
 #------------------------------------------------------------------------------

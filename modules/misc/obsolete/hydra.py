@@ -16,6 +16,8 @@
 # Modules
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import ConfigParser
 from datetime import timedelta
 from optparse import OptionParser, OptionGroup
@@ -69,14 +71,14 @@ def PrintWarning(message):
     PrintToConsole('Warning: ' + message + '\n', Console.YELLOW)
 
 def Call(command, options):
-    print command
+    print(command)
     if not options.dry_run:
         ret = subprocess.call(command.split())
         if 0 != ret:
             raise IOError("Command '" + command + "' failed with error " + str(ret))
 
 def Execute(command, options):
-    print command
+    print(command)
     if not options.dry_run:
         process = subprocess.Popen(command.split(),
                                    shell=True,
@@ -87,8 +89,8 @@ def Execute(command, options):
             if len(output) == 0:
                 break
             if options.verbosity != Verbosity.Silent:
-                print output
-        print "\n"
+                print(output)
+        print("\n")
 
 def FormatDuration(deltaSecs):
     if deltaSecs < 0:
@@ -275,7 +277,7 @@ class Project:
     def zipFileList(self, path, version, verbosity):
         list = []
         if verbosity != Verbosity.Silent:
-            print "Retrieving list of zip files from " + path + " ..."
+            print("Retrieving list of zip files from " + path + " ...")
         regexp = self.zipFileRegexp(version)
         for entry in os.listdir(path):
             if regexp.match(entry):
@@ -425,24 +427,24 @@ class Environment:
             else:
                 transferList.append(entry)
 
-        print "\nIncluded:"
+        print("\nIncluded:")
         for entry in remoteList:
-            print "    " + entry
+            print("    " + entry)
 
-        print "\nExcluded:"
+        print("\nExcluded:")
         for entry in self.excludedRemoteZipFileList():
-            print "    " + entry
+            print("    " + entry)
 
-        print "\nAlready in local directory:"
+        print("\nAlready in local directory:")
         for entry in localList:
-            print "    " + entry
+            print("    " + entry)
 
-        print "\nTo be transferred:"
+        print("\nTo be transferred:")
         for entry in transferList:
-            print "    " + entry
+            print("    " + entry)
 
-        print "\nRemote directory: " + self.remoteDir()
-        print "Local directory:  " + self.localDir()
+        print("\nRemote directory: " + self.remoteDir())
+        print("Local directory:  " + self.localDir())
 
         if not self.options.dry_run:
             # Write readme.txt into destination directory
@@ -465,10 +467,10 @@ class Environment:
             readmeFile.close()
 
             count = 0
-            print "\nStarting transfer ..."
+            print("\nStarting transfer ...")
             for entry in transferList:
                 count = count + 1
-                print "\n" + entry + " (" + str(count) + " / " + str(len(transferList)) + ")"
+                print("\n" + entry + " (" + str(count) + " / " + str(len(transferList)) + ")")
                 localPath = os.path.join(self.localDir(), entry)
                 remotePath = os.path.join(self.remoteDir(), entry)
                 file_size = os.stat(remotePath).st_size
@@ -476,14 +478,14 @@ class Environment:
                 fileCopy(remotePath, localPath, callback = lambda pos: p.update(pos))
 
     def unzip(self, destDir):
-        print "Destination directory:\n    " + destDir + "\n"
+        print("Destination directory:\n    " + destDir + "\n")
         localList = self.includedLocalZipFileList()
-        print "\nTo be unzipped:"
+        print("\nTo be unzipped:")
         for entry in localList:
-            print "    " + entry
-        print "\nNot to be unzipped:"
+            print("    " + entry)
+        print("\nNot to be unzipped:")
         for entry in self.excludedLocalZipFileList():
-            print "    " + entry
+            print("    " + entry)
         if not self.options.dry_run:
             # Write readme.txt into destination directory
             readmeFileName = os.path.join(destDir, 'readme.txt')
@@ -505,11 +507,11 @@ class Environment:
         log = None
         if not self.options.dry_run:
             log = open("hydra.log", "a")
-        print "\nStarting unzip ..."
+        print("\nStarting unzip ...")
         count = 0
         for entry in localList:
             count = count + 1
-            print "\nUnzipping " + entry + " (" + str(count) + " / " + str(len(localList)) + ")"
+            print("\nUnzipping " + entry + " (" + str(count) + " / " + str(len(localList)) + ")")
             if not self.options.dry_run:
                 log.write(entry + " (" + str(count) + " / " + str(len(localList)) + ")\n")
             cmd = "7z"
@@ -703,7 +705,7 @@ def InvalidAction(commandLine, config):
 
 def ActionProjects(commandLine, config):
     for project in config['projects']:
-        print config['projects'][project]
+        print(config['projects'][project])
     return True
 
 def ActionTest(commandLine, config):
@@ -712,16 +714,16 @@ def ActionTest(commandLine, config):
         version = commandLine['args'][2]
         project = config['projects'][projectName]
         environment = Environment(commandLine['options'], config, project, version)
-        print environment
+        print(environment)
         all = environment.remoteZipFileList()
 
-        print "Included:"
+        print("Included:")
         for x in environment.includedRemoteZipFileList():
-            print x
+            print(x)
 
-        print "\nExcluded:"
+        print("\nExcluded:")
         for x in environment.excludedRemoteZipFileList():
-            print x
+            print(x)
 
     else:
         UsageError('Invalid project / version')
@@ -735,14 +737,14 @@ def ActionFetch(commandLine, config):
         version = commandLine['args'][2]
         project = config['projects'][projectName]
         environment = Environment(commandLine['options'], config, project, version)
-        print environment
+        print(environment)
         localDir = environment.localDir()
         if not os.path.exists(localDir):
-            print "Creating local directory " + localDir
+            print("Creating local directory " + localDir)
             if not commandLine['options'].dry_run:
                 os.makedirs(localDir)
         environment.fetch()
-    print timer
+    print(timer)
     return True
 
 def ActionUnzip(commandLine, config):
@@ -752,7 +754,7 @@ def ActionUnzip(commandLine, config):
         destDir = commandLine['args'][3]
         project = config['projects'][projectName]
         environment = Environment(commandLine['options'], config, project, version)
-        print environment
+        print(environment)
         environment.unzip(destDir)
     return True
 

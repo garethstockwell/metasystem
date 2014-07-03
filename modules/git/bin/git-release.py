@@ -7,6 +7,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import os
 import os.path
@@ -67,7 +69,7 @@ class ArgumentParser(argparse.ArgumentParser):
 
 def execute(command, args):
     if args.verbose:
-        print '\n' + command
+        print('\n' + command)
     output = []
     if not args.dry_run:
         process = subprocess.Popen(command.split(),
@@ -82,7 +84,7 @@ def execute(command, args):
     return output
 
 def print_error(message):
-    print >> sys.stderr, 'Error:', message
+    print('Error:', message, file=sys.stderr)
 
 def parse_command_line():
     '''
@@ -102,14 +104,14 @@ def print_summary(args, *initial_group):
     maxkeylen = max([len(key) for key in keys])
     maxvaluelen = max([len(str(getattr(args, key))) for key in keys])
     rightcolpos = LINE_WIDTH - maxvaluelen - 2
-    print '-' * LINE_WIDTH
-    print 'Summary of options'
-    print '-' * LINE_WIDTH
+    print('-' * LINE_WIDTH)
+    print('Summary of options')
+    print('-' * LINE_WIDTH)
     for key in initial_group:
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
     for key in sorted(list(set(keys) - set(initial_group))):
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
-    print '-' * LINE_WIDTH
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
+    print('-' * LINE_WIDTH)
 
 #------------------------------------------------------------------------------
 # Main
@@ -122,34 +124,34 @@ if args.verbose:
     print_summary(args)
 
 [head, project_name] = os.path.split(args.repo)
-print "Project name = " + project_name
+print("Project name = " + project_name)
 
 # Check repo is clean
 os.chdir(args.repo)
 if len(execute("git status", args)) > 4:
     if args.force:
-        print "Warning: dirty repo; continuing due to force flag"
+        print("Warning: dirty repo; continuing due to force flag")
     else:
-        print "Repo is dirty: commit or clean before re-running"
+        print("Repo is dirty: commit or clean before re-running")
         exit(1)
 
 # Get SHA1
 commit_msg = execute("git log --pretty=oneline", args)[0]
 sha = commit_msg.split(' ')[0][0:8]
-print "SHA1 = " + sha
+print("SHA1 = " + sha)
 
 # Get timestamp
 timestamp = time.strftime('%y%m%d%H%M%S')
-print "timestamp = " + timestamp
+print("timestamp = " + timestamp)
 
 archivename = project_name + '-' + timestamp + '-' + sha + '.7z'
 archivefile = os.path.join(args.repo, '..', archivename)
-print "Archive file = " + archivefile
+print("Archive file = " + archivefile)
 
 # Create temporary directory
 tmpdir = tempfile.mkdtemp()
 if args.verbose:
-    print "Temporary directory = " + tmpdir
+    print("Temporary directory = " + tmpdir)
 tmprepodir = os.path.join(tmpdir, project_name)
 
 # Copy files

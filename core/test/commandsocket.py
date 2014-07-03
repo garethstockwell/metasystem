@@ -2,6 +2,8 @@
 
 # Script for testing commandsocket module
 
+from __future__ import print_function
+
 import logging
 import os
 import sys
@@ -11,16 +13,16 @@ from metasystem import commandsocket
 
 def do_client(args):
     msg = ' '.join(args)
-    print "Client: sending '" + msg + "'"
+    print("Client: sending '" + msg + "'")
     client = commandsocket.Client()
     reply = client.send(msg)
-    print "Reply: '" + reply + "'"
+    print("Reply: '" + reply + "'")
 
 def do_server():
     server = commandsocket.Server()
     while True:
         msg = server.get_message()
-        print "Server: message '" + msg.msg + "'"
+        print("Server: message '" + msg.msg + "'")
         msg.send_reply('OK')
 
 logging.getLogger().setLevel(logging.DEBUG)

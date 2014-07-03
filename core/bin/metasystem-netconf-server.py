@@ -9,14 +9,16 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(
         sys.argv[0]), os.pardir, 'lib', 'python'))
 
-print "arg = "  + sys.argv[0]
-print "dir = "  + os.path.dirname(sys.argv[0])
+print("arg = "  + sys.argv[0])
+print("dir = "  + os.path.dirname(sys.argv[0]))
 
 import argparse
 import logging

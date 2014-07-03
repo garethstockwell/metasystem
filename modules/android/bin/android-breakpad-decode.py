@@ -27,6 +27,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import logging
 import os
@@ -237,7 +239,7 @@ class Library(object):
 #------------------------------------------------------------------------------
 
 def print_error(message):
-    print >> sys.stderr, 'Error:', message
+    print('Error:', message, file=sys.stderr)
 
 
 def parse_command_line():
@@ -259,14 +261,14 @@ def print_summary(args, *initial_group):
     maxkeylen = max([len(key) for key in keys])
     maxvaluelen = max([len(str(getattr(args, key))) for key in keys])
     rightcolpos = LINE_WIDTH - maxvaluelen - 2
-    print '-' * LINE_WIDTH
-    print 'Summary of options'
-    print '-' * LINE_WIDTH
+    print('-' * LINE_WIDTH)
+    print('Summary of options')
+    print('-' * LINE_WIDTH)
     for key in initial_group:
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
     for key in sorted(list(set(keys) - set(initial_group))):
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
-    print '-' * LINE_WIDTH
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
+    print('-' * LINE_WIDTH)
 
 
 def file_exists(filename):
@@ -290,14 +292,14 @@ def build_lib_dict(lib_dir, args):
 
 
 def resolve_libs(libs, args, config):
-    print "\nResolving libraries ..."
+    print("\nResolving libraries ...")
     lib_dir = config['lib_dir']
     lib_dict = build_lib_dict(lib_dir, args)
     for lib in libs:
         if lib.name in lib_dict.keys():
             lib.path = lib_dict[lib.name]
         else:
-            print >> sys.stderr,'Warning: failed to resolve ' + lib.name
+            print('Warning: failed to resolve ' + lib.name, file=sys.stderr)
 
 
 def generate_symbols(lib, args, config):
@@ -328,11 +330,11 @@ def generate_symbols(lib, args, config):
                 sym_file = open(lib.sym_path, 'w')
                 sym_file.write(result.out)
         else:
-            print >> sys.stderr,'Warning: symbol name mismatch ({0:s}, {1:s}'.format(lib.name, sym_name)
+            print('Warning: symbol name mismatch ({0:s}, {1:s}'.format(lib.name, sym_name), file=sys.stderr)
 
 
 def generate_all_symbols(libs, args, config):
-    print "\nGenerating symbols ..."
+    print("\nGenerating symbols ...")
     p = ProgressBar(maxValue = len(libs))
     n = 0
     for lib in libs:
@@ -341,19 +343,19 @@ def generate_all_symbols(libs, args, config):
             generate_symbols(lib, args, config)
         n += 1
         p.update(note = lib.name, amount = n)
-    print
+    print()
 
 
 def print_libs(libs):
-    print "Summary of libraries listed in minidump file:"
-    print '----------------------------------------------------------------'
-    print 'name                              resolved  symbols'
-    print '----------------------------------------------------------------'
+    print("Summary of libraries listed in minidump file:")
+    print('----------------------------------------------------------------')
+    print('name                              resolved  symbols')
+    print('----------------------------------------------------------------')
     for lib in libs:
         has_path = 'y' if lib.path else 'n'
         sym_hash = lib.sym_hash[0:6] if lib.sym_hash else '-'
-        print '{0:40s} {1:s}   {2:s}'.format(lib.name, has_path, sym_hash)
-    print '----------------------------------------------------------------'
+        print('{0:40s} {1:s}   {2:s}'.format(lib.name, has_path, sym_hash))
+    print('----------------------------------------------------------------')
 
 
 def write_banner(fh, msg):
@@ -372,7 +374,7 @@ def check_output(filename, args):
 
 
 def write_output(stackwalk, args, config):
-    print "\nWriting output to " + config['stk_file'] + ' ...'
+    print("\nWriting output to " + config['stk_file'] + ' ...')
     out = open(config['stk_file'], 'w')
     err = open(config['err_file'], 'a')
     result = stackwalk.run()
@@ -411,8 +413,8 @@ config = {
 # If library versioning is broken, then we clean out the symbols in case any
 # library has been rebuilt since they were generated
 if os.path.exists(config['sym_dir']) and BROKEN_VERSION:
-    print "ANDROID_BREAKPAD_DECODE_BROKEN_VERSION is set"
-    print "\nRemoving old symbols ..."
+    print("ANDROID_BREAKPAD_DECODE_BROKEN_VERSION is set")
+    print("\nRemoving old symbols ...")
     shutil.rmtree(config['sym_dir'])
 
 # Ensure output directory exists, and check whether output files exist

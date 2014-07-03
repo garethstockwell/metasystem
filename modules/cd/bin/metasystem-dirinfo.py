@@ -13,6 +13,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import os
 import os.path
@@ -150,12 +152,12 @@ def postamble_projects(context):
 def check_args_count(command, count):
     assert len(command.args) >= count, 'Insufficient arguments on line {0:d}'.format(command.line_number)
     if len(command.args) > count:
-        print 'Warning: extra arguments ignored on line {0:d}'.format(command.line_number)
+        print('Warning: extra arguments ignored on line {0:d}'.format(command.line_number))
 
 def check_options(command, valid_options):
     for option in command.options.keys():
         if not option in valid_options:
-            print 'Warning: extra options ignored on line {0:d}'.format(command.line_number)
+            print('Warning: extra options ignored on line {0:d}'.format(command.line_number))
 
 def handle_label(command, context):
     check_args_count(command, 1)
@@ -209,10 +211,10 @@ def handle_shell(command, context):
     deprecate = os.environ.get('METASYSTEM_DIRINFO_SHELL_DEPRECATE')
     ignore = os.environ.get('METASYSTEM_DIRINFO_SHELL_IGNORE')
     if ignore == 'yes':
-        print "Warning: use of 'shell' keyword in metasystem-dirinfo files is ignored"
+        print("Warning: use of 'shell' keyword in metasystem-dirinfo files is ignored")
     else:
         if deprecate == 'yes':
-            print "Warning: use of 'shell' keyword in metasystem-dirinfo files is deprecated"
+            print("Warning: use of 'shell' keyword in metasystem-dirinfo files is deprecated")
         context['output'].write("\n# [{0:d}] {1:s}\n".format(command.line_number, command.line))
         context['output'].write(' '.join(command.tokens) + "\n")
 
@@ -251,7 +253,7 @@ def check_env():
             raise IOError("Environment variable '{0:s}' not set".format(var))
 
 def print_error(message):
-    print >> sys.stderr, 'Error:', message
+    print('Error:', message, file=sys.stderr)
 
 def parse_command_line():
     '''
@@ -271,14 +273,14 @@ def print_summary(args, *initial_group):
     maxkeylen = max([len(key) for key in keys])
     maxvaluelen = max([len(str(getattr(args, key))) for key in keys])
     rightcolpos = LINE_WIDTH - maxvaluelen - 2
-    print '-' * LINE_WIDTH
-    print 'Summary of options'
-    print '-' * LINE_WIDTH
+    print('-' * LINE_WIDTH)
+    print('Summary of options')
+    print('-' * LINE_WIDTH)
     for key in initial_group:
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
     for key in sorted(list(set(keys) - set(initial_group))):
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
-    print '-' * LINE_WIDTH
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
+    print('-' * LINE_WIDTH)
 
 #------------------------------------------------------------------------------
 # Main

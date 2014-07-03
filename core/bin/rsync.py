@@ -4,6 +4,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import os
 import re
 import subprocess
@@ -35,6 +37,6 @@ else:
     args = sys.argv[1:]
 
 cmd = 'rsync ' + ' '.join(args)
-print cmd
+print(cmd)
 subprocess.call(cmd)
 

@@ -12,6 +12,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import logging
 import re
@@ -73,7 +75,7 @@ class ArgumentParser(argparse.ArgumentParser):
 #------------------------------------------------------------------------------
 
 def print_error(message):
-    print >> sys.stderr, 'Error:', message
+    print('Error:', message, file=sys.stderr)
 
 
 def parse_command_line():
@@ -95,14 +97,14 @@ def print_summary(args, *initial_group):
     maxkeylen = max([len(key) for key in keys])
     maxvaluelen = max([len(str(getattr(args, key))) for key in keys])
     rightcolpos = LINE_WIDTH - maxvaluelen - 2
-    print '-' * LINE_WIDTH
-    print 'Summary of options'
-    print '-' * LINE_WIDTH
+    print('-' * LINE_WIDTH)
+    print('Summary of options')
+    print('-' * LINE_WIDTH)
     for key in initial_group:
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
     for key in sorted(list(set(keys) - set(initial_group))):
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
-    print '-' * LINE_WIDTH
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
+    print('-' * LINE_WIDTH)
 
 
 #------------------------------------------------------------------------------
@@ -123,8 +125,8 @@ def list_file(filename, res, args):
             matches = r.findall(content)
             for m in matches:
                 result.add(m)
-    print '\n\n' + filename
-    print '\n'.join(sorted_nicely(result))
+    print('\n\n' + filename)
+    print('\n'.join(sorted_nicely(result)))
     return result
 
 
@@ -146,6 +148,6 @@ result = set()
 for f in args.files:
     result |= list_file(f, res, args)
 
-print "\n\nResult"
-print '\n'.join(sorted_nicely(result))
+print("\n\nResult")
+print('\n'.join(sorted_nicely(result)))
 

@@ -9,6 +9,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import os
 import sys
 
@@ -77,7 +79,7 @@ class Program(script.Program):
         if self.args.fqdn is not None:
             for entry in result:
                 if entry.cookie == self.args.cookie:
-                    print entry.ip_addr
+                    print(entry.ip_addr)
                     return
 
             sys.exit(1)

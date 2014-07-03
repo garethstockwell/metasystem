@@ -20,6 +20,7 @@
 # written by jeff sharkey, http://jsharkey.org/
 # piping detection and popen() added by other android team members
 
+from __future__ import print_function
 
 import os, sys, re, StringIO
 import fcntl, termios, struct
@@ -164,7 +165,7 @@ while True:
 
         # write out tagtype colored edge
         if not tagtype in TAGTYPES:
-            print "ERROR: unmatched tag " + tagtype
+            print("ERROR: unmatched tag " + tagtype)
             break
         linebuf.write(TAGTYPES[tagtype])
 
@@ -179,6 +180,6 @@ while True:
         linebuf.write(message)
         line = linebuf.getvalue()
 
-    print line
+    print(line)
     if len(line) == 0: break
 

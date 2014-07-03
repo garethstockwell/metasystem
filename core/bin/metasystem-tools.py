@@ -6,6 +6,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import ConfigParser
 import os
@@ -183,14 +185,14 @@ def parse_ini(args):
 #------------------------------------------------------------------------------
 
 def print_types(config):
-    print "types:"
+    print("types:")
     for type in config['types'].values():
-        print type
+        print(type)
 
 def print_tools(config):
-    print "tools:"
+    print("tools:")
     for tool in config['tools'].values():
-        print tool
+        print(tool)
 
 def get_current_tools(config):
     for type in config['types'].values():
@@ -253,7 +255,7 @@ def write_shell_script(args, config):
 def cmd_set(args, config):
     if not args.type in config['types']:
         print_types(config)
-        print
+        print()
         raise IOError("type '" + args.type + "' not recognized")
     type = config['types'][args.type]
     tool = None
@@ -265,7 +267,7 @@ def cmd_set(args, config):
                 tool = t
     if not tool:
         print_tools(config)
-        print
+        print()
         raise IOError("tool '" + args.tool + "' not recognized")
     type.current_tool = tool.name
     write_shell_script(args, config)
@@ -281,7 +283,7 @@ def check_env():
             raise IOError("Environment variable '{0:s}' not set".format(var))
 
 def print_error(message):
-    print >> sys.stderr, 'Error:', message
+    print('Error:', message, file=sys.stderr)
 
 def parse_command_line():
     '''
@@ -303,14 +305,14 @@ def print_summary(args):
     values.append(args.func.func_name)
     maxvaluelen = max([len(str(value)) for value in values])
     rightcolpos = LINE_WIDTH - maxvaluelen - 4
-    print '-' * LINE_WIDTH
-    print 'Summary of options'
-    print '-' * LINE_WIDTH
-    print ' subcommand', ('.' * (rightcolpos - len('subcommand') - 2)), args.func.func_name
+    print('-' * LINE_WIDTH)
+    print('Summary of options')
+    print('-' * LINE_WIDTH)
+    print(' subcommand', ('.' * (rightcolpos - len('subcommand') - 2)), args.func.func_name)
     for key in sorted(list(set(keys))):
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
-    print '-' * LINE_WIDTH
-    print
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
+    print('-' * LINE_WIDTH)
+    print()
 
 #------------------------------------------------------------------------------
 # Main

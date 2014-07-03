@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import os
 import sys
 
@@ -13,5 +15,5 @@ if len(sys.argv) > 1:
     f.write(content.replace('\n\n', '\n'))
 else:
     content = sys.stdin.read()
-    print content.replace('\n\n', '\n')
+    print(content.replace('\n\n', '\n'))
 

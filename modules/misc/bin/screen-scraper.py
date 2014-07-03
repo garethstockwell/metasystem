@@ -28,6 +28,8 @@
 # Modules
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 from BeautifulSoup import BeautifulSoup
 import re
 import urllib
@@ -65,7 +67,7 @@ CONFIG = {}
 #------------------------------------------------------------------------------
 
 def PrintUsage():
-	print "Usage: " + sys.argv[0]  + " <ini_file>"
+	print("Usage: " + sys.argv[0]  + " <ini_file>")
 
 
 def ExtractRequiredIniField(config, section, field, target):
@@ -89,7 +91,7 @@ def ParseIniFile(fileName):
 	CONFIG['external_urls'] = []
 	if config.has_section('external'):
 		for key in config.options('external'):
-			print "EXTERNAL " + config.get('external', key)
+			print("EXTERNAL " + config.get('external', key))
 			CONFIG['external_urls'].append(config.get('external', key))
 
 	CONFIG['options_wait_min'] = 0
@@ -121,7 +123,7 @@ def Visit(url):
 	# Check if this URL has already been visited
 	for key in VISITED.keys():
 		if key == url:
-			print "Already visited: " + url
+			print("Already visited: " + url)
 			return VISIT_VISITED
 
 	# Check whether this URL is below the list of external links
@@ -129,13 +131,13 @@ def Visit(url):
 	for externalUrl in CONFIG['external_urls']:
 		index = url.find(externalUrl)
 		if index == 0:
-			print "Allowing external URL: " + url
+			print("Allowing external URL: " + url)
 			return VISIT_RESOURCE
 
 	# Check whether this URL is below the root
 	index = url.find(CONFIG['source_url'])
 	if index != 0:
-		print "Skipping external URL: " + url
+		print("Skipping external URL: " + url)
 		return VISIT_SKIP
 
 	return VISIT_RECURSE
@@ -165,7 +167,7 @@ def ProcessResource(url):
 		if key == url:
 			return VISITED[url]
 
-	print "ProcessResource " + url
+	print("ProcessResource " + url)
 
 	o = urlparse(url)
 	path = o.path
@@ -185,7 +187,7 @@ def ProcessResource(url):
 
 	urllib.urlretrieve(url, targetFileName)
 
-	print "Stored mapping " + url + " to " + fileName
+	print("Stored mapping " + url + " to " + fileName)
 	VISITED[url] = fileName
 
 	return fileName
@@ -199,14 +201,14 @@ def ProcessLink(targetUrl):
 	regex = re.compile('\?.*')
 	trimmedUrl = regex.sub('', targetUrl)
 
-	print "ProcessLink " + targetUrl
+	print("ProcessLink " + targetUrl)
 	visit = Visit(trimmedUrl)
 
 	if visit == VISIT_RECURSE:
 		if CONFIG['options_depth_max'] == 0 or DEPTH < CONFIG['options_depth_max']:
 			return ProcessUrl(trimmedUrl)
 		else:
-			print "Already at depth " + DEPTH + " - terminating recursion"
+			print("Already at depth " + DEPTH + " - terminating recursion")
 			return targetUrl
 	if visit == VISIT_RESOURCE:
 		return ProcessResource(trimmedUrl)
@@ -219,7 +221,7 @@ def ProcessLink(targetUrl):
 
 def Wait():
 	interval = random.randint(CONFIG['options_wait_min'], CONFIG['options_wait_max'])
-	print "Waiting for " + str(interval) + " sec ..."
+	print("Waiting for " + str(interval) + " sec ...")
 	time.sleep(interval)
 
 
@@ -235,12 +237,12 @@ def ProcessUrl(url):
 	DEPTH += 1
 
 	msg = "\nProcessUrl [%2d] %s" % (DEPTH, url)
-	print msg
+	print(msg)
 
 	fileName = TargetPath(url)
 
 	# Mark URL as having been visited
-	print "Stored mapping " + trimmedUrl + " to " + fileName
+	print("Stored mapping " + trimmedUrl + " to " + fileName)
 	VISITED[trimmedUrl] = fileName
 
 	try:
@@ -273,15 +275,15 @@ def ProcessUrl(url):
 		for link in links:
 			linkUrl = AbsoluteUrl(url, link['href'])
 			link['href'] = ProcessLink(linkUrl)
-			print "Link in " + url + " (" + fileName + ") remapped from " + linkUrl + " to " + link['href']
+			print("Link in " + url + " (" + fileName + ") remapped from " + linkUrl + " to " + link['href'])
 
 		# Write page to local file
-		print "Writing " + url + " to " + fileName
+		print("Writing " + url + " to " + fileName)
 		file = open(CONFIG['output_dir'] + '/' + fileName, 'w')
-		print >>file, soup
+		print(soup, file=file)
 
 	except:
-		print "Error occurred retrieving " + url
+		print("Error occurred retrieving " + url)
 
 	DEPTH -= 1
 

@@ -6,6 +6,8 @@
 # Imports
 #------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import argparse
 import os
 import re
@@ -67,7 +69,7 @@ HEADER_DICT = {
 def process_file(args):
     header = HEADER_DICT.get(args.license)
     if not header:
-        print "Invalid licence '" + args.license + "' - valid keys are " + str(HEADER_DICT.keys())
+        print("Invalid licence '" + args.license + "' - valid keys are " + str(HEADER_DICT.keys()))
         raise IOError
     tmp = args.filename + ".tmp"
     if os.path.exists(tmp):
@@ -98,7 +100,7 @@ def process_file(args):
 #------------------------------------------------------------------------------
 
 def print_error(message):
-    print >> sys.stderr, 'Error:', message
+    print('Error:', message, file=sys.stderr)
 
 def parse_command_line():
     '''
@@ -118,14 +120,14 @@ def print_summary(args, *initial_group):
     maxkeylen = max([len(key) for key in keys])
     maxvaluelen = max([len(str(getattr(args, key))) for key in keys])
     rightcolpos = LINE_WIDTH - maxvaluelen - 2
-    print '-' * LINE_WIDTH
-    print 'Summary of options'
-    print '-' * LINE_WIDTH
+    print('-' * LINE_WIDTH)
+    print('Summary of options')
+    print('-' * LINE_WIDTH)
     for key in initial_group:
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
     for key in sorted(list(set(keys) - set(initial_group))):
-        print ' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key)
-    print '-' * LINE_WIDTH
+        print(' '+ key, ('.' * (rightcolpos - len(key) - 2)), getattr(args, key))
+    print('-' * LINE_WIDTH)
 
 #------------------------------------------------------------------------------
 # Main

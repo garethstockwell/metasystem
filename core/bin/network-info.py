@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import os
 import sys
 
@@ -10,14 +12,14 @@ from metasystem import network
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'domain':
-        print network.domain()
+        print(network.domain())
 
     if sys.argv[1] == 'fqdn':
-        print network.fqdn()
+        print(network.fqdn())
 
     if sys.argv[1] == 'hostname':
-        print network.hostname()
+        print(network.hostname())
 
     if sys.argv[1] == 'ip':
-        print network.ip_addr()
+        print(network.ip_addr())
 
