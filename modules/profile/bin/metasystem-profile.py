@@ -9,7 +9,12 @@
 from __future__ import print_function
 
 import argparse
-import ConfigParser
+
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
+
 import os
 import os.path
 import re
@@ -262,7 +267,7 @@ def print_summary(args):
 
 def parse_ini_file(args):
     config = {}
-    config['parser'] = ConfigParser.RawConfigParser()
+    config['parser'] = configparser.RawConfigParser()
     ini_file = os.path.abspath(os.path.join(os.environ.get('METASYSTEM_CORE_CONFIG'), 'profile.ini'))
     if len(config['parser'].read(ini_file)) == 0:
         raise IOError("Failed to read config file " + ini_file)

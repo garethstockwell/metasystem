@@ -18,7 +18,11 @@
 
 from __future__ import print_function
 
-import ConfigParser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
+
 from datetime import timedelta
 from optparse import OptionParser, OptionGroup
 import os.path
@@ -665,7 +669,7 @@ def ExtractOptionalIniFieldBool(parser, section, field, host = None, default = F
 def ParseIniFile(options):
     config = { }
 
-    parser = ConfigParser.RawConfigParser()
+    parser = configparser.RawConfigParser()
     fileName = options.ini_filename
     if len(parser.read(fileName)) == 0:
         raise IOError("Failed to read config file " + fileName)

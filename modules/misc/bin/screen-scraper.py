@@ -37,7 +37,12 @@ import urllib2
 from urlparse import *
 import os.path
 import sys
-import ConfigParser
+
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
+
 import random
 import time
 
@@ -82,7 +87,7 @@ def ExtractOptionalIniFieldInt(config, section, field, target):
 
 
 def ParseIniFile(fileName):
-	config = ConfigParser.RawConfigParser()
+	config = configparser.RawConfigParser()
 	if len(config.read(fileName)) == 0:
 		raise IOError("Failed to read config file " + fileName)
 	ExtractRequiredIniField(config, 'source', 'url', 'source_url')

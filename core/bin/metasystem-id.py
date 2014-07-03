@@ -9,7 +9,12 @@
 from __future__ import print_function
 
 import argparse
-import ConfigParser
+
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
+
 import os
 import os.path
 import re
@@ -158,7 +163,7 @@ def parse_ini(args):
     config['ids'] = { }
 
     fileName = os.path.join(os.environ.get('METASYSTEM_CORE_CONFIG'), 'id.ini')
-    parser = ConfigParser.RawConfigParser()
+    parser = configparser.RawConfigParser()
     if len(parser.read(fileName)) == 0:
         raise IOError("Failed to read config file " + fileName)
 
