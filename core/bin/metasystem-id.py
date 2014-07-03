@@ -229,7 +229,7 @@ def do_write_config_file(args, sourceFileName, type, id, overlay=False):
             matches = regexp.findall(line)
             for m in matches:
                 line = line.replace('${' + m + '}', subst.get(m, ''))
-            destFile.write(line)
+            destFile.write(line.encode('utf-8'))
         return
     if overlay:
         return
