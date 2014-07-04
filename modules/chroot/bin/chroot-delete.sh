@@ -117,13 +117,8 @@ print_banner 'Unmounting filesystems'
 
 for dir in proc sys; do
     mount_point=$chroot_dir/$dir
-    echo -n "$mount_point ... "
-    if [[ -z $(mount | awk '{ print $3 }' | sort | uniq | grep $mount_point) ]]; then
-        echo "not mounted"
-    else
-        echo
-        sudo umount -l $mount_point
-    fi
+    echo "$mount_point ... "
+    sudo umount -l $mount_point
 done
 
 schroot_mounts=$(mount | awk '{ print $3 }' | grep $SCHROOT_DIR/mount/$chroot_name)
