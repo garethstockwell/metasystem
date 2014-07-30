@@ -8,6 +8,7 @@ total_run_times 0
 use_spacer none
 
 TEXT
+^fg(\#aaaaaa)VOL ${exec %{METASYSTEM_XMONAD_BIN}/xmonad-volume.sh}^fg() | \
 ^fg(\#aaaaaa)CPU $cpu%^fg() | \
 ^fg(\#aaaaaa)MEM $mem/$memmax ($memperc%)^fg() | \
 ^fg(\#aaaaaa)$time^fg()

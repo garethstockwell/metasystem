@@ -40,9 +40,11 @@ function get_state()
 
 function print_state()
 {
-    echo -n "$curr_vol_dec (${curr_vol_pct}%"
-    [[ $curr_mute != yes ]] || echo -n ', mute'
-    echo ')'
+    [[ $opt_verbose != yes ]] || echo -n "$curr_vol_dec ("
+    echo -n "${curr_vol_pct}%"
+    [[ $opt_verbose != yes ]] || echo -n " "
+    [[ $curr_mute != yes ]] || echo -n ' (mute)'
+    echo
 }
 
 function set_mute()
@@ -134,7 +136,9 @@ elif [[ $arg_action == mute ]]; then
     CHANGE=yes
 fi
 
-[[ $opt_level != yes ]] || echo $curr_vol_pct
+[[ -n $arg_action ]] || opt_level=yes
 
-[[ -z $CHANGE || $opt_verbose != yes ]] || print_state
+if [[ -n $CHANGE || $opt_level == yes || $opt_verbose == yes ]]; then
+    print_state
+fi
 

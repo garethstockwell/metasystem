@@ -42,7 +42,7 @@ function xmonad_restart()
 
 PATH=$(path_append $METASYSTEM_XMONAD_BIN $PATH)
 
-_metasystem_dotfile_register xmonad conkyrc xmonad/conkyrc
+_metasystem_dotfile_register xmonad conkyrc xmonad/conkyrc %
 _metasystem_dotfile_register xmonad xmonad.hs xmonad/xmonad.hs
 _metasystem_dotfile_register xmonad xmonad-start xmonad/xmonad-start
 _metasystem_dotfile_register xmonad xmobar.hs xmonad/xmobar.hs
