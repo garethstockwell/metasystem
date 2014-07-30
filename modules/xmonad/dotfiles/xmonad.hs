@@ -12,10 +12,14 @@
 
 import XMonad
 
+import Control.Exception as E
 import Control.Monad ( liftM2 )
 
 import Data.Char ( toLower )
 import Data.List ( intercalate )
+
+import System.Environment ( getEnv )
+import System.IO.Unsafe ( unsafePerformIO )
 
 import XMonad.Actions.Plane
 import XMonad.Actions.SpawnOn
@@ -46,6 +50,25 @@ import XMonad.Util.Run
 import qualified Data.Map as M
 import qualified XMonad.StackSet as W ( findTag, focusDown,
                                         sink, shift, greedyView )
+
+
+-------------------------------------------------------------------------------
+-- Environment
+-------------------------------------------------------------------------------
+
+-- Ask the shell environment for the value of a variable in XMonad's environment, with a
+-- default value.
+-- In order to /set/ an environment variable (eg. combine with a prompt so you can modify
+-- @$HTTP_PROXY@ dynamically), you need to use 'System.Posix.putEnv'.
+--
+-- From http://xmonad.org/xmonad-docs/xmonad-contrib/src/XMonad-Prompt-Shell.html
+--
+
+econst :: Monad m => a -> IOException -> m a
+econst = const . return
+
+env :: String -> String -> IO String
+env variable fallthrough = getEnv variable `E.catch` econst fallthrough
 
 
 -------------------------------------------------------------------------------
@@ -249,11 +272,21 @@ myManageHook = (composeAll $ concat
 
 myTerminalMux = myTerminal ++ " -e tmux attach -t default"
 
+binPath = unsafePerformIO $ env "METASYSTEM_XMONAD_BIN" "???"
+myVolume = binPath ++ "/xmonad-volume.sh"
+myVolumeUp = myVolume ++ " up --level"
+myVolumeDown = myVolume ++ " down --level"
+myVolumeMute = myVolume ++ " mute --level"
+
 myKeys = [ ("M-S-<Backspace>", spawn "xscreensaver-command -lock")
          , ("M-S-t",           spawnHere myTerminal)
          , ("M-S-<Return>",    spawnHere myTerminalMux)
          , ("M-S-b",           spawnHere myBrowser)
          , ("M-p",             spawnHere myDmenuRun)
+
+         , ("M-S-<Up>",        spawn myVolumeUp)
+         , ("M-S-<Down>",      spawn myVolumeDown)
+         , ("M-S-m",           spawn myVolumeMute)
          ]
 
 
