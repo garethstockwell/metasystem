@@ -50,6 +50,8 @@
 	ll = log --graph --stat --abbrev-commit --decorate=full
 	lp = log --graph --patch --abbrev-commit --decorate=full
 
+	rc = rebase --continue
+
 	remove = !git ls-files -z --deleted | xargs -0 git rm
 
 	rv = remote --verbose
