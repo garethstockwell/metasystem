@@ -40,17 +40,6 @@ builtin cd $HOME
 
 
 #------------------------------------------------------------------------------
-# Local profile
-#------------------------------------------------------------------------------
-
-if [[ -n $METASYSTEM_LOCAL_SHELL ]]; then
-	if [[ -e $METASYSTEM_LOCAL_SHELL/profile.sh ]]; then
-		source $METASYSTEM_LOCAL_SHELL/profile.sh
-	fi
-fi
-
-
-#------------------------------------------------------------------------------
 # Imports
 #------------------------------------------------------------------------------
 
@@ -63,6 +52,17 @@ source $METASYSTEM_CORE_LIB_BASH/string.sh
 source $METASYSTEM_CORE_SHELL/autoload.sh
 source $METASYSTEM_CORE_SHELL/config.sh
 source $METASYSTEM_CORE_SHELL/help.sh
+
+
+#------------------------------------------------------------------------------
+# Local profile
+#------------------------------------------------------------------------------
+
+if [[ -n $METASYSTEM_LOCAL_SHELL ]]; then
+	if [[ -e $METASYSTEM_LOCAL_SHELL/profile.sh ]]; then
+		source $METASYSTEM_LOCAL_SHELL/profile.sh
+	fi
+fi
 
 
 #------------------------------------------------------------------------------
