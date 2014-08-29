@@ -24,6 +24,28 @@ function _metasystem_module_register_hooks()
 	$(func_exists $func) && metasystem_register_help_hook $module $func
 }
 
+function _metasystem_module_dir()
+{
+	local type=$1
+	local result=
+
+	case $type in
+		core)
+			result=$METASYSTEM_ROOT/modules
+			;;
+		local)
+			[[ -n $METASYSTEM_LOCAL_ROOT ]] || return
+			result=$METASYSTEM_LOCAL_ROOT/modules
+			;;
+		*)
+			echo "Error: metasystem_module_list invalid type $type" >&2
+			return 1
+			;;
+	esac
+
+	echo $result
+}
+
 function metasystem_module_load()
 {
 	local module=$1
@@ -49,14 +71,20 @@ function metasystem_module_load()
 		echo "Module $module already loaded - skipping"
 		ret=1
 	else
-		local script=$METASYSTEM_ROOT/modules/$module/module.sh
+		local type=core
+		[[ -z $(echo $module | grep '^local\.') ]] || type=local
+		local dir=$(_metasystem_module_dir $type)
+
+		local module_name=$(echo $module | sed -e 's/^local\.//')
+
+		local script=$dir/$module_name/module.sh
 		if [[ -e $script ]]; then
 			[[ $opt_quiet != yes ]] && echo "Loading module $module ..."
 			source $script
 			ret=$?
 			if [[ $ret == 0 ]]; then
 				METASYSTEM_MODULES_LOADED="$(list_append $module $METASYSTEM_MODULES_LOADED)"
-				[[ -n $first_load ]] && _metasystem_module_register_hooks $module
+				[[ -n $first_load ]] && _metasystem_module_register_hooks $module_name
 			fi
 		else
 			echo "Error: $module not found" >&2
@@ -70,11 +98,15 @@ function metasystem_module_load()
 # TODO: support modules in metasystem-local
 function metasystem_module_list()
 {
+	local type=$1
+	local dir=$(_metasystem_module_dir $type)
+
 	local list=
-	for script in $(find $METASYSTEM_ROOT/modules -iname module.sh | sed -e "s|$METASYSTEM_ROOT/modules/||" | grep -v ^template); do
+	for script in $(find $dir -iname module.sh | sed -e "s|$dir/||" | grep -v ^template); do
 		[[ -n $first ]] && _metasystem_print_banner Modules
 		unset first
 		local module=$(dirname $script)
+		[[ $type != local ]] || module="local.$module"
 		list="$(list_append $module $list)"
 	done
 	echo $list
@@ -97,7 +129,7 @@ function metasystem_module_loaded()
 #     Specify modules to be excluded from the list
 function metasystem_module_select()
 {
-	local result="$(metasystem_module_list)"
+	local result="$(metasystem_module_list core) $(metasystem_module_list local)"
 	if [[ -n $METASYSTEM_MODULES_EXPLICIT ]]; then
 		local list=$result
 		result=
