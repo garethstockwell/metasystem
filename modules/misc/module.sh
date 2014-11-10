@@ -21,6 +21,14 @@ function firefox_remove_lock()
 	rm -fv $(find ${firefox_dir} -iname .parentlock)
 }
 
+# Run to remove corrupted xmarks db
+function firefox_remove_xmarks()
+{
+	local firefox_dir=$HOME/.mozilla/firefox
+	rm -fv $(find ${firefox_dir} -iname *.sqlite*)
+	rm -fv $(find ${firefox_dir} -iname xmarks*)
+}
+
 function edit_source()
 {
 	local dirs="$@"
