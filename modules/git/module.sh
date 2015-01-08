@@ -11,8 +11,20 @@ command_exists git || return 1
 # Functions
 #------------------------------------------------------------------------------
 
+function git_root()
+{
+	$GIT_EXE rev-parse --show-toplevel
+}
+
+function git_in_repo()
+{
+	git_root >/dev/null 2>/dev/null || return 1
+	return 0
+}
+
 function git_current_repo()
 {
+	git_in_repo || return 1
 	local ref="$(git symbolic-ref HEAD 2> /dev/null)" || \
 	local ref="$(git rev-parse --short HEAD 2> /dev/null)" || return
 	echo $(git remote -v | cut -d':' -f 2)
@@ -20,6 +32,7 @@ function git_current_repo()
 
 function git_current_branch()
 {
+	git_in_repo || return 1
 	local ref="$(git symbolic-ref HEAD 2> /dev/null)" || \
 	local ref="$(git rev-parse --short HEAD 2> /dev/null)" || return
 	echo ${ref#refs/heads/}
@@ -27,12 +40,14 @@ function git_current_branch()
 
 function git_remote_repo()
 {
+	git_in_repo || return 1
 	local local_branch=$1
 	$GIT_EXE config branch.${local_branch}.remote 2>/dev/null
 }
 
 function git_remote_branch()
 {
+	git_in_repo || return 1
 	local local_branch=$1
 	local remote_branch="$($GIT_EXE config branch.${local_branch}.merge 2>/dev/null)" || return
 	echo ${remote_branch#refs/heads/}
@@ -40,47 +55,49 @@ function git_remote_branch()
 
 function git_head()
 {
+	git_in_repo || return 1
 	$GIT_EXE rev-parse HEAD 2>/dev/null
-}
-
-function git_root()
-{
-	$GIT_EXE rev-parse --show-toplevel
 }
 
 # Returns success if there are staged changes
 function git_staged()
 {
+	git_in_repo || return 1
 	test -n "$(git status --porcelain --ignore-submodules | grep -E '^[MARC]')"
 }
 
 # Returns success if there are unstaged changes
 function git_unstaged()
 {
+	git_in_repo || return 1
 	test -n "$(git status --porcelain --ignore-submodules | grep -E '^[ MARC][MD]')"
 }
 
 # Returns success if there are untracked files
 function git_untracked()
 {
+	git_in_repo || return 1
 	test -n "$(git status --porcelain | grep -E '^\?\?')"
 }
 
 # Returns success if there are unmerged changes
 function git_unmerged()
 {
+	git_in_repo || return 1
 	test -n "$(git status --porcelain | grep -E '^(DD|AU|UD|UA|DU|AU|UU)')"
 }
 
 # Returns success if there are uncommitted changes
 function git_uncommitted()
 {
+	git_in_repo || return 1
 	test -n "$(git status --porcelain | grep -E '^[MADRC]')"
 }
 
 # Returns success if there are unpushed changes
 function git_unpushed()
 {
+	git_in_repo || return 1
 	local message=
 	local output=$(git branch --no-color -vv 2> /dev/null)
 	while read line; do
@@ -97,9 +114,35 @@ function git_unpushed()
 
 function git_grep()
 {
+	git_in_repo || return 1
 	local path=$1
 	shift
 	grep "$@" $(find $path ! -path "*/.git/*" -type f)
+}
+
+function git_branch_desc_edit()
+{
+	git_in_repo || return 1
+	git branch --edit-description "$@"
+}
+
+function git_branch_desc_show()
+{
+	# From https://gist.github.com/jeenuv/3145db36eb2a27ba022a
+
+	# For each branch in the repository, get the branch description from
+	# Git config, and print in a neat fashion
+
+	git_in_repo || return 1
+
+	$GIT_EXE for-each-ref refs/heads --format='%(refname:short)' | \
+		xargs sh -c '
+			head="$(git symbolic-ref --short HEAD)"
+			for br; do
+				star=" "
+				[ "$head" = "$br" ] && star="*"
+				printf " %s %-30s%s\n" "$star" "$br" "$(git config --get branch.$br.description | head -n1 )"
+			done' sh
 }
 
 function metasystem_grep()
