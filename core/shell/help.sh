@@ -36,7 +36,7 @@ Metasystem help
 -------------------------------------------------------------------------------
 
 Miscellaneous
-    rc-update                Regenerate dot files in home directory
+    dotfile-update           Regenerate dot files in home directory
 
 -------------------------------------------------------------------------------
 
