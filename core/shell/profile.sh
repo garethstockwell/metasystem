@@ -45,6 +45,15 @@ query_platform
 # Misc stuff
 #------------------------------------------------------------------------------
 
+function get_x_display()
+{
+	local x=$(which X)
+	test -n "$x" || return 1
+	ps ax | grep $x | grep -v grep | awk '{ print $6 }'
+}
+
+export DISPLAY=$(get_x_display)
+
 export EDITOR=vim
 
 # cgrep
