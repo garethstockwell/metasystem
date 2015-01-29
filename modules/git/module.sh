@@ -42,6 +42,7 @@ function git_remote_repo()
 {
 	git_in_repo || return 1
 	local local_branch=$1
+	[[ -n ${local_branch} ]] || local_branch=$(git_current_branch)
 	$GIT_EXE config branch.${local_branch}.remote 2>/dev/null
 }
 
@@ -49,6 +50,7 @@ function git_remote_branch()
 {
 	git_in_repo || return 1
 	local local_branch=$1
+	[[ -n ${local_branch} ]] || local_branch=$(git_current_branch)
 	local remote_branch="$($GIT_EXE config branch.${local_branch}.merge 2>/dev/null)" || return
 	echo ${remote_branch#refs/heads/}
 }
@@ -118,31 +120,6 @@ function git_grep()
 	local path=$1
 	shift
 	grep "$@" $(find $path ! -path "*/.git/*" -type f)
-}
-
-function git_branch_desc_edit()
-{
-	git_in_repo || return 1
-	git branch --edit-description "$@"
-}
-
-function git_branch_desc_show()
-{
-	# From https://gist.github.com/jeenuv/3145db36eb2a27ba022a
-
-	# For each branch in the repository, get the branch description from
-	# Git config, and print in a neat fashion
-
-	git_in_repo || return 1
-
-	$GIT_EXE for-each-ref refs/heads --format='%(refname:short)' | \
-		xargs sh -c '
-			head="$(git symbolic-ref --short HEAD)"
-			for br; do
-				star=" "
-				[ "$head" = "$br" ] && star="*"
-				printf " %s %-30s%s\n" "$star" "$br" "$(git config --get branch.$br.description | head -n1 )"
-			done' sh
 }
 
 function metasystem_grep()

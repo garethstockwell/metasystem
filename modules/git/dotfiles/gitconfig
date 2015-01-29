@@ -1,27 +1,55 @@
 [alias]
-	alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\: \\2/' | sort
+	alias = !git config --list | \
+			grep 'alias\\.' | \
+			sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\: \\2/' | \
+			sed 's/  */ /g' | \
+			sed 's/\t\t*/ /g' | \
+			sort
 
 	# Aliases adapted from sources including
 	# http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/`
 	# http://stackoverflow.com/questions/1862423/git-how-to-tell-which-commit-a-tag-points-to
 	# https://github.com/vecio/.linux/blob/master/gitconfig
 
-	a = "!(git status --porcelain --ignore-submodules | grep -E '^[ MARC][MD]' >/dev/null \
-			&& (echo 'Staging changes\n' ; git add .) \
-			|| echo 'No changes to stage\n') ; \
-         git status"
+	a = "!(git status --porcelain --ignore-submodules | \
+				grep -E '^[ MARC][MD]' >/dev/null && \
+			(echo 'Staging changes\n' ; git add .) || \
+				echo 'No changes to stage\n') ; \
+		 git status"
 
-	au = "!(git status --porcelain --ignore-submodules | grep -E '^\\?\\?' >/dev/null \
-			&& (echo 'Staging untracked files\n' ; git add -u) \
-			|| echo 'No untracked files to stage\n') ; \
-         git status"
+	au = "!(git status --porcelain --ignore-submodules | \
+			grep -E '^\\?\\?' >/dev/null && \
+			(echo 'Staging untracked files\n' ; git add -u) || \
+				echo 'No untracked files to stage\n') ; \
+		 git status"
 
-	aa = !git add . && git add -u && git status
+	aa = !git add . && \
+		 git add -u && \
+		 git status
 
-	amend = !git log -n 1 --pretty=tformat:%s%n%n%b | git commit -F - --amend
+	amend = !git log -n 1 --pretty=tformat:%s%n%n%b | \
+			git commit -F - --amend
 
 	b = branch
-	
+
+	# bds = branch description show
+	# From https://gist.github.com/jeenuv/3145db36eb2a27ba022a
+	bds = "!f() { \
+			head=$(git symbolic-ref --short HEAD); \
+			git for-each-ref refs/heads --format='%(refname:short)' | \
+				while read br; do \
+					desc=$(git config --get branch.$br.description | head -n1); \
+					if [ \"$head\" = \"$br\" ]; then \
+						printf '* \\033[0;32m%-30s\\033[0m %s\\n' \"$br\" \"$desc\"; \
+					else \
+						printf '  %-30s %s\\n' \"$br\" \"$desc\"; \
+					fi; \
+				done; \
+		}; f"
+
+	# bde = branch description edit
+	bde = branch --edit-description
+
 	c = commit
 	ca = commit --amend
 	cm = commit -m
@@ -42,17 +70,37 @@
 	grep = grep -Ii
 
 	# Find from root of repo
-	grt = "!f() { A=$(pwd) && TOPLEVEL=$(git rev-parse --show-toplevel) && cd $TOPLEVEL && git grep --full-name -In $1 | xargs -I{} echo $TOPLEVEL/{} && cd $A; }; f"
+	grt = "!f() { \
+				A=$(pwd) && \
+				TOPLEVEL=$(git rev-parse --show-toplevel) && \
+				cd $TOPLEVEL && \
+				git grep --full-name -In $1 | \
+					xargs -I{} echo $TOPLEVEL/{} && \
+				cd $A; \
+			}; f"
 
-	ignore = !([ ! -e .gitignore ] && touch .gitignore) | echo $1 >>.gitignore
+	ignore = !([ ! -e .gitignore ] && touch .gitignore) | \
+			 echo $1 >>.gitignore
 
-	l = log --graph --pretty=format:'%C(yellow)%h %C(green)%cr%C(red)%d%C(reset) %s %C(bold blue)[%an]' --abbrev-commit --date=relative
-	ll = log --graph --stat --abbrev-commit --decorate=full
-	lp = log --graph --patch --abbrev-commit --decorate=full
+	l = log --graph \
+			--pretty=format:'%C(yellow)%h %C(green)%cr%C(red)%d%C(reset) %s %C(bold blue)[%an]' \
+			--abbrev-commit \
+			--date=relative
+
+	ll = log --graph \
+			 --stat \
+			 --abbrev-commit \
+			 --decorate=full
+
+	lp = log --graph \
+			 --patch \
+			 --abbrev-commit \
+			 --decorate=full
 
 	rc = rebase --continue
 
-	remove = !git ls-files -z --deleted | xargs -0 git rm
+	remove = !git ls-files -z --deleted | \
+			 xargs -0 git rm
 
 	rv = remote --verbose
 
