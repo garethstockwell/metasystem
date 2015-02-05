@@ -1,4 +1,5 @@
 [alias]
+    # Print out all aliases, reformatted to condense whitespace
 	alias = !git config --list | \
 			grep 'alias\\.' | \
 			sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\: \\2/' | \
@@ -11,28 +12,28 @@
 	# http://stackoverflow.com/questions/1862423/git-how-to-tell-which-commit-a-tag-points-to
 	# https://github.com/vecio/.linux/blob/master/gitconfig
 
+	# Stage all uncommitted changes, then print out a status message
 	a = "!(git status --porcelain --ignore-submodules | \
 				grep -E '^[ MARC][MD]' >/dev/null && \
 			(echo 'Staging changes\n' ; git add .) || \
 				echo 'No changes to stage\n') ; \
 		 git status"
 
+	# Stage all untracked files, then print out a status message
 	au = "!(git status --porcelain --ignore-submodules | \
 			grep -E '^\\?\\?' >/dev/null && \
 			(echo 'Staging untracked files\n' ; git add -u) || \
 				echo 'No untracked files to stage\n') ; \
 		 git status"
 
+	# Stage all uncommitted changes and untracked files, then print out a status message
 	aa = !git add . && \
 		 git add -u && \
 		 git status
 
-	amend = !git log -n 1 --pretty=tformat:%s%n%n%b | \
-			git commit -F - --amend
-
 	b = branch
 
-	# bds = branch description show
+	# Show branch descriptions (bds = branch description show)
 	# From https://gist.github.com/jeenuv/3145db36eb2a27ba022a
 	bds = "!f() { \
 			head=$(git symbolic-ref --short HEAD); \
@@ -47,7 +48,7 @@
 				done; \
 		}; f"
 
-	# bde = branch description edit
+	# Edit branch descriptions (bde = branch description edit)
 	bde = branch --edit-description
 
 	c = commit
@@ -61,11 +62,13 @@
 	d = diff
 	ds = diff --staged
 
+	# Find files whose name matches a pattern
 	f = !git ls-files | grep -i
 	find = !git ls-files | grep -i
 
 	fp = format-patch
 
+	# Search for strings in file contents
 	gr = grep -Ii
 	grep = grep -Ii
 
@@ -79,6 +82,7 @@
 				cd $A; \
 			}; f"
 
+	# Append a string to .gitignore
 	ignore = !([ ! -e .gitignore ] && touch .gitignore) | \
 			 echo $1 >>.gitignore
 
