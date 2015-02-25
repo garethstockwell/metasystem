@@ -159,17 +159,22 @@ EOF
 
 function handle_arg()
 {
-	local token=$1
+	local token="$1"
 	local arg_used=
 	local arg=
 	for arg in $SCRIPT_ARGUMENTS; do
 		if [[ -z `eval "echo \\$arg_$arg"` ]]; then
-			eval "arg_$arg=$token"
+			eval "arg_$arg=\"$token\""
 			arg_used=1
 			break
 		fi
 	done
-	[[ -z "$arg_used" ]] && warn "Additional argument '$token' ignored"
+	if [[ -z "$arg_used" ]]; then
+		extra_args="$extra_args \"$token\""
+		if [[ -z $SCRIPT_VAR_ARGS ]]; then
+			warn "Additional argument '$token' ignored"
+		fi
+	fi
 }
 
 function check_sufficient_args()
@@ -205,5 +210,22 @@ EOF
 		awk "BEGIN{for(c=0;c<$num_dots;c++) printf \".\"}"
 		echo " $value"
 	done
+}
+
+function script_preamble()
+{
+	if [[ $opt_help == yes ]]; then
+		print_usage
+		exit 0
+	fi
+
+	if [[ $opt_version == yes ]]; then
+		print_version
+		exit 0
+	fi
+
+	if [[ $opt_verbosity == verbose ]]; then
+		print_summary
+	fi
 }
 
