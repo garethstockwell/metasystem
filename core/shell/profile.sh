@@ -52,7 +52,9 @@ function get_x_display()
 	ps ax | grep $x | grep -v grep | awk '{ print $6 }'
 }
 
-export DISPLAY=$(get_x_display)
+if [[ -z $DISPLAY ]]; then
+	export DISPLAY=$(get_x_display)
+fi
 
 export EDITOR=vim
 
