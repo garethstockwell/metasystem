@@ -122,6 +122,16 @@ function git_grep()
 	grep "$@" $(find $path ! -path "*/.git/*" -type f)
 }
 
+function git_edit()
+{
+    git_in_repo || return 1
+	local files=
+	for a in "$@"; do
+		files="$files $(git grep $a | sed -e 's/:.*//g')"
+	done
+	vi $(echo $files | sort | uniq)
+}
+
 function metasystem_grep()
 {
 	git_grep $METASYSTEM_ROOT "$@"
