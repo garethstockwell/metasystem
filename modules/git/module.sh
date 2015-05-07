@@ -178,8 +178,6 @@ alias diff=git_diff
 export METASYSTEM_GIT_ROOT=$( builtin cd "$( dirname "${BASH_SOURCE:-$0}" )" && pwd )
 export METASYSTEM_GIT_BIN=$METASYSTEM_GIT_ROOT/bin
 
-export PAGER='less -R'
-
 
 #------------------------------------------------------------------------------
 # Aliases

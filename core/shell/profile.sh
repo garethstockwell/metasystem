@@ -58,6 +58,8 @@ fi
 
 export EDITOR=vim
 
+export PAGER='less'
+
 # cgrep
 # 1;32 = bright green
 # See	http://www.termsys.demon.co.uk/vtansi.htm#colors
