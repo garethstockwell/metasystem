@@ -32,15 +32,16 @@ function firefox_remove_xmarks()
 function edit_source()
 {
 	local args="$@"
-	local SUFFIXES='h hpp hxx cpp py s'
+	local SUFFIXES=$METASYSTEM_EDIT_SOURCE_SUFFIXES
+	[[ -n $SUFFIXES ]] || SUFFIXES='h hpp hxx cpp py s'
 	[[ -n $args ]] || args=$PWD
 	local files=
 	for arg in $args; do
 		if [[ -d $arg ]]; then
 			for suffix in $SUFFIXES; do
-				files="$files $(find $arg -iname *.$suffix)"
+				files="$files $(find $arg -iname \*.$suffix)"
 			done
-			files="$files $(find $arg -iname *.c | grep -v mod.c)"
+			files="$files $(find $arg -iname \*.c | grep -v mod.c)"
 		fi
 
 		if [[ -f $arg ]]; then
