@@ -541,6 +541,8 @@ nnoremap <Leader>l :ls<CR>
 " Forward / back
 nnoremap <Leader>[ :bp<CR>
 nnoremap <Leader>] :bn<CR>
+nmap <C-[> :bn<CR>
+nmap <C-]> :bn<CR>
 
 " Switch to last used buffer
 nnoremap <Leader>. :e#<CR>
