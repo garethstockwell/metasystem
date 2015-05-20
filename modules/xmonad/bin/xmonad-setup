@@ -15,10 +15,12 @@ xrdb -merge ~/.Xresources
 
 # TODO: screen configuration
 
-# Background
 # Use S_base03 from solarized
-#xsetroot -solid "#002b36"
-hsetroot -solid "#002b36"
+XMONAD_BG_COLOR=#002b36
+
+# Background
+#xsetroot -solid $XMONAD_BG_COLOR
+hsetroot -solid $XMONAD_BG_COLOR
 
 #------------------------------------------------------------------------------
 # Launch programs
