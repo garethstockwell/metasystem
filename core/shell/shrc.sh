@@ -685,6 +685,11 @@ function _metasystem_dotfile_update()
 	for entry in $_METASYSTEM_DOTFILES; do
 		local key=$(echo $entry | cut -d: -f1)
 
+		local is_local=yes
+		[[ $key == local.* ]] || is_local=
+
+		key=${key/local\./}
+
 		if [[ -z $search_key || $key == $search_key ]]; then
 
 			local src=$(echo $entry | cut -d: -f2)
@@ -707,7 +712,11 @@ function _metasystem_dotfile_update()
 			fi
 
 			if [[ -z $src_path ]]; then
-				src_path=$METASYSTEM_ROOT/modules/$key/dotfiles/$src
+				if [[ -n $is_local ]]; then
+					src_path=$METASYSTEM_LOCAL_ROOT/modules/$key/dotfiles/$src
+				else
+					src_path=$METASYSTEM_ROOT/modules/$key/dotfiles/$src
+				fi
 			fi
 
 			echo "$key: $src -> $dst [$start]"
