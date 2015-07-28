@@ -78,7 +78,9 @@ env variable fallthrough = getEnv variable `E.catch` econst fallthrough
 myModMask                      = mod4Mask
 
 myTerminal                     = "urxvt"
-myBrowser                      = "firefox"
+
+--myBrowser                      = "firefox"
+myBrowser                      = "google-chrome"
 
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse            = True
