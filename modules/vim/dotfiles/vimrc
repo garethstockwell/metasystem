@@ -58,7 +58,8 @@ set cindent
 set cinoptions={.5s,+.5s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
 
 " now real wrap during insert (enable/override this when using as mail-editor)
-set tw=0
+"set textwidth=0
+set textwidth=80
 
 " use full featured format-options. see "help fo-table for help
 if v:version >= 600
@@ -77,8 +78,6 @@ if has("autocmd")
     autocmd FileType text setlocal textwidth=78
     autocmd FileType text set nocindent
 endif
-
-"set textwidth=80
 
 " ----------------------------------------------------------------------------
 " Searching, substituting
