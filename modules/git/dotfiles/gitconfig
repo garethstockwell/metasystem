@@ -112,7 +112,8 @@
 	st = status
 
     # https://joernhees.de/blog/2012/04/24/git-ad-hoc-sharing/
-    serve = !git daemon --reuseaddr --base-path=. --export-all --verbose
+    serve = !git daemon --reuseaddr --base-path=. --export-all --verbose --informative-errors
+    hub = !git daemon --reuseaddr --base-path=. --export-all --verbose --informative-errors --enable=receive-pack
 
 	# See which commit a tag points to
 	tagcommit = !sh -c 'git rev-list $0 | head -n 1'
