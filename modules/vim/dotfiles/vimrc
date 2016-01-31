@@ -57,10 +57,6 @@ set cindent
 " and here some nice options for cindenting
 set cinoptions={.5s,+.5s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s
 
-" now real wrap during insert (enable/override this when using as mail-editor)
-"set textwidth=0
-set textwidth=80
-
 " use full featured format-options. see "help fo-table for help
 if v:version >= 600
     set formatoptions=tcrqn2
@@ -72,12 +68,6 @@ endif
 " define what are comments
 set com& " reset to default
 set com^=sr:*\ -,mb:*\ \ ,el:*/ com^=sr://\ -,mb://\ \ ,el:///
-
-" auto tw=78 when textmode
-if has("autocmd")
-    autocmd FileType text setlocal textwidth=78
-    autocmd FileType text set nocindent
-endif
 
 " ----------------------------------------------------------------------------
 " Searching, substituting
@@ -332,12 +322,32 @@ set nosft
 " Line length
 " ----------------------------------------------------------------------------
 
-set colorcolumn=80
+function! UpdateTextWidth()
+    let width = 80
 
-" http://stackoverflow.com/a/235970/152436
-" http://stackoverflow.com/a/3305790/152436
-highlight OverLength ctermbg=red ctermfg=white guibg=red
-match OverLength /\%>80v.\+/
+    if &ft =~ 'markdown'
+        let width = 9999
+    endif
+
+    exec 'set textwidth=' . width
+    exec 'set colorcolumn=' . width
+
+    " http://stackoverflow.com/a/235970/152436
+    " http://stackoverflow.com/a/3305790/152436
+    highlight OverLength ctermbg=red ctermfg=white guibg=red
+    exec 'match OverLength /\%>' . width . 'v.\+/'
+
+    if &ft =~ 'markdown\|text'
+        set nocindent
+    endif
+endfunction
+
+call UpdateTextWidth()
+
+if has("autocmd")
+    autocmd BufEnter * call UpdateTextWidth()
+endif
+
 
 " ----------------------------------------------------------------------------
 " Bracket expansion
