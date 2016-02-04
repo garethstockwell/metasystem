@@ -322,11 +322,17 @@ set nosft
 " Line length
 " ----------------------------------------------------------------------------
 
+" http://vi.stackexchange.com/questions/2846/how-to-set-up-vim-to-work-with-one-sentence-per-line
+function! FormatSentencePerLine(start, end)
+    silent execute a:start.','.a:end.'s/[.!?]\zs /\r/g'
+endfunction
+
 function! UpdateTextWidth()
     let width = 80
 
     if &ft =~ 'markdown'
         let width = 9999
+        set formatexpr=FormatSentencePerLine(v:lnum,v:lnum+v:count-1)
     endif
 
     exec 'set textwidth=' . width
