@@ -20,6 +20,4 @@ export METASYSTEM_DOCKER_BIN=$METASYSTEM_DOCKER_ROOT/bin
 #------------------------------------------------------------------------------
 
 PATH=$(path_append $METASYSTEM_DOCKER_BIN $PATH)
-echo "*** PATH:"
-path
 
