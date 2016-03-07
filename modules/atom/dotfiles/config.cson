@@ -1,0 +1,14 @@
+"*":
+  core:
+    autoHideMenuBar: true
+    disabledPackages: [
+      "metrics"
+    ]
+  editor:
+    invisibles: {}
+    tabLength: 4
+  "exception-reporting":
+    userId: "dd4fdbae-35a6-adc4-50fa-573a6d33f5e9"
+  "tree-view": {}
+  welcome:
+    showOnStartup: false
