@@ -126,7 +126,7 @@ def service(name):
 #------------------------------------------------------------------------------
 
 import platform
-if platform.system() == 'Linux':
+if platform.system() in [ 'Linux', 'Darwin' ]:
 
     import fcntl
 
