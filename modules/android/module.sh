@@ -393,9 +393,14 @@ else
 	export ANDROID_STUDIO_DIR=
 fi
 
+if [[ -z $ANDROID_SDK_DIR ]]; then
+	export ANDROID_SDK_DIR=~/work/local/sdk/android/sdk/current
+fi
+
 if [[ -d $ANDROID_SDK_DIR ]]; then
 	PATH=$(path_prepend $ANDROID_SDK_DIR/platform-tools $PATH)
 	PATH=$(path_prepend $ANDROID_SDK_DIR/tools $PATH)
+	export ANDROID_HOME=$ANDROID_SDK_DIR
 fi
 
 if [[ -d $ANDROID_NDK_DIR ]]; then
