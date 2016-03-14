@@ -1,14 +1,23 @@
 "*":
+  "atom-ctags": {}
   core:
     autoHideMenuBar: true
     disabledPackages: [
       "metrics"
+    ]
+    themes: [
+      "one-dark-ui"
+      "solarized-dark-syntax"
     ]
   editor:
     invisibles: {}
     tabLength: 4
   "exception-reporting":
     userId: "dd4fdbae-35a6-adc4-50fa-573a6d33f5e9"
-  "tree-view": {}
+  "tree-view":
+    hideIgnoredNames: true
+    hideVcsIgnoredFiles: true
   welcome:
     showOnStartup: false
+  whitespace:
+    ensureSingleTrailingNewline: false
