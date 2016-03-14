@@ -9,7 +9,7 @@
 # 5% volume change = 3276
 FULL=65536
 VALUE=3276
-SINK=0
+SINK=1
 
 
 #------------------------------------------------------------------------------
@@ -32,8 +32,9 @@ function update_pct()
 
 function get_state()
 {
-    curr_vol_hex=$(pacmd dump |grep set-sink-volume | sed 's/.* //g')
-    curr_mute=$(pacmd dump | grep set-sink-mute | sed 's/.* //g')
+    local line=$(expr $SINK + 1)
+    curr_vol_hex=$(pacmd dump | grep set-sink-volume | head -n$line | tail -n1 | sed 's/.* //g')
+    curr_mute=$(pacmd dump | grep set-sink-mute | head -n$line | tail -n1 | sed 's/.* //g')
     curr_vol_dec=$(printf '%d\n' $curr_vol_hex)
     update_pct
 }
