@@ -12,8 +12,8 @@ command_exists irssi || return 1
 #------------------------------------------------------------------------------
 
 IRSSI_TMUX_SESSION=irssi
-IRSSI_TMUX_WINDOW=${IRSSI_TMUX}:1
-IRSSI_TMUX_WINDOW=${IRSSI_TMUX}:1
+IRSSI_TMUX_WINDOW=${IRSSI_TMUX_SESSION}:1
+IRSSI_TMUX_WINDOW=${IRSSI_TMUX_SESSION}:1
 
 function irssi_nickpane() {
     local session=$1
