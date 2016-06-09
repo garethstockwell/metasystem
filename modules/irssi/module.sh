@@ -48,6 +48,7 @@ function irssi_install() {
     curl -O https://scripts.irssi.org/scripts/adv_windowlist.pl
     curl -O https://scripts.irssi.org/scripts/hilightwin.pl
     curl -O https://scripts.irssi.org/scripts/nicklist.pl
+    curl -O https://raw.githubusercontent.com/stickster/irssi-libnotify/old-libnotify/notify.pl
     curl -O https://scripts.irssi.org/scripts/usercount.pl
     popd
 
