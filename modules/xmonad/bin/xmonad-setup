@@ -52,11 +52,11 @@ launch gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh
 
 # Apps
 launch rxvt -e tmux attach -t default
-launch firefox
-launch pidgin
-launch skype
-launch remmina
-launch thunderbird
+launch google-chrome
+#launch pidgin
+#launch skype
+#launch remmina
+#launch thunderbird
 
 # Desktop monitor (mirrored across two screens)
 launch conky -c ~/.conky/desktop -a bottom_left -x 20 -y 20

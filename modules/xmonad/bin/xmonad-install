@@ -11,7 +11,7 @@ PACKAGES='
 conky
 dmenu
 dzen2
-ttf-inconsolata
+fonts-inconsolata
 trayer
 xcompmgr
 xmonad
@@ -22,7 +22,9 @@ echo "Installing packages"
 
 # Add repo which contains xft-enabled versions of dmenu, dzen2
 # See https://launchpad.net/~chilicuil/+archive/sucklesstools
-sudo apt-add-repository ppa:chilicuil/sucklesstools
+SUCKLESS_REPO=chilicuil/sucklesstools
+sudo apt-add-repository ppa:${SUCKLESS_REPO}
+sudo apt-get update
 
 sudo apt-get install ${PACKAGES}
 
@@ -36,4 +38,8 @@ if [[ -e ${desktop_file} ]]; then
 	sudo mv ${desktop_file} ${desktop_file}.orig
 fi
 sudo cp -v ${XMONAD_DIR}/config/xmonad.desktop ${desktop_file}
+
+sudo apt-add-repository --remove ${SUCKLESS_REPO}
+sudo apt-get update
+sudo apt-cache purge
 
