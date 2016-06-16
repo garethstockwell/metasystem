@@ -51,7 +51,7 @@ launch xcompmgr
 launch gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh
 
 # Apps
-launch rxvt -e tmux attach -t default
+launch urxvt -e tmux attach -t default
 launch google-chrome
 #launch pidgin
 #launch skype

@@ -18,12 +18,14 @@ xmonad
 xscreensaver
 '
 
+SUCKLESS_REPO=chilicuil/sucklesstools
+
 echo "Installing packages"
 
 # Add repo which contains xft-enabled versions of dmenu, dzen2
 # See https://launchpad.net/~chilicuil/+archive/sucklesstools
-SUCKLESS_REPO=chilicuil/sucklesstools
-sudo apt-add-repository ppa:${SUCKLESS_REPO}
+#sudo apt-add-repository ppa:${SUCKLESS_REPO}
+
 sudo apt-get update
 
 sudo apt-get install ${PACKAGES}
@@ -31,15 +33,21 @@ sudo apt-get install ${PACKAGES}
 echo "Creating xsession configuration"
 desktop_file=/usr/share/xsessions/xmonad.desktop
 if [[ -e ${desktop_file} ]]; then
-	if [[ -e ${desktop_file}.orig ]]; then
-		echo "Error: ${desktop_file}.orig" already exists
-		exit 1
-	fi
-	sudo mv ${desktop_file} ${desktop_file}.orig
+    if [[ -e ${desktop_file}.orig ]]; then
+        echo "Warning: ${desktop_file}.orig already exists - not overwriting"
+    else
+        sudo mv ${desktop_file} ${desktop_file}.orig
+    fi
 fi
-sudo cp -v ${XMONAD_DIR}/config/xmonad.desktop ${desktop_file}
 
-sudo apt-add-repository --remove ${SUCKLESS_REPO}
+tmp=$(mktemp -d)
+cp ${XMONAD_DIR}/config/xmonad.desktop ${tmp}
+sudo cp -v ${tmp}/xmonad.desktop ${desktop_file}
+sudo chmod a+r ${desktop_file}
+rm -rf $tmp
+
+#sudo apt-add-repository --remove ${SUCKLESS_REPO}
 sudo apt-get update
-sudo apt-cache purge
+
+echo 'xmonad installation complete'
 
