@@ -10,10 +10,15 @@
       "solarized-dark-syntax"
     ]
   editor:
+    fontSize: 12
     invisibles: {}
+    showInvisibles: true
     tabLength: 4
+    tabType: "soft"
   "exception-reporting":
     userId: "dd4fdbae-35a6-adc4-50fa-573a6d33f5e9"
+  "markdown-preview": {}
+  minimap: {}
   "tree-view":
     hideIgnoredNames: true
     hideVcsIgnoredFiles: true
