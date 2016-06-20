@@ -103,8 +103,6 @@ unset os_rc
 # PATH
 #------------------------------------------------------------------------------
 
-PATH=$HOME/bin:$PATH
-
 # Editor
 METASYSTEM_EDITOR=vi
 
