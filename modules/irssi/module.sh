@@ -45,11 +45,11 @@ function irssi_install() {
     mkdir -p ~/.irssi/scripts/autorun
 
     pushd ~/.irssi/scripts
-    curl -O https://scripts.irssi.org/scripts/adv_windowlist.pl
-    curl -O https://scripts.irssi.org/scripts/hilightwin.pl
-    curl -O https://scripts.irssi.org/scripts/nicklist.pl
-    curl -O https://raw.githubusercontent.com/stickster/irssi-libnotify/old-libnotify/notify.pl
-    curl -O https://scripts.irssi.org/scripts/usercount.pl
+    curl --insecure -O https://scripts.irssi.org/scripts/adv_windowlist.pl
+    curl --insecure -O https://scripts.irssi.org/scripts/hilightwin.pl
+    curl --insecure -O https://scripts.irssi.org/scripts/nicklist.pl
+    curl --insecure -O https://raw.githubusercontent.com/stickster/irssi-libnotify/old-libnotify/notify.pl
+    curl --insecure -O https://scripts.irssi.org/scripts/usercount.pl
     popd
 
     pushd ~/.irssi/scripts/autorun
