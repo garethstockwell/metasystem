@@ -11,6 +11,7 @@ PACKAGES='
 conky
 dmenu
 dzen2
+hsetroot
 fonts-inconsolata
 trayer
 xcompmgr
