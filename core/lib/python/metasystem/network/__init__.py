@@ -209,7 +209,10 @@ else:
 
     def ip_addr(ifname=DEFAULT_IF_NAME):
 
-        return socket.gethostbyname(socket.gethostname())
+	try:
+            return socket.gethostbyname(socket.gethostname())
+	except:
+	    pass 
 
 
     def bcast_addr(ifname=DEFAULT_IF_NAME):

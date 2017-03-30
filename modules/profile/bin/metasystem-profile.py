@@ -288,16 +288,21 @@ def detect_location(config, args):
     ini = config['parser']
     location = None
     if 'location:ip' in ini.sections():
-        ip = socket.gethostbyname(socket.gethostname())
+        ip = None
+        try:
+            ip = socket.gethostbyname(socket.gethostname())
+        except:
+            pass
         if os.environ.get('METASYSTEM_OS') == 'linux' and ip.startswith('127.0'):
             x = get_ip_linux()
             if x:
                 ip = x
-        print_message('Checking IP {0:s}'.format(ip), args)
-        for mask in ini.options('location:ip'):
-            if not location and re.match(mask, ip):
-                location = ini.get('location:ip', mask)
-                print_message('    IP matched {0:s}: location {1:s}'.format(mask, location), args)
+        if ip is not None:
+            print_message('Checking IP {0:s}'.format(ip), args)
+            for mask in ini.options('location:ip'):
+                if not location and re.match(mask, ip):
+                    location = ini.get('location:ip', mask)
+                    print_message('    IP matched {0:s}: location {1:s}'.format(mask, location), args)
     if not location and 'location:fqdn' in ini.sections():
         fqdn = socket.getfqdn()
         print_message('Checking FQDN {0:s}'.format(fqdn), args)

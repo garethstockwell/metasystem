@@ -241,8 +241,10 @@ def do_write_config_file(args, sourceFileName, type, id, overlay=False):
 def write_config_file(args, type, id):
     template = os.path.join(os.environ.get('METASYSTEM_ROOT'), 'modules', type.name, 'dotfiles', type.config_file)
     do_write_config_file(args, template, type, id)
-    template = os.path.join(os.environ.get('METASYSTEM_LOCAL_DOTFILES'), type.name, 'dotfiles', type.config_file)
-    do_write_config_file(args, template, type, id, overlay=True)
+    path = os.environ.get('METASYSTEM_LOCAL_DOTFILES', None)
+    if path is not None:
+        template = os.path.join(path, type.name, 'dotfiles', type.config_file)
+        do_write_config_file(args, template, type, id, overlay=True)
 
 def write_shell_script(args, config):
     if not args.quiet:
