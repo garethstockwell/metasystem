@@ -25,7 +25,7 @@ function number_of_processors()
 #     -parallel: use all available CPUs; prioritise make jobs on Linux scheduler
 #     -log: tee output to timestamped file in $MAKE_LOG_DIR, if that is defined
 #     -time: measure time
-function make()
+function super_make()
 {
 	local cmd=$(which make)
 	local args=
