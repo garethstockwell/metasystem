@@ -35,7 +35,6 @@ function metasystem_load_lib()
 #------------------------------------------------------------------------------
 
 # build.sh
-metasystem_declare_stub build.sh make
 metasystem_declare_stub build.sh number_of_processors
 
 # func.sh
