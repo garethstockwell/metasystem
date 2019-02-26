@@ -11,6 +11,7 @@
 	# http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/`
 	# http://stackoverflow.com/questions/1862423/git-how-to-tell-which-commit-a-tag-points-to
 	# https://github.com/vecio/.linux/blob/master/gitconfig
+	# https://haacked.com/archive/2014/07/28/github-flow-aliases/
 
 	# Stage all uncommitted changes, then print out a status message
 	a = "!(git status --porcelain --ignore-submodules | \
@@ -52,7 +53,7 @@
 	bde = branch --edit-description
 
 	c = commit
-	ca = commit --amend
+	ca = commit -a --amend
 	cm = commit -m
 
 	co = checkout
@@ -100,12 +101,15 @@
 			 --abbrev-commit \
 			 --decorate=full
 
+    ri = rebase --interactive
 	rc = rebase --continue
 
 	remove = !git ls-files -z --deleted | \
 			 xargs -0 git rm
 
 	rv = remote --verbose
+
+    save = !git add -A && git commit -m 'SAVEPOINT'
 
 	s = status
 	st = status
@@ -123,6 +127,14 @@
 
 	# See which commit a tag points to
 	tagcommit = !sh -c 'git rev-list $0 | head -n 1'
+
+    undo = reset HEAD~1 --mixed
+
+	up = !git pull --rebase --prune $@ && git submodule update --init --recursive
+
+    wip = commit -am "WIP"
+
+    wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
 
 [branch]
 	autosetuprebase = always
