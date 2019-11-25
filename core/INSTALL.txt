@@ -188,9 +188,6 @@ Install firefox addons
 	Xmarks
 	IE Tab Plus
 	Tree-style tab
-	Ubiquity
-		Note: for new versions of Firefox, use community version (https://bitbucket.org/satyr/ubiquity/downloads/tip.xpi)
-Install ubiquity commands from $METASYSTEM_CORE_SHELL/lib/firefox/ubiquity
 
 
 -------------------------------------------------------------------------------

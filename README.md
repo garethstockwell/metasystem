@@ -28,7 +28,6 @@ metasystem includes the following features:
   * Various scripts for Symbian development
   * Various scripts for Qt development
 * Perl and Python libraries
-* Firefox Ubiquity scripts
 
 More information on some of these features is provided below.
 
