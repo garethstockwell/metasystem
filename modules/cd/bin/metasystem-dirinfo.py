@@ -115,7 +115,6 @@ def process_file(args):
     fh.close()
     handlers = {'label':    handle_label
                ,'id':       handle_id
-               ,'project':  handle_project
                ,'shell':    handle_shell
                ,'tool':     handle_tool
                }
@@ -140,14 +139,7 @@ def preamble(context):
     pass
 
 def postamble(context):
-    postamble_projects(context)
-
-def postamble_projects(context):
-    context['output'].write("\n# projects postamble\n")
-    for project in (os.environ.get('METASYSTEM_PROJECTS') or '').split():
-        if not project in context['projects']:
-            context['output'].write("_metasystem_set_projectdirs {0:s} '' ''\n".format(project))
-    context['output'].write("_metasystem_export METASYSTEM_PROJECTS='{0:s}'\n".format(' '.join(context['projects'])))
+    pass
 
 def check_args_count(command, count):
     assert len(command.args) >= count, 'Insufficient arguments on line {0:d}'.format(command.line_number)
@@ -178,35 +170,6 @@ def handle_id(command, context):
     context['output'].write("_metasystem_set_id {0:s} {1:s}\n".format(key, value))
     context['ids'].append(key)
 
-def handle_project(command, context):
-    check_args_count(command, 1)
-    check_options(command, ['dir', 'sourcedir', 'builddir', 'chroot'])
-    [name] = command.args
-    assert not name in context['projects'], 'Repeated project on line {0:d}'.format(command.line_number)
-    projectdir = ''
-    if 'dir' in command.options.keys():
-        projectdir = command.options['dir']
-    sourcedir = projectdir
-    if 'sourcedir' in command.options.keys():
-        sourcedir = command.options['sourcedir']
-    builddir = projectdir
-    if 'builddir' in command.options.keys():
-        builddir = command.options['builddir']
-    assert builddir != '', 'Build directory not specified on line {0:d}'.format(command.line_number)
-    if not builddir.startswith('/'):
-        builddir = os.path.join(context['dir'], builddir)
-    if sourcedir != '' and not sourcedir.startswith('/'):
-        sourcedir = os.path.join(context['dir'], sourcedir)
-    if os.environ.get('METASYSTEM_PLATFORM') == 'mingw':
-        sourcedir = abspath_mingw(sourcedir)
-        builddir = abspath_mingw(builddir)
-    context['output'].write("\n# [{0:d}] {1:s}\n".format(command.line_number, command.line))
-    context['output'].write("_metasystem_set_projectdirs {0:s} $(metasystem_unixpath \"{1:s}\") $(metasystem_unixpath \"{2:s}\")\n".format(name, builddir, sourcedir))
-    if 'chroot' in command.options.keys():
-        chroot = command.options['chroot']
-        context['output'].write("_metasystem_set_project_chroot {0:s} {1:s}".format(name, chroot))
-    context['projects'].append(name)
-
 def handle_shell(command, context):
     deprecate = os.environ.get('METASYSTEM_DIRINFO_SHELL_DEPRECATE')
     ignore = os.environ.get('METASYSTEM_DIRINFO_SHELL_IGNORE')
@@ -229,17 +192,8 @@ def handle_tool(command, context):
     context['tools'].append(key)
 
 def clear(args):
-    project_list = os.environ.get('METASYSTEM_PROJECTS')
-    projects = []
-    if project_list:
-        projects = project_list.split()
     output = open(os.path.join(os.environ.get('HOME'), '.metasystem-dirinfo.sh'), 'w')
     output.write('# Clearing metasystem dirinfo\n')
-    for project in projects:
-        project = project.replace('-', '_')
-        output.write('_metasystem_unset METASYSTEM_PROJECT_{0:s}_BUILD_DIR\n'.format(project.upper()))
-        output.write('_metasystem_unset METASYSTEM_PROJECT_{0:s}_SOURCE_DIR\n'.format(project.upper()))
-    output.write('_metasystem_export METASYSTEM_PROJECTS=\n')
 
 
 #------------------------------------------------------------------------------
@@ -294,4 +248,3 @@ if args.file:
     process_file(args)
 else:
     clear(args)
-

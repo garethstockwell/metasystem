@@ -67,39 +67,6 @@ Files
 * templates/smartcd
 
 
-Project shortcuts
------------------
-
-The problem
-
-When working on multiple different projects, the paths to each one can get quite long, for example:
-
-	cd ~/work/projects/android/devices/my_custom_device
-	cd ~/work/projects/android/apps/my_app
-	cd ~/work/projects/qt/devices/my_embedded_linux_target
-
-The solution
-
-To avoid having to type in the full path, we define a 'cd shortcut', whereby each project is referenced via a label, and the user can type 'pcd <shortcut>', e.g.
-
-	pcd android-device
-	pcd android-app
-	pcd qt-embedded-linux
-
-Optionally, each project can have a source path and a build path; these can be accessed via e.g.
-
-	pcds qt-embedded-linux
-	pcdb qt-embedded-linux
-
-Project paths are specified in the .metasystem-dirinfo files, via entries such as
-
-	project android-device dir=work/projects/android/devices/my_custom_device
-
-Files
-
-* core/templates/metasystem-dirinfo
-
-
 Shell environment management
 ----------------------------
 
