@@ -10,4 +10,3 @@ elif [[ -n $ZSH_VERSION ]]; then
 else
 	echo "Error: shell is not bash or zsh" >&2
 fi
-

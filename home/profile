@@ -9,3 +9,6 @@ export METASYSTEM_ROOT=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/.. && pwd )
 
 source $METASYSTEM_ROOT/core/shell/profile.sh
 
+if [[ -n $PS1 ]]; then
+	source ${HOME}/.bashrc
+fi

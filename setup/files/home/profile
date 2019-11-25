@@ -1,12 +1,3 @@
 # .profile
 
-if [ -z $BASH_VERSION ]; then
-	return
-fi
-
 . ${METASYSTEM_ROOT}/home/profile
-
-if [[ -n $PS1 ]]; then
-	. ${HOME}/.bashrc
-fi
-

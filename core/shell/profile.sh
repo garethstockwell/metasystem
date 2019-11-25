@@ -34,27 +34,8 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Platform
-#------------------------------------------------------------------------------
-
-source $METASYSTEM_CORE_LIB_BASH/platform.sh
-query_platform
-
-
-#------------------------------------------------------------------------------
 # Misc stuff
 #------------------------------------------------------------------------------
-
-function get_x_display()
-{
-	local x=$(which X)
-	test -n "$x" || return 1
-	ps ax | grep $x | grep -v grep | awk '{ print $6 }'
-}
-
-if [[ -z $DISPLAY ]]; then
-	export DISPLAY=$(get_x_display)
-fi
 
 export EDITOR=vim
 
@@ -65,4 +46,3 @@ export PAGER='less'
 # See	http://www.termsys.demon.co.uk/vtansi.htm#colors
 #		http://www.debian-administration.org/articles/460
 export GREP_COLOR='1;32'
-
