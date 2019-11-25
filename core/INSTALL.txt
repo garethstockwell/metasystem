@@ -178,11 +178,6 @@ Mount ntfs-data
 
 Install software updates
 
-To set up for Android development:
-sudo -E $METASYSTEM_ROOT/core/setup/setup-linux.sh android -y
-(Note: -E is required to propagate METASYSTEM_* environment variables to the
-subshell in which the script runs)
-
 
 -------------------------------------------------------------------------------
 Firefox setup
@@ -261,4 +256,3 @@ work
 		unison
 
 On Linux, ~/work/sync/unison -> /media/ntfs-data/work/sync/unison
-

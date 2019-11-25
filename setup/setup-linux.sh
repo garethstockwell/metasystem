@@ -18,8 +18,8 @@ SCRIPT_VERSION=0.1
 # Arguments
 ARGUMENTS='recipe'
 
-RECIPES='base android android-app android-plat java'
-ALL_RECIPES='base android'
+RECIPES='base java'
+ALL_RECIPES='base'
 
 WORKGROUP=DIR
 
@@ -592,4 +592,3 @@ then
 	print_banner "Restart required"
 	echo "A system restart is required in order to apply the changes"
 fi
-

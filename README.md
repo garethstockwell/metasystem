@@ -25,7 +25,6 @@ metasystem includes the following features:
   * Tools for switching between different identities (for SCM tools)
   * A synchronisation wrapper script
 * Special-purpose scripts
-  * Various scripts for Android development
   * Various scripts for Symbian development
   * Various scripts for Qt development
 * Perl and Python libraries
@@ -186,4 +185,3 @@ e.g. cygwin, mingw
 
 PS1
 Bash shell prompt command string.
-

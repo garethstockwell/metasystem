@@ -13,4 +13,3 @@ Host android-adb
 HostName 127.0.0.1
 Port 9999
 User root
-
