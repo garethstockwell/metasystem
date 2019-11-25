@@ -1,3 +1,5 @@
 # .profile
 
+#echo ~/.profile
+
 . ${METASYSTEM_ROOT}/home/profile

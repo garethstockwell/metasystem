@@ -1,5 +1,7 @@
 # .bashrc
 
+#echo ~/.bashrc
+
 if [[ -z $METASYSTEM_ROOT ]]; then
 	source ${METASYSTEM_ROOT}/home/profile
 fi

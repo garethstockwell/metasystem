@@ -1,5 +1,17 @@
 # Sourced from ~/.bashrc
 
+#echo METASYSTEM_ROOT/home/shrc
+
+function _metasystem_prompt_update()
+{
+	echo > /dev/null
+}
+
+if [[ -n $METASYSTEM_DISABLE ]]; then
+	echo "Disabling metasystem"
+	return
+fi
+
 # Find location of this script
 export METASYSTEM_ROOT=$( builtin cd $(dirname ${BASH_SOURCE:-$0})/.. && pwd )
 

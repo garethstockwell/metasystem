@@ -1,5 +1,7 @@
 # Sourced from ~/.profile
 
+#echo METASYSTEM_ROOT/home/profile
+
 if [[ -e ~/.metasystem-config ]]; then
 	source ~/.metasystem-config
 fi
