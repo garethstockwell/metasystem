@@ -158,7 +158,6 @@ Install graphics drivers
 Clone metasystem.git
 
 Run metasystem/setup/setup.sh
-Run metasystem/setup/setup-linux.sh
 
 smartcd_install
 
