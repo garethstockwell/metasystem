@@ -362,8 +362,6 @@ function setup_generate_dot_files()
 	print_banner Generating .metasystem-xxx files
 	METASYSTEM_HOSTNAME=$HOSTNAME \
 	METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config \
-		execute $METASYSTEM_ROOT/modules/profile/bin/metasystem-profile.py set --reset --auto all
-	METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config \
 		execute $METASYSTEM_CORE_BIN/metasystem-id.py generate --reset
 	METASYSTEM_CORE_CONFIG=$METASYSTEM_CORE_TEMPLATES/local/config \
 		execute $METASYSTEM_CORE_BIN/metasystem-tools.py generate
@@ -448,4 +446,3 @@ dryrun=
 do_it
 
 print_banner Execution complete
-

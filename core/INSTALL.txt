@@ -30,9 +30,6 @@ Clone metasystem.git
 
 Run metasystem/setup/setup.sh
 
-Add host to $METASYSTEM_CORE_CONFIG/profiles.ini
-Run 'profile-update' to generate ~/.metasystem-profile
-
 Install unison.exe to /c/apps/bin
 
 Resize partitions (see Partitions section below)

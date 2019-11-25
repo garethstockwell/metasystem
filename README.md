@@ -65,34 +65,6 @@ Files
 * templates/smartcd
 
 
-Shell environment management
-----------------------------
-
-The problem
-
-When switching between different physical locations, environment variables (e.g. HTTP_PROXY; LM_LICENSE_FILE) need to be updated to match the local network configuration
-
-The solution
-
-A config file is populated with
-
-* Information which can be used to identify on which network the machine is currently running - for example IP address ranges or FQDNs
-* Values which should be assigned to environment variables when the location changes
-
-This config file is parsed by a python script which writes out a shell script; the shell script is then sourced to set the relevant environment variables.
-
-Files
-
-* modules/profile/bin/metasystem-profile.py
-* core/templates/local/config/profile.ini
-
-Shell aliases
-
-* profile-get
-* profile
-* profile-update
-
-
 Identity management
 -------------------
 
