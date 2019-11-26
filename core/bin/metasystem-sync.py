@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 # Syncs dynamic content managed by SCM systems (git, hg), rsync and unison
 #
